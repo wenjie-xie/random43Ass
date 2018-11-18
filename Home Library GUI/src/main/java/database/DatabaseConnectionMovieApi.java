@@ -55,6 +55,8 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + RoleTable.TABLE_NAME + " "
+					+ "WHERE " + RoleTable.DESCRIPTION + " = " + role);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + RoleTable.TABLE_NAME + " "
 					+ "WHERE " + RoleTable.DESCRIPTION + " = " + role);
 			if (rs.next()) {
@@ -77,6 +79,9 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + RoleTable.TABLE_NAME + " "
+					+ "(" + RoleTable.DESCRIPTION + ") "
+					+ "VALUES (" + role + ")");
 			stmt.executeUpdate("INSERT INTO " + RoleTable.TABLE_NAME + " "
 					+ "(" + RoleTable.DESCRIPTION + ") "
 					+ "VALUES (" + role + ")");
@@ -119,6 +124,9 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + MovieTable.TABLE_NAME + " "
+					+ "(" + MovieTable.MOVIE_NAME + ", " + MovieTable.YEAR + ") "
+					+ "VALUES (" + movie.getMovieName() + ", " + movie.getReleaseYear() + ")");
 			stmt.executeUpdate("INSERT INTO " + MovieTable.TABLE_NAME + " "
 					+ "(" + MovieTable.MOVIE_NAME + ", " + MovieTable.YEAR + ") "
 					+ "VALUES (" + movie.getMovieName() + ", " + movie.getReleaseYear() + ")");
@@ -144,6 +152,11 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + CrewMemberTable.TABLE_NAME + " "
+					+ "(" + CrewMemberTable.PEOPLE_INVOLVED_ID + ", " + CrewMemberTable.MOVIE_NAME + ", "
+					+ CrewMemberTable.RELEASE_YEAR + ", " + CrewMemberTable.ROLE_ID + ") "
+					+ "VALUES (" + personID + ", " + movie.getMovieName() + ", "
+					+ movie.getReleaseYear() + ", " + roleID + ")");
 			stmt.executeUpdate("INSERT INTO " + CrewMemberTable.TABLE_NAME + " "
 					+ "(" + CrewMemberTable.PEOPLE_INVOLVED_ID + ", " + CrewMemberTable.MOVIE_NAME + ", "
 					+ CrewMemberTable.RELEASE_YEAR + ", " + CrewMemberTable.ROLE_ID + ") "
@@ -217,6 +230,11 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
+				System.out.println("INSERT INTO " + AwardTable.TABLE_NAME + " "
+						+ "(" + AwardTable.PEOPLE_INVOLVED_ID + ", " + AwardTable.MOVIE_NAME + ", "
+						+ AwardTable.YEAR + ", " + AwardTable.AWARD + ") "
+						+ "VALUES (" + castID + ", " + movie.getMovieName() + ", "
+						+ movie.getReleaseYear() + ", " + movie.getAward() + ")");
 				stmt.executeUpdate("INSERT INTO " + AwardTable.TABLE_NAME + " "
 						+ "(" + AwardTable.PEOPLE_INVOLVED_ID + ", " + AwardTable.MOVIE_NAME + ", "
 						+ AwardTable.YEAR + ", " + AwardTable.AWARD + ") "
@@ -246,6 +264,8 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MovieTable.TABLE_NAME + " "
 					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
 			if (rs.next()) {

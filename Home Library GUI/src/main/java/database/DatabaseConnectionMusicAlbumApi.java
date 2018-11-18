@@ -133,6 +133,12 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			for (Music currMusic : musicAlbum.getMusicTrackList()) {
 				Statement stmt = null;
 				stmt = connection.createStatement();
+				System.out.println("INSERT INTO " + MusicTable.TABLE_NAME + " "
+						+ "(" + MusicTable.ALBUM_NAME + ", " + MusicTable.YEAR + ", " + MusicTable.MUSIC_NAME + ", "
+						+ MusicTable.LANGUAGE + ", " + MusicTable.DISK_TYPE + ", " + MusicTable.PRODUCER_ID + ") "
+						+ "VALUES (" + musicAlbum.getAlbumName() + ", " + musicAlbum.getYearPublished() + ", "
+						+ currMusic.getMusicName() + ", " + currMusic.getLanguage() + ", "
+						+ musicAlbum.getDiskType() + ", " + producerID + ")");
 				stmt.executeUpdate("INSERT INTO " + MusicTable.TABLE_NAME + " "
 						+ "(" + MusicTable.ALBUM_NAME + ", " + MusicTable.YEAR + ", " + MusicTable.MUSIC_NAME + ", "
 						+ MusicTable.LANGUAGE + ", " + MusicTable.DISK_TYPE + ", " + MusicTable.PRODUCER_ID + ") "
@@ -160,6 +166,11 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
+				System.out.println("INSERT INTO " + MusicSingerTable.TABLE_NAME + " "
+						+ "("  + MusicSingerTable.ALBUM_NAME + ", " + MusicSingerTable.YEAR + ", "
+						+ MusicSingerTable.MUSIC_NAME + ", " + MusicSingerTable.PEOPLE_INVOLVED_ID + ") "
+						+ "VALUES (" + musicAlbum.getAlbumName() + ", " + musicAlbum.getYearPublished() + ", "
+						+ music.getMusicName() + ", " + singerID + ")");
 				stmt.executeUpdate("INSERT INTO " + MusicSingerTable.TABLE_NAME + " "
 						+ "("  + MusicSingerTable.ALBUM_NAME + ", " + MusicSingerTable.YEAR + ", "
 						+ MusicSingerTable.MUSIC_NAME + ", " + MusicSingerTable.PEOPLE_INVOLVED_ID + ") "
@@ -241,6 +252,13 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + PeopleInvolvedMusicTable.TABLE_NAME + " "
+					+ "(" + PeopleInvolvedMusicTable.ALBUM_NAME + ", " + PeopleInvolvedMusicTable.YEAR + ", "
+					+ PeopleInvolvedMusicTable.MUSIC_NAME + ", " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + ", "
+					+ PeopleInvolvedMusicTable.IS_SONG_WRITER + ", " + PeopleInvolvedMusicTable.IS_COMPOSER + ", "
+					+ PeopleInvolvedMusicTable.IS_ARRANGER + ") "
+					+ "VALUES (" + musicAlbum.getAlbumName() + ", " + musicAlbum.getYearPublished() + ", "
+					+ music.getMusicName() + ", " + peopleInvolvedID + ", " + sw + ", " + com + ", " + arr + ")");
 			stmt.executeUpdate("INSERT INTO " + PeopleInvolvedMusicTable.TABLE_NAME + " "
 					+ "(" + PeopleInvolvedMusicTable.ALBUM_NAME + ", " + PeopleInvolvedMusicTable.YEAR + ", "
 					+ PeopleInvolvedMusicTable.MUSIC_NAME + ", " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + ", "
