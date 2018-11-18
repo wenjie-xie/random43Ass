@@ -248,7 +248,6 @@ public class DataInsertBookPanel extends JPanel {
 	
 	/**
 	 * Create a submit button for this panel
-	 * @param book the book object the button is going to use to add book info
 	 * @return a submit JButton
 	 */
 	private JButton createSubmitButton() {
@@ -308,7 +307,7 @@ public class DataInsertBookPanel extends JPanel {
 		int targetNumOfPage;
 		try {
 			targetNumOfPage = Integer.parseInt(this.numberOfPage.getText());
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			targetNumOfPage = -1;
 		}
 		
@@ -316,7 +315,7 @@ public class DataInsertBookPanel extends JPanel {
 		int targetPublicationYear;
 		try {
 			targetPublicationYear = Integer.parseInt(this.publicationYear.getText());
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			targetPublicationYear = -1;
 		}
 		
@@ -331,7 +330,7 @@ public class DataInsertBookPanel extends JPanel {
 		int targetEditionNumber;
 		try {
 			targetEditionNumber = Integer.parseInt(this.editionNumber.getText());
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			targetEditionNumber = -1;
 		}
 		book.setEditionNumber(targetEditionNumber);
