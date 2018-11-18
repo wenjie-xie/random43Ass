@@ -261,12 +261,7 @@ public class DataInsertMoviePanel extends JPanel {
 	 */
 	private Movie getMovieInfo() {
 		// nameOfMovie
-		String targetMovieName;
-		try {
-			targetMovieName = this.nameOfMovie.getText();
-		} catch (NullPointerException e) {
-			targetMovieName = null;
-		}
+		String targetMovieName = textAreaToString(this.nameOfMovie);
 		
 		// directorNameTable
 		ArrayList<Person> targetDirectorList = nameTableToPersonList(directorNameTable);
@@ -290,12 +285,7 @@ public class DataInsertMoviePanel extends JPanel {
 		ArrayList<Person> targetCostumeDesignerList = nameTableToPersonList(costumeDesignerNameTable);
 		
 		// yearOfRelease
-		int targetYearOfRelease;
-		try {
-			targetYearOfRelease = Integer.parseInt(this.yearOfRelease.getText());
-		} catch (NullPointerException e) {
-			targetYearOfRelease = -1;
-		}
+		int targetYearOfRelease = textAreaToInt(this.yearOfRelease);
 		
 		Movie movie = new Movie(targetMovieName, targetYearOfRelease);
 		movie.setDirectorList(targetDirectorList);
@@ -314,31 +304,16 @@ public class DataInsertMoviePanel extends JPanel {
 		ArrayList<Person> targetPersonList = new ArrayList<>();
 		for (ArrayList<JTextArea> person : nameTable) {
 			// Surname
-			String targetPersonSurname;
-			try {
-				targetPersonSurname = person.get(0).getText();
-			} catch (NullPointerException e) {
-				targetPersonSurname = null;
-			}
+			String targetPersonSurname = textAreaToString(person.get(0));
 			
 			// First Name
-			String targetPersonFirstName;
-			try {
-				targetPersonFirstName = person.get(1).getText();
-			} catch (NullPointerException e) {
-				targetPersonFirstName = null;
-			}
+			String targetPersonFirstName = textAreaToString(person.get(1));
 			
 			if ((targetPersonSurname != null) && (targetPersonFirstName != null)) {
 				// Create person
 				Person targetPerson = new Person(targetPersonSurname, targetPersonFirstName);
 				// Middle Name
-				String targetPersonMiddleName;
-				try {
-					targetPersonMiddleName = person.get(2).getText();
-				} catch (NullPointerException e) {
-					targetPersonMiddleName = null;
-				}
+				String targetPersonMiddleName = textAreaToString(person.get(2));
 				targetPerson.setMiddleName(targetPersonMiddleName);
 				
 				// Add person
@@ -347,5 +322,35 @@ public class DataInsertMoviePanel extends JPanel {
 		}
 		
 		return targetPersonList;
+	}
+	
+	/**
+	 * Get data from the text area as int
+	 * @param textArea
+	 * @return a int given, otherwise return -1
+	 */
+	private int textAreaToInt(JTextArea textArea) {
+		int target;
+		try {
+			target = Integer.parseInt(textArea.getText());
+		} catch (Exception e) {
+			target = -1;
+		}
+		return target;
+	}
+	
+	/**
+	 * Get data from the text area as String
+	 * @param textArea
+	 * @return a String given, otherwise return null
+	 */
+	private String textAreaToString(JTextArea textArea) {
+		String target;
+		try {
+			target = textArea.getText();
+		} catch (NullPointerException e) {
+			target = null;
+		}
+		return target;
 	}
 }

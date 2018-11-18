@@ -240,159 +240,68 @@ public class DataInsertMusicPanel extends JPanel {
 	 */
 	private MusicAlbum getMusicAlbumInfo() {
 		// name of disk
-		String targetAlbumName;
-		try {
-			targetAlbumName = this.nameOfDisk.getText();
-		} catch (NullPointerException e) {
-			targetAlbumName = null;
-		}
+		String targetAlbumName = textAreaToString(this.nameOfDisk);
 		
 		// year published
-		int targetYearPublished;
-		try {
-			targetYearPublished = Integer.parseInt(this.yearPublished.getText());
-		} catch (Exception e) {
-			targetYearPublished = -1;
-		}
+		int targetYearPublished = textAreaToInt(this.yearPublished);
 		
 		// music track list
 		ArrayList<Music> musicList = new ArrayList<>();
 		for (ArrayList<JTextArea> music : this.musicTrackTable) {
 			// music track name
-			String targetMusicName;
-			try {
-				targetMusicName = music.get(0).getText();
-			} catch (NullPointerException e) {
-				targetMusicName = null;
-			}
+			String targetMusicName = textAreaToString(music.get(0));
 			
 			// Skip if the music name is blank
 			if (targetMusicName != null) {
 				// language of lyric
-				String targetLanguage;
-				try {
-					targetLanguage = music.get(1).getText();
-				} catch (NullPointerException e) {
-					targetLanguage = null;
-				}
+				String targetLanguage = textAreaToString(music.get(1));
 				
 				// singer1
-				String targetSinger1Surname;
-				try {
-					targetSinger1Surname = music.get(2).getText();
-				} catch (NullPointerException e) {
-					targetSinger1Surname = null;
-				}
+				String targetSinger1Surname = textAreaToString(music.get(2));
 				
-				String targetSinger1FirstName;
-				try {
-					targetSinger1FirstName = music.get(3).getText();
-				} catch (NullPointerException e) {
-					targetSinger1FirstName = null;
-				}
+				String targetSinger1FirstName = textAreaToString(music.get(3));
 				
-				String targetSinger1MiddleName;
-				try {
-					targetSinger1MiddleName = music.get(4).getText();
-				} catch (NullPointerException e) {
-					targetSinger1MiddleName = null;
-				}
+				String targetSinger1MiddleName = textAreaToString(music.get(4));
+				
 				Person targetSinger1 = new Person(targetSinger1Surname, targetSinger1FirstName);
 				targetSinger1.setMiddleName(targetSinger1MiddleName);
 				
 				// singer2
-				String targetSinger2Surname;
-				try {
-					targetSinger2Surname = music.get(5).getText();
-				} catch (NullPointerException e) {
-					targetSinger2Surname = null;
-				}
+				String targetSinger2Surname = textAreaToString(music.get(5));
 				
-				String targetSinger2FirstName;
-				try {
-					targetSinger2FirstName = music.get(6).getText();
-				} catch (NullPointerException e) {
-					targetSinger2FirstName = null;
-				}
+				String targetSinger2FirstName = textAreaToString(music.get(6));
 				
-				String targetSinger2MiddleName;
-				try {
-					targetSinger2MiddleName = music.get(7).getText();
-				} catch (NullPointerException e) {
-					targetSinger2MiddleName = null;
-				}
+				String targetSinger2MiddleName = textAreaToString(music.get(7));
+				
 				Person targetSinger2 = new Person(targetSinger2Surname, targetSinger2FirstName);
 				targetSinger2.setMiddleName(targetSinger2MiddleName);
 				
 				// song writer
-				String targetSongWriterSurname;
-				try {
-					targetSongWriterSurname = music.get(8).getText();
-				} catch (NullPointerException e) {
-					targetSongWriterSurname = null;
-				}
+				String targetSongWriterSurname = textAreaToString(music.get(8));
 				
-				String targetSongWriterFirstName;
-				try {
-					targetSongWriterFirstName = music.get(9).getText();
-				} catch (NullPointerException e) {
-					targetSongWriterFirstName = null;
-				}
+				String targetSongWriterFirstName = textAreaToString(music.get(9));
 				
-				String targetSongWriterMiddleName;
-				try {
-					targetSongWriterMiddleName = music.get(10).getText();
-				} catch (NullPointerException e) {
-					targetSongWriterMiddleName = null;
-				}
+				String targetSongWriterMiddleName = textAreaToString(music.get(10));
+				
 				Person targetSongWriter = new Person(targetSongWriterSurname, targetSongWriterFirstName);
 				targetSongWriter.setMiddleName(targetSongWriterMiddleName);
 				
 				// composer
-				String targetComposerSurname;
-				try {
-					targetComposerSurname = music.get(8).getText();
-				} catch (NullPointerException e) {
-					targetComposerSurname = null;
-				}
+				String targetComposerSurname = textAreaToString(music.get(11));
 				
-				String targetComposerFirstName;
-				try {
-					targetComposerFirstName = music.get(9).getText();
-				} catch (NullPointerException e) {
-					targetComposerFirstName = null;
-				}
+				String targetComposerFirstName = textAreaToString(music.get(12));
 				
-				String targetComposerMiddleName;
-				try {
-					targetComposerMiddleName = music.get(10).getText();
-				} catch (NullPointerException e) {
-					targetComposerMiddleName = null;
-				}
+				String targetComposerMiddleName = textAreaToString(music.get(13));
+				
 				Person targetComposer = new Person(targetComposerSurname, targetComposerFirstName);
 				targetComposer.setMiddleName(targetComposerMiddleName);
 				
 				// arranger
-				String targetArrangerSurname;
-				try {
-					targetArrangerSurname = music.get(8).getText();
-				} catch (NullPointerException e) {
-					targetArrangerSurname = null;
-				}
+				String targetArrangerSurname = textAreaToString(music.get(14));
 				
-				String targetArrangerFirstName;
-				try {
-					targetArrangerFirstName = music.get(9).getText();
-				} catch (NullPointerException e) {
-					targetArrangerFirstName = null;
-				}
+				String targetArrangerFirstName = textAreaToString(music.get(15));
 				
-				String targetArrangerMiddleName;
-				try {
-					targetArrangerMiddleName = music.get(10).getText();
-				} catch (NullPointerException e) {
-					targetArrangerMiddleName = null;
-				}
+				String targetArrangerMiddleName = textAreaToString(music.get(16));
 				Person targetArranger = new Person(targetArrangerSurname, targetArrangerFirstName);
 				targetArranger.setMiddleName(targetArrangerMiddleName);
 				
@@ -412,26 +321,12 @@ public class DataInsertMusicPanel extends JPanel {
 		MusicAlbum musicAlbum = new MusicAlbum(targetAlbumName, targetYearPublished, musicList);
 		
 		// producer
-		String targetProducerSurname;
-		try {
-			targetProducerSurname = this.producerSurname.getText();
-		} catch (NullPointerException e) {
-			targetProducerSurname = null;
-		}
+		String targetProducerSurname = textAreaToString(this.producerSurname);
 		
-		String targetProducerFirstName;
-		try {
-			targetProducerFirstName = this.producerFirstName.getText();
-		} catch (NullPointerException e) {
-			targetProducerFirstName = null;
-		}
+		String targetProducerFirstName = textAreaToString(this.producerFirstName);
 		
-		String targetProducerMiddleName;
-		try {
-			targetProducerMiddleName = this.producerMiddleName.getText();
-		} catch (NullPointerException e) {
-			targetProducerMiddleName = null;
-		}
+		String targetProducerMiddleName = textAreaToString(this.producerMiddleName);
+		
 		Person targetProducer = new Person(targetProducerSurname, targetProducerFirstName);
 		targetProducer.setMiddleName(targetProducerMiddleName);
 		
@@ -439,5 +334,35 @@ public class DataInsertMusicPanel extends JPanel {
 		musicAlbum.setProducer(targetProducer);
 		
 		return musicAlbum;
+	}
+	
+	/**
+	 * Get data from the text area as int
+	 * @param textArea
+	 * @return a int given, otherwise return -1
+	 */
+	private int textAreaToInt(JTextArea textArea) {
+		int target;
+		try {
+			target = Integer.parseInt(textArea.getText());
+		} catch (Exception e) {
+			target = -1;
+		}
+		return target;
+	}
+	
+	/**
+	 * Get data from the text area as String
+	 * @param textArea
+	 * @return a String given, otherwise return null
+	 */
+	private String textAreaToString(JTextArea textArea) {
+		String target;
+		try {
+			target = textArea.getText();
+		} catch (NullPointerException e) {
+			target = null;
+		}
+		return target;
 	}
 }

@@ -280,44 +280,19 @@ public class DataInsertBookPanel extends JPanel {
 	 */
 	private Book getBookInfo() {
 		// bookName
-		String targetBookName;
-		try {
-			targetBookName = this.bookName.getText();
-		} catch (NullPointerException e) {
-			targetBookName = null;
-		}
+		String targetBookName = textAreaToString(this.bookName);
 		
 		// bookISBN
-		String targetBookISBN;
-		try {
-			targetBookISBN = this.bookISBN.getText();
-		} catch (NullPointerException e) {
-			targetBookISBN = null;
-		}
+		String targetBookISBN = textAreaToString(this.bookISBN);
 		
 		// publisherName
-		String targetPublisherName;
-		try {
-			targetPublisherName = this.publisherName.getText();
-		} catch (NullPointerException e) {
-			targetPublisherName = null;
-		}
+		String targetPublisherName = textAreaToString(this.publisherName);
 		
 		// numberPage
-		int targetNumOfPage;
-		try {
-			targetNumOfPage = Integer.parseInt(this.numberOfPage.getText());
-		} catch (Exception e) {
-			targetNumOfPage = -1;
-		}
+		int targetNumOfPage = textAreaToInt(this.numberOfPage);
 		
 		// publicationYear
-		int targetPublicationYear;
-		try {
-			targetPublicationYear = Integer.parseInt(this.publicationYear.getText());
-		} catch (Exception e) {
-			targetPublicationYear = -1;
-		}
+		int targetPublicationYear = textAreaToInt(this.publicationYear);
 		
 		
 		Book book = new Book(targetBookISBN,
@@ -327,44 +302,24 @@ public class DataInsertBookPanel extends JPanel {
 				targetPublicationYear);
 		
 		// editionNumber
-		int targetEditionNumber;
-		try {
-			targetEditionNumber = Integer.parseInt(this.editionNumber.getText());
-		} catch (Exception e) {
-			targetEditionNumber = -1;
-		}
+		int targetEditionNumber = textAreaToInt(this.editionNumber);
 		book.setEditionNumber(targetEditionNumber);
 		
 		// authorNameTable
 		ArrayList<Person> targetAuthorList = new ArrayList<>();
 		for (ArrayList<JTextArea> authorList : this.authorNameTable) {
 			// author surname
-			String targetAuthorSurname;
-			try {
-				targetAuthorSurname = authorList.get(0).getText();
-			} catch (NullPointerException e) {
-				targetAuthorSurname = null;
-			}
+			String targetAuthorSurname = textAreaToString(authorList.get(0));
 			
 			// author first name
-			String targetAuthorFirstName;
-			try {
-				targetAuthorFirstName = authorList.get(1).getText();
-			} catch (NullPointerException e) {
-				targetAuthorFirstName = null;
-			}
+			String targetAuthorFirstName = textAreaToString(authorList.get(1));
 			
 			// If both field is not null than add, else skip
 			if ((targetAuthorSurname != null) && (targetAuthorFirstName != null)) {
 				Person author = new Person(targetAuthorSurname, targetAuthorFirstName);
 				
 				// author middle name
-				String targetAuthorMiddleName;
-				try {
-					targetAuthorMiddleName = authorList.get(2).getText();
-				} catch (NullPointerException e) {
-					targetAuthorMiddleName = null;
-				}
+				String targetAuthorMiddleName = textAreaToString(authorList.get(2));
 				author.setMiddleName(targetAuthorMiddleName);
 				
 				// Append to targetAuthorList
@@ -376,12 +331,7 @@ public class DataInsertBookPanel extends JPanel {
 		// tagList
 		ArrayList<String> targetTagList = new ArrayList<>();
 		for (JTextArea tag : this.tagList) {
-			String targetTag;
-			try {
-				targetTag = tag.getText();
-			} catch (NullPointerException e) {
-				targetTag = null;
-			}
+			String targetTag = textAreaToString(tag);
 			
 			if (targetTag != null) {
 				targetTagList.add(targetTag);
@@ -390,14 +340,40 @@ public class DataInsertBookPanel extends JPanel {
 		book.setKeyWords(targetTagList);
 		
 		// description
-		String targetDescription;
-		try {
-			targetDescription = this.description.getText();
-		} catch (NullPointerException e) {
-			targetDescription = null;
-		}
+		String targetDescription = textAreaToString(this.description);
 		book.setBookDescription(targetDescription);
 		
 		return book;
+	}
+	
+	
+	/**
+	 * Get data from the text area as int
+	 * @param textArea
+	 * @return a int given, otherwise return -1
+	 */
+	private int textAreaToInt(JTextArea textArea) {
+		int target;
+		try {
+			target = Integer.parseInt(textArea.getText());
+		} catch (Exception e) {
+			target = -1;
+		}
+		return target;
+	}
+	
+	/**
+	 * Get data from the text area as String
+	 * @param textArea
+	 * @return a String given, otherwise return null
+	 */
+	private String textAreaToString(JTextArea textArea) {
+		String target;
+		try {
+			target = textArea.getText();
+		} catch (NullPointerException e) {
+			target = null;
+		}
+		return target;
 	}
 }
