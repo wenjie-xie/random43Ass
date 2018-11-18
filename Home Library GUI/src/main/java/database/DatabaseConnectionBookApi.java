@@ -54,6 +54,13 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + BookTable.TABLE_NAME + " "
+					+ "(" + BookTable.ISBN + ", " + BookTable.TITLE + ", " + BookTable.PUBLISHER + ", "
+					+ BookTable.NUMBER_OF_PAGES + ", " + BookTable.YEAR_OF_PUBLICATION + ", "
+					+ BookTable.EDITION_NUMBER + ", " + BookTable.ABSTRACT + ") "
+					+ "VALUES (" + book.getBookISBN() + ", " + book.getBookName() + ", " + book.getPublisherName() + ", "
+					+ book.getNumOfPage() + ", " + book.getPublicationYear() + ", "
+					+ book.getEditionNumber() + ", " + book.getBookDescription() + ")");
 			stmt.executeUpdate("INSERT INTO " + BookTable.TABLE_NAME + " "
 					+ "(" + BookTable.ISBN + ", " + BookTable.TITLE + ", " + BookTable.PUBLISHER + ", "
 					+ BookTable.NUMBER_OF_PAGES + ", " + BookTable.YEAR_OF_PUBLICATION + ", "
@@ -89,6 +96,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				// SQL
 				Statement stmt = null;
 				stmt = connection.createStatement();
+				System.out.println("INSERT INTO " + BookKeywordTable.TABLE_NAME + " "
+						+ "(" + BookKeywordTable.ISBN + ", " + BookKeywordTable.KEYWORD_ID + ") "
+						+ "VALUES (" + book.getBookISBN() + ", " + tagID + ")");
 				stmt.executeUpdate("INSERT INTO " + BookKeywordTable.TABLE_NAME + " "
 						+ "(" + BookKeywordTable.ISBN + ", " + BookKeywordTable.KEYWORD_ID + ") "
 						+ "VALUES (" + book.getBookISBN() + ", " + tagID + ")");
@@ -111,6 +121,8 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + KeywordTable.TABLE_NAME + " "
+					+ "WHERE " + KeywordTable.TAG + " = " + tag + "");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " "
 					+ "WHERE " + KeywordTable.TAG + " = " + tag + "");
 			if (rs.next()) {
@@ -133,6 +145,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + KeywordTable.TABLE_NAME + " "
+					+ "(" + KeywordTable.TAG + ") "
+					+ "VALUES (" + tag + ")");
 			stmt.executeUpdate("INSERT INTO " + KeywordTable.TABLE_NAME + " "
 					+ "(" + KeywordTable.TAG + ") "
 					+ "VALUES (" + tag + ")");
@@ -157,6 +172,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
+				System.out.println("INSERT INTO " + BookAuthorTable.TABLE_NAME + " "
+						+ "(" + BookAuthorTable.ISBN + ", " + BookAuthorTable.AUTHOR_ID + ") "
+						+ "VALUES (" + book.getBookISBN() + ", " + authorID + ")");
 				stmt.executeUpdate("INSERT INTO " + BookAuthorTable.TABLE_NAME + " "
 						+ "(" + BookAuthorTable.ISBN + ", " + BookAuthorTable.AUTHOR_ID + ") "
 						+ "VALUES (" + book.getBookISBN() + ", " + authorID + ")");

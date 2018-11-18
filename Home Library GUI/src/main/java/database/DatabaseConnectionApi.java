@@ -38,10 +38,12 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
+							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
-							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName() + " "
-							+ "and " + PeopleInvolvedTable.MIDDLE_NAME + " = " + person.getMiddleName() + "");
+							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
 			if (rs.next()) {
 				result = rs.getString(PeopleInvolvedTable.ID);
 			}
@@ -62,6 +64,11 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "(" + PeopleInvolvedTable.FIRST_NAME + ", " + PeopleInvolvedTable.MIDDLE_NAME + ", "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
+					+ "VALUES (" + person.getFirstName() + ", " + person.getMiddleName() + ", "
+							+ person.getSurname() + ", " + person.getGender() + ")");
 			stmt.executeUpdate("INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "(" + PeopleInvolvedTable.FIRST_NAME + ", " + PeopleInvolvedTable.MIDDLE_NAME + ", "
 						+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
