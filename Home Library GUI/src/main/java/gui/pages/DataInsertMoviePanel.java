@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,6 +13,13 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+
+import app.HL_xiewen4;
+import database.DatabaseConnectionMovieApi;
+import database.DatabaseConnectionMusicAlbumApi;
+import items.Movie;
+import items.MusicAlbum;
+import items.Person;
 
 /**
  * This is the panel for Data > Insert > Movie
@@ -21,6 +29,17 @@ import javax.swing.JTextArea;
 public class DataInsertMoviePanel extends JPanel {
 
 	private static final long serialVersionUID = -618204154220577240L;
+	
+	// Fields
+	private JTextArea nameOfMovie;
+	private ArrayList<ArrayList<JTextArea>> directorNameTable;
+	private ArrayList<ArrayList<JTextArea>> scriptWriterNameTable;
+	private ArrayList<ArrayList<JTextArea>> castNameTable;
+	private ArrayList<ArrayList<JTextArea>> producerNameTable;
+	private ArrayList<ArrayList<JTextArea>> composerNameTable;
+	private ArrayList<ArrayList<JTextArea>> editorNameTable;
+	private ArrayList<ArrayList<JTextArea>> costumeDesignerNameTable;
+	private JTextArea yearOfRelease;
 	
 	public DataInsertMoviePanel() {
 		super();
@@ -42,10 +61,10 @@ public class DataInsertMoviePanel extends JPanel {
 		this.add(message, c);
 		
 		// Name of the Movie
-		JTextArea nameIfMovie = this.createTextField("Name of the Movie:", 1, 0);
+		nameOfMovie = this.createTextField("Name of the Movie:", 1, 0);
 		
 		// Director
-		ArrayList<ArrayList<JTextArea>> directorNameTable = new ArrayList<ArrayList<JTextArea>>();
+		directorNameTable = new ArrayList<ArrayList<JTextArea>>();
 		directorNameTable.add(this.createNameRow("Director", 2, 1));
 		
 		directorNameTable.add(this.createNameRow("Director", 4, 2));
@@ -53,7 +72,7 @@ public class DataInsertMoviePanel extends JPanel {
 		directorNameTable.add(this.createNameRow("Director", 6, 3));
 		
 		// Script Writer (1-3)
-		ArrayList<ArrayList<JTextArea>> scriptWriterNameTable = new ArrayList<ArrayList<JTextArea>>();
+		scriptWriterNameTable = new ArrayList<ArrayList<JTextArea>>();
 		scriptWriterNameTable.add(this.createNameRow("Script Writer", 8, 1));
 		
 		scriptWriterNameTable.add(this.createNameRow("Script Writer", 10, 2));
@@ -61,7 +80,7 @@ public class DataInsertMoviePanel extends JPanel {
 		scriptWriterNameTable.add(this.createNameRow("Script Writer", 12, 3));
 		
 		// Cast (1-10)
-		ArrayList<ArrayList<JTextArea>> castNameTable = new ArrayList<>();
+		castNameTable = new ArrayList<>();
 		castNameTable.add(this.createNameRow("Cast", 14, 1));
 		
 		// Add more cast button
@@ -93,7 +112,7 @@ public class DataInsertMoviePanel extends JPanel {
 		this.add(addCastBtn, c);
 		
 		// Producers (1-3)
-		ArrayList<ArrayList<JTextArea>> producerNameTable = new ArrayList<ArrayList<JTextArea>>();
+		producerNameTable = new ArrayList<ArrayList<JTextArea>>();
 		producerNameTable.add(this.createNameRow("Producer", 35, 1));
 		
 		producerNameTable.add(this.createNameRow("Producer", 37, 2));
@@ -101,7 +120,7 @@ public class DataInsertMoviePanel extends JPanel {
 		producerNameTable.add(this.createNameRow("Producer", 39, 3));
 		
 		// Composers (1-3)
-		ArrayList<ArrayList<JTextArea>> composerNameTable = new ArrayList<ArrayList<JTextArea>>();
+		composerNameTable = new ArrayList<ArrayList<JTextArea>>();
 		composerNameTable.add(this.createNameRow("Composer", 41, 1));
 		
 		composerNameTable.add(this.createNameRow("Composer", 43, 2));
@@ -109,7 +128,7 @@ public class DataInsertMoviePanel extends JPanel {
 		composerNameTable.add(this.createNameRow("Composer", 45, 3));
 		
 		// Editor (1-3)
-		ArrayList<ArrayList<JTextArea>> editorNameTable = new ArrayList<ArrayList<JTextArea>>();
+		editorNameTable = new ArrayList<ArrayList<JTextArea>>();
 		editorNameTable.add(this.createNameRow("Editor", 47, 1));
 		
 		editorNameTable.add(this.createNameRow("Editor", 49, 2));
@@ -117,7 +136,7 @@ public class DataInsertMoviePanel extends JPanel {
 		editorNameTable.add(this.createNameRow("Editor", 51, 3));
 		
 		// Costume Designer (1-3)
-		ArrayList<ArrayList<JTextArea>> costumeDesignerNameTable = new ArrayList<ArrayList<JTextArea>>();
+		costumeDesignerNameTable = new ArrayList<ArrayList<JTextArea>>();
 		costumeDesignerNameTable.add(this.createNameRow("Costume Designer", 53, 1));
 		
 		costumeDesignerNameTable.add(this.createNameRow("Costume Designer", 55, 2));
@@ -128,15 +147,7 @@ public class DataInsertMoviePanel extends JPanel {
 		JTextArea yearOfRelease = this.createTextField("Year of Release:", 59, 0);
 		
 		// Submit
-		JButton submitBtn = new JButton("Submit");
-		submitBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		JButton submitBtn = this.createSubmitButton();
 		c.gridwidth = 1;
 		c.gridy = 60;
 		c.gridx = 0;
@@ -149,7 +160,7 @@ public class DataInsertMoviePanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});
@@ -215,5 +226,126 @@ public class DataInsertMoviePanel extends JPanel {
 		nameList.addAll(Arrays.asList(surname, firstName, middleName));
 		
 		return nameList;
+	}
+	
+	/**
+	 * Create a submit button for this panel
+	 * @return a submit JButton
+	 */
+	private JButton createSubmitButton() {
+		JButton submitBtn = new JButton("Submit");
+		submitBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Add all the info into the Music Album object
+				Movie movie = getMovieInfo();
+				
+				try {
+					DatabaseConnectionMovieApi.insertMovie(movie);
+					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
+					
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+		
+		return submitBtn;
+	}
+	
+	/**
+	 * Put all info provided by the user into a Movie object
+	 * @return
+	 */
+	private Movie getMovieInfo() {
+		// nameOfMovie
+		String targetMovieName;
+		try {
+			targetMovieName = this.nameOfMovie.getText();
+		} catch (NullPointerException e) {
+			targetMovieName = null;
+		}
+		
+		// directorNameTable
+		ArrayList<Person> targetDirectorList = nameTableToPersonList(directorNameTable);
+		
+		// scriptWriterNameTable
+		ArrayList<Person> targetScriptWriterList = nameTableToPersonList(scriptWriterNameTable);
+		
+		// castNameTable
+		ArrayList<Person> targetCastList = nameTableToPersonList(castNameTable);
+		
+		// producerNameTable
+		ArrayList<Person> targetProducerList = nameTableToPersonList(producerNameTable);
+		
+		// composerNameTable
+		ArrayList<Person> targetComposerList = nameTableToPersonList(composerNameTable);
+		
+		// editorNameTable
+		ArrayList<Person> targetEditorList = nameTableToPersonList(editorNameTable);
+		
+		// costumeDesignerNameTable
+		ArrayList<Person> targetCostumeDesignerList = nameTableToPersonList(costumeDesignerNameTable);
+		
+		// yearOfRelease
+		int targetYearOfRelease;
+		try {
+			targetYearOfRelease = Integer.parseInt(this.yearOfRelease.getText());
+		} catch (NullPointerException e) {
+			targetYearOfRelease = -1;
+		}
+		
+		Movie movie = new Movie(targetMovieName, targetYearOfRelease);
+		movie.setDirectorList(targetDirectorList);
+		movie.setScriptWriterList(targetScriptWriterList);
+		movie.setCastList(targetCastList);
+		movie.setProducerList(targetProducerList);
+		movie.setComposerList(targetComposerList);
+		movie.setEditorList(targetEditorList);
+		movie.setCostumeDesignerList(targetCostumeDesignerList);
+
+		
+		return movie;
+	}
+	
+	private ArrayList<Person> nameTableToPersonList(ArrayList<ArrayList<JTextArea>> nameTable) {
+		ArrayList<Person> targetPersonList = new ArrayList<>();
+		for (ArrayList<JTextArea> person : nameTable) {
+			// Surname
+			String targetPersonSurname;
+			try {
+				targetPersonSurname = person.get(0).getText();
+			} catch (NullPointerException e) {
+				targetPersonSurname = null;
+			}
+			
+			// First Name
+			String targetPersonFirstName;
+			try {
+				targetPersonFirstName = person.get(1).getText();
+			} catch (NullPointerException e) {
+				targetPersonFirstName = null;
+			}
+			
+			if ((targetPersonSurname != null) && (targetPersonFirstName != null)) {
+				// Create person
+				Person targetPerson = new Person(targetPersonSurname, targetPersonFirstName);
+				// Middle Name
+				String targetPersonMiddleName;
+				try {
+					targetPersonMiddleName = person.get(2).getText();
+				} catch (NullPointerException e) {
+					targetPersonMiddleName = null;
+				}
+				targetPerson.setMiddleName(targetPersonMiddleName);
+				
+				// Add person
+				targetPersonList.add(targetPerson);
+			}
+		}
+		
+		return targetPersonList;
 	}
 }

@@ -88,15 +88,7 @@ public class DataInsertMusicPanel extends JPanel {
 		this.add(addMusicTrackBtn, c);
 		
 		// Submit
-		JButton submitBtn = new JButton("Submit");
-		submitBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		JButton submitBtn = createSubmitButton();
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 999;
@@ -109,7 +101,7 @@ public class DataInsertMusicPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});
@@ -274,144 +266,147 @@ public class DataInsertMusicPanel extends JPanel {
 				targetMusicName = null;
 			}
 			
-			// language of lyric
-			String targetLanguage;
-			try {
-				targetLanguage = music.get(1).getText();
-			} catch (NullPointerException e) {
-				targetLanguage = null;
-			}
-			
-			// singer1
-			String targetSinger1Surname;
-			try {
-				targetSinger1Surname = music.get(2).getText();
-			} catch (NullPointerException e) {
-				targetSinger1Surname = null;
-			}
-			
-			String targetSinger1FirstName;
-			try {
-				targetSinger1FirstName = music.get(3).getText();
-			} catch (NullPointerException e) {
-				targetSinger1FirstName = null;
-			}
-			
-			String targetSinger1MiddleName;
-			try {
-				targetSinger1MiddleName = music.get(4).getText();
-			} catch (NullPointerException e) {
-				targetSinger1MiddleName = null;
-			}
-			Person targetSinger1 = new Person(targetSinger1Surname, targetSinger1FirstName);
-			targetSinger1.setMiddleName(targetSinger1MiddleName);
-			
-			// singer2
-			String targetSinger2Surname;
-			try {
-				targetSinger2Surname = music.get(5).getText();
-			} catch (NullPointerException e) {
-				targetSinger2Surname = null;
-			}
-			
-			String targetSinger2FirstName;
-			try {
-				targetSinger2FirstName = music.get(6).getText();
-			} catch (NullPointerException e) {
-				targetSinger2FirstName = null;
-			}
-			
-			String targetSinger2MiddleName;
-			try {
-				targetSinger2MiddleName = music.get(7).getText();
-			} catch (NullPointerException e) {
-				targetSinger2MiddleName = null;
-			}
-			Person targetSinger2 = new Person(targetSinger2Surname, targetSinger2FirstName);
-			targetSinger2.setMiddleName(targetSinger2MiddleName);
-			
-			// song writer
-			String targetSongWriterSurname;
-			try {
-				targetSongWriterSurname = music.get(8).getText();
-			} catch (NullPointerException e) {
-				targetSongWriterSurname = null;
-			}
-			
-			String targetSongWriterFirstName;
-			try {
-				targetSongWriterFirstName = music.get(9).getText();
-			} catch (NullPointerException e) {
-				targetSongWriterFirstName = null;
-			}
-			
-			String targetSongWriterMiddleName;
-			try {
-				targetSongWriterMiddleName = music.get(10).getText();
-			} catch (NullPointerException e) {
-				targetSongWriterMiddleName = null;
-			}
-			Person targetSongWriter = new Person(targetSongWriterSurname, targetSongWriterFirstName);
-			targetSongWriter.setMiddleName(targetSongWriterMiddleName);
-			
-			// composer
-			String targetComposerSurname;
-			try {
-				targetComposerSurname = music.get(8).getText();
-			} catch (NullPointerException e) {
-				targetComposerSurname = null;
-			}
-			
-			String targetComposerFirstName;
-			try {
-				targetComposerFirstName = music.get(9).getText();
-			} catch (NullPointerException e) {
-				targetComposerFirstName = null;
-			}
-			
-			String targetComposerMiddleName;
-			try {
-				targetComposerMiddleName = music.get(10).getText();
-			} catch (NullPointerException e) {
-				targetComposerMiddleName = null;
-			}
-			Person targetComposer = new Person(targetComposerSurname, targetComposerFirstName);
-			targetComposer.setMiddleName(targetComposerMiddleName);
-			
-			// arranger
-			String targetArrangerSurname;
-			try {
-				targetArrangerSurname = music.get(8).getText();
-			} catch (NullPointerException e) {
-				targetArrangerSurname = null;
-			}
-			
-			String targetArrangerFirstName;
-			try {
-				targetArrangerFirstName = music.get(9).getText();
-			} catch (NullPointerException e) {
-				targetArrangerFirstName = null;
-			}
-			
-			String targetArrangerMiddleName;
-			try {
-				targetArrangerMiddleName = music.get(10).getText();
-			} catch (NullPointerException e) {
-				targetArrangerMiddleName = null;
-			}
-			Person targetArranger = new Person(targetArrangerSurname, targetArrangerFirstName);
-			targetArranger.setMiddleName(targetArrangerMiddleName);
-			
-			// Create a music object
-			Music targetMusic = new Music(targetMusicName);
-			targetMusic.setLanguage(targetLanguage);
-			targetMusic.setSingerList(new ArrayList<>(Arrays.asList(targetSinger1, targetSinger2)));
-			targetMusic.setSongWriter(targetSongWriter);
-			targetMusic.setComposer(targetComposer);
-			targetMusic.setArranger(targetArranger);
-			
-			// Add music
-			musicList.add(targetMusic);
+			// Skip if the music name is blank
+			if (targetMusicName != null) {
+				// language of lyric
+				String targetLanguage;
+				try {
+					targetLanguage = music.get(1).getText();
+				} catch (NullPointerException e) {
+					targetLanguage = null;
+				}
+				
+				// singer1
+				String targetSinger1Surname;
+				try {
+					targetSinger1Surname = music.get(2).getText();
+				} catch (NullPointerException e) {
+					targetSinger1Surname = null;
+				}
+				
+				String targetSinger1FirstName;
+				try {
+					targetSinger1FirstName = music.get(3).getText();
+				} catch (NullPointerException e) {
+					targetSinger1FirstName = null;
+				}
+				
+				String targetSinger1MiddleName;
+				try {
+					targetSinger1MiddleName = music.get(4).getText();
+				} catch (NullPointerException e) {
+					targetSinger1MiddleName = null;
+				}
+				Person targetSinger1 = new Person(targetSinger1Surname, targetSinger1FirstName);
+				targetSinger1.setMiddleName(targetSinger1MiddleName);
+				
+				// singer2
+				String targetSinger2Surname;
+				try {
+					targetSinger2Surname = music.get(5).getText();
+				} catch (NullPointerException e) {
+					targetSinger2Surname = null;
+				}
+				
+				String targetSinger2FirstName;
+				try {
+					targetSinger2FirstName = music.get(6).getText();
+				} catch (NullPointerException e) {
+					targetSinger2FirstName = null;
+				}
+				
+				String targetSinger2MiddleName;
+				try {
+					targetSinger2MiddleName = music.get(7).getText();
+				} catch (NullPointerException e) {
+					targetSinger2MiddleName = null;
+				}
+				Person targetSinger2 = new Person(targetSinger2Surname, targetSinger2FirstName);
+				targetSinger2.setMiddleName(targetSinger2MiddleName);
+				
+				// song writer
+				String targetSongWriterSurname;
+				try {
+					targetSongWriterSurname = music.get(8).getText();
+				} catch (NullPointerException e) {
+					targetSongWriterSurname = null;
+				}
+				
+				String targetSongWriterFirstName;
+				try {
+					targetSongWriterFirstName = music.get(9).getText();
+				} catch (NullPointerException e) {
+					targetSongWriterFirstName = null;
+				}
+				
+				String targetSongWriterMiddleName;
+				try {
+					targetSongWriterMiddleName = music.get(10).getText();
+				} catch (NullPointerException e) {
+					targetSongWriterMiddleName = null;
+				}
+				Person targetSongWriter = new Person(targetSongWriterSurname, targetSongWriterFirstName);
+				targetSongWriter.setMiddleName(targetSongWriterMiddleName);
+				
+				// composer
+				String targetComposerSurname;
+				try {
+					targetComposerSurname = music.get(8).getText();
+				} catch (NullPointerException e) {
+					targetComposerSurname = null;
+				}
+				
+				String targetComposerFirstName;
+				try {
+					targetComposerFirstName = music.get(9).getText();
+				} catch (NullPointerException e) {
+					targetComposerFirstName = null;
+				}
+				
+				String targetComposerMiddleName;
+				try {
+					targetComposerMiddleName = music.get(10).getText();
+				} catch (NullPointerException e) {
+					targetComposerMiddleName = null;
+				}
+				Person targetComposer = new Person(targetComposerSurname, targetComposerFirstName);
+				targetComposer.setMiddleName(targetComposerMiddleName);
+				
+				// arranger
+				String targetArrangerSurname;
+				try {
+					targetArrangerSurname = music.get(8).getText();
+				} catch (NullPointerException e) {
+					targetArrangerSurname = null;
+				}
+				
+				String targetArrangerFirstName;
+				try {
+					targetArrangerFirstName = music.get(9).getText();
+				} catch (NullPointerException e) {
+					targetArrangerFirstName = null;
+				}
+				
+				String targetArrangerMiddleName;
+				try {
+					targetArrangerMiddleName = music.get(10).getText();
+				} catch (NullPointerException e) {
+					targetArrangerMiddleName = null;
+				}
+				Person targetArranger = new Person(targetArrangerSurname, targetArrangerFirstName);
+				targetArranger.setMiddleName(targetArrangerMiddleName);
+				
+				// Create a music object
+				Music targetMusic = new Music(targetMusicName);
+				targetMusic.setLanguage(targetLanguage);
+				targetMusic.setSingerList(new ArrayList<>(Arrays.asList(targetSinger1, targetSinger2)));
+				targetMusic.setSongWriter(targetSongWriter);
+				targetMusic.setComposer(targetComposer);
+				targetMusic.setArranger(targetArranger);
+				
+				// Add music
+				musicList.add(targetMusic);
+			} // SKIP
 		}
 		// Create a MusicAlbum object
 		MusicAlbum musicAlbum = new MusicAlbum(targetAlbumName, targetYearPublished, musicList);

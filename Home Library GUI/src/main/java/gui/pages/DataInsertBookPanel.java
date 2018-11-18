@@ -179,7 +179,7 @@ public class DataInsertBookPanel extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});
