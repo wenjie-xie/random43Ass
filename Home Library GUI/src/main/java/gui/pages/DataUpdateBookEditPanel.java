@@ -42,9 +42,11 @@ public class DataUpdateBookEditPanel extends JPanel {
 	private ArrayList<JTextArea> tagList;
 	private JButton addMoreTagBtn;
 	private JTextArea description;
+	private Book oldBookInfo;
 
 	public DataUpdateBookEditPanel(Book book) {
 		super();
+		oldBookInfo = book;
 		
 		// Create all the fields for a book
 		displayBookFields();
@@ -339,10 +341,10 @@ public class DataUpdateBookEditPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Book object
-				Book book = getBookInfo();
+				Book newBook = getBookInfo();
 				
 				try {
-					//DatabaseConnectionBookApi.insertBook(book);
+					DatabaseConnectionBookApi.compareAndUpdateBookInfo(oldBookInfo, newBook);
 					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 					
 				} catch (SQLException e1) {

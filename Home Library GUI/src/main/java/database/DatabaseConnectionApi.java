@@ -117,6 +117,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
 			
 			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
@@ -146,7 +147,10 @@ public class DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+			System.out.println("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
+			stmt.executeUpdate("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
 			
@@ -167,7 +171,10 @@ public class DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+			System.out.println("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
+			stmt.executeUpdate("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
 			
@@ -225,7 +232,10 @@ public class DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+			System.out.println("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
+					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
+			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
 					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
 			
@@ -244,7 +254,9 @@ public class DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+			System.out.println("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
+			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
 			
 		} catch (SQLException e) {

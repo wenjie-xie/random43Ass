@@ -421,6 +421,10 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("UPDATE " + BookTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
+					+ "and " + BookTable.TITLE + " = " + oldBookInfo.getBookName());
 			stmt.executeUpdate("UPDATE " + BookTable.TABLE_NAME + " "
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
@@ -443,6 +447,10 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("UPDATE " + BookTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
+					+ "and " + BookTable.TITLE + " = " + oldBookInfo.getBookName());
 			stmt.executeUpdate("UPDATE " + BookTable.TABLE_NAME + " "
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
@@ -514,6 +522,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("UPDATE " + BookAuthorTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
 			stmt.executeUpdate("UPDATE " + BookAuthorTable.TABLE_NAME + " "
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
@@ -542,6 +553,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// Remember the book iSBN is change above
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT " + BookAuthorTable.AUTHOR_ID + " "
+					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = " + newBookInfo.getBookISBN());
 			ResultSet rs = stmt.executeQuery("SELECT " + BookAuthorTable.AUTHOR_ID + " "
 					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
 					+ "WHERE " + BookAuthorTable.ISBN + " = " + newBookInfo.getBookISBN());
@@ -594,6 +608,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("UPDATE " + BookKeywordTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
 			stmt.executeUpdate("UPDATE " + BookKeywordTable.TABLE_NAME + " "
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
@@ -622,6 +639,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// Remember the book iSBN is change above
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT " + BookKeywordTable.KEYWORD_ID + " "
+					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
+					+ "WHERE " + BookKeywordTable.ISBN + " = " + newBookInfo.getBookISBN());
 			ResultSet rs = stmt.executeQuery("SELECT " + BookKeywordTable.KEYWORD_ID + " "
 					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
 					+ "WHERE " + BookKeywordTable.ISBN + " = " + newBookInfo.getBookISBN());
@@ -676,6 +696,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN + " "
+					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
 			stmt.executeUpdate("DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
 					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN + " "
 					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
@@ -696,6 +719,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("DELETE FROM " + BookKeywordTable.TABLE_NAME + " "
+					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN + " "
+					+ "and " + BookKeywordTable.KEYWORD_ID + " = " + keywordID);
 			stmt.executeUpdate("DELETE FROM " + BookKeywordTable.TABLE_NAME + " "
 					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN + " "
 					+ "and " + BookKeywordTable.KEYWORD_ID + " = " + keywordID);
