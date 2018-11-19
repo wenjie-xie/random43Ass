@@ -307,6 +307,10 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	}
 	
 	
+	/********************************
+	 * GET MUSIC ALBUM *
+	 ********************************/
+	
 	/**
 	 * Get the info of the music album with the given album name
 	 * @param musicAlbumName the name of the music album

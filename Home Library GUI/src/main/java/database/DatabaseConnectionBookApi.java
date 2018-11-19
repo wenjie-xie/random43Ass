@@ -235,7 +235,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	
 	
 	/***********************************
-	 * UPDATE BOOK *
+	 * SEARCH BOOK *
 	 ***********************************/
 	
 	/**
@@ -262,6 +262,11 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		
 		return result;
 	}
+	
+	
+	/*******************************
+	 * GET BOOK *
+	 *******************************/
 	
 	/**
 	 * Get all info of a given Book Name into a Book object
@@ -380,4 +385,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		
 		return authorList;
 	}
+	
+	
+	/**************************************
+	 * UPDATE BOOK *
+	 **************************************/
 }
