@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import database.tables.BookAuthorTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedTable;
 import items.Book;
@@ -131,5 +132,123 @@ public class DatabaseConnectionApi {
 		    throw new SQLException(e);
 		}
 		return person;
+	}
+	
+	/**
+	 * Update the people involved table with the new data
+	 * @param oldID
+	 * @param columnName
+	 * @param newData the new data with ''
+	 * @throws SQLException 
+	 */
+	private static void updatePeopleInvolvedTableWithNewData(int oldID, String columnName, String newData) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Update the people involved table with the new data
+	 * @param oldID
+	 * @param columnName
+	 * @param newData the new data as a int
+	 * @throws SQLException 
+	 */
+	private static void updatePeopleInvolvedTableWithNewData(int oldID, String columnName, int newData) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = " + newData + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Compare and update people involved
+	 * @param oldPersonID
+	 * @param oldPerson
+	 * @param newPerson
+	 * @throws SQLException 
+	 */
+	protected static void compareAndUpdatePeopleInvolved(int oldPersonID, Person oldPerson, Person newPerson) throws SQLException {
+		try {
+			// check if old person id exists
+			// FirstName
+			if (!oldPerson.getFirstName().equals(newPerson.getFirstName())) {
+				updatePeopleInvolvedTableWithNewData(oldPersonID, PeopleInvolvedTable.FIRST_NAME, newPerson.getFirstName());
+			}
+			
+			// MiddleName
+			if (!oldPerson.getMiddleName().equals(newPerson.getMiddleName())) {
+				updatePeopleInvolvedTableWithNewData(oldPersonID, PeopleInvolvedTable.MIDDLE_NAME, newPerson.getMiddleName());
+			}
+			
+			// LastName
+			if (!oldPerson.getSurname().equals(newPerson.getSurname())) {
+				updatePeopleInvolvedTableWithNewData(oldPersonID, PeopleInvolvedTable.FAMILY_NAME, newPerson.getSurname());
+			}
+			
+			// Gender
+			if (!oldPerson.getGender().equals(newPerson.getGender())) {
+				updatePeopleInvolvedTableWithNewData(oldPersonID, PeopleInvolvedTable.GENDER, newPerson.getGender());
+			}
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/***********************************
+	 * REMOVE *
+	 ***********************************/
+	
+	/**
+	 * Delete a person from Person Involved table
+	 * @param person
+	 * @throws SQLException
+	 */
+	protected static void removePersonFromPeopleInvolvedTable(Person person) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
+					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Delete a person from Person Involved table
+	 * @param personID
+	 * @throws SQLException
+	 */
+	protected static void removePersonFromPeopleInvolvedTable(int personID) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
 	}
 }
