@@ -293,6 +293,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + MusicTable.TABLE_NAME + " WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MusicTable.TABLE_NAME + " WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			if (rs.next()) {
 				result = rs.getString(MusicTable.ALBUM_NAME);
@@ -321,6 +322,9 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT " + MusicTable.ALBUM_NAME + ", " + MusicTable.YEAR + " "
+					+ "FROM " + MusicTable.TABLE_NAME + " "
+					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT " + MusicTable.ALBUM_NAME + ", " + MusicTable.YEAR + " "
 					+ "FROM " + MusicTable.TABLE_NAME + " "
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
@@ -338,6 +342,9 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			for (String musicName : musicNames) {
 				stmt = null;
 				stmt = connection.createStatement();
+				System.out.println("SELECT " + MusicTable.LANGUAGE + " FROM " + MusicTable.TABLE_NAME + " "
+						+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'"
+						+ " and " + MusicTable.MUSIC_NAME + " = '" + musicName + "'");
 				rs = stmt.executeQuery("SELECT " + MusicTable.LANGUAGE + " FROM " + MusicTable.TABLE_NAME + " "
 						+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'"
 						+ " and " + MusicTable.MUSIC_NAME + " = '" + musicName + "'");
@@ -380,6 +387,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT " + MusicTable.MUSIC_NAME + " FROM " + MusicTable.TABLE_NAME + " WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT " + MusicTable.MUSIC_NAME + " FROM " + MusicTable.TABLE_NAME + " WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			
 			while (rs.next()) {
@@ -410,11 +418,16 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * "
+					+ "FROM " + PeopleInvolvedMusicTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = " + musicAlbum.getAlbumName() + " "
+					+ " and " + PeopleInvolvedMusicTable.YEAR + " = " + musicAlbum.getYearPublished() + " "
+					+ " and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * "
 					+ "FROM " + PeopleInvolvedMusicTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = " + musicAlbum.getAlbumName() + " "
 					+ " and " + PeopleInvolvedMusicTable.YEAR + " = " + musicAlbum.getYearPublished() + " "
-					+ " and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = " + musicName);
+					+ " and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
 				int personID = Integer.parseInt(rs.getString(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID));
@@ -459,11 +472,16 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * "
+					+ "FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + musicAlbum.getAlbumName() + " "
+					+ " and " + MusicSingerTable.YEAR + " = " + musicAlbum.getYearPublished() + " "
+					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * "
 					+ "FROM " + MusicSingerTable.TABLE_NAME + " "
 					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + musicAlbum.getAlbumName() + " "
 					+ " and " + MusicSingerTable.YEAR + " = " + musicAlbum.getYearPublished() + " "
-					+ " and " + MusicSingerTable.MUSIC_NAME + " = " + musicName);
+					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
 				int personID = Integer.parseInt(rs.getString(MusicSingerTable.PEOPLE_INVOLVED_ID));

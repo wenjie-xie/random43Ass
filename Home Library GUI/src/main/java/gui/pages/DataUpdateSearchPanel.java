@@ -81,16 +81,16 @@ public class DataUpdateSearchPanel extends JPanel {
 		try {
 			// Check if the target is a book, music album, movie or neither
 			if (DatabaseConnectionBookApi.tryToFindBookName(targetName) != null) {
-					Book targetBook = DatabaseConnectionApi.getBook(targetName);
+					Book targetBook = DatabaseConnectionBookApi.getBookInfo(targetName);
 					// if it is a book navigate to the DataUpdateBookEditPanel
 					HL_xiewen4.mainFrame.flipPageTo(new DataUpdateBookEditPanel(targetBook));
 					
 			} else if (DatabaseConnectionMusicAlbumApi.tryToFindMusicAlbumName(targetName) != null) {
-					MusicAlbum targetMusicAlbum = DatabaseConnectionApi.getMusicAlbum(targetName);
+					MusicAlbum targetMusicAlbum = DatabaseConnectionMusicAlbumApi.getMusicAlbumInfo(targetName);
 					
 					// if it is a music album navigate to the DataUpdateMusicAlbumEditPanel
 			} else if (DatabaseConnectionMovieApi.tryToFindMovieName(targetName) != null) {
-					Movie targetMovie = DatabaseConnectionApi.getMovie(targetName);
+					Movie targetMovie = DatabaseConnectionMovieApi.getMovieInfo(targetName);
 					// If it is a movie navigate to the DataUpdateMovieEditPanel
 			}
 			

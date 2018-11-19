@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import database.tables.AwardTable;
 import database.tables.CrewMemberTable;
@@ -271,6 +273,190 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			if (rs.next()) {
 				result = rs.getString(MovieTable.MOVIE_NAME);
 			}
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/***********************************
+	 * GET MOVIE *
+	 ***********************************/
+	
+	/**
+	 * Get the info of a given movieName
+	 * @param movieName the name of a movie
+	 * @return a movie object containing all the info
+	 * @throws SQLException 
+	 */
+	public static Movie getMovieInfo(String movieName) throws SQLException {
+		Movie movie;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
+			
+			int year = Integer.parseInt(rs.getString(MovieTable.YEAR));
+			
+			movie = new Movie(movieName, year);
+			
+			// Crew member
+			HashMap<String, ArrayList<Person>> crewMemberMap = getCrewMemberMap(movie);
+			// Director
+			movie.setDirectorList(crewMemberMap.get(Role.DIRECTOR));
+			// Script Writer
+			movie.setScriptWriterList(crewMemberMap.get(Role.SCRIPT_WRITER));
+			// Cast
+			movie.setCastList(crewMemberMap.get(Role.CAST));
+			// Producer
+			movie.setProducerList(crewMemberMap.get(Role.PRODUCER));
+			// Composer
+			movie.setComposerList(crewMemberMap.get(Role.COMPOSER));
+			// Editor
+			movie.setEditorList(crewMemberMap.get(Role.EDITOR));
+			// Costume Designer
+			movie.setCostumeDesignerList(crewMemberMap.get(Role.COSTUME_DESIGNER));
+			
+			// Award
+			movie.setAward(getAward(movie));
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return movie;
+	}
+	
+	
+	/**
+	 * Get the Description of a given role id
+	 * @param id the id of a Role
+	 * @return a description of the role (Role class)
+	 * @throws SQLException 
+	 */
+	private static String getRoleDescription(int id) throws SQLException {
+		String result;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			System.out.println("SELECT " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + " "
+					+ "WHERE " + RoleTable.ID + " = " + id);
+			ResultSet rs = stmt.executeQuery("SELECT " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + " "
+					+ "WHERE " + RoleTable.ID + " = " + id);
+			
+			result = rs.getString(RoleTable.DESCRIPTION);
+			
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	/**
+	 * Put every person that is in the movie crew into a map and return them
+	 * 
+	 * @param movie a movie object containing movie info
+	 * @return a map that contains list of all crew 
+	 * @throws SQLException 
+	 */
+	private static HashMap<String, ArrayList<Person>> getCrewMemberMap(Movie movie) throws SQLException {
+		HashMap<String, ArrayList<Person>> crewMemberMap = new HashMap<>();
+		ArrayList<Person> directorList = new ArrayList<>();
+		ArrayList<Person> scriptWriterList = new ArrayList<>();
+		ArrayList<Person> castList = new ArrayList<>();
+		ArrayList<Person> producerList = new ArrayList<>();
+		ArrayList<Person> composerList = new ArrayList<>();
+		ArrayList<Person> editorList = new ArrayList<>();
+		ArrayList<Person> costumeDesignerList = new ArrayList<>();
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+			ResultSet rs = stmt.executeQuery("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+			
+			while (rs.next()) {
+				int roleID = Integer.parseInt(rs.getString(CrewMemberTable.ROLE_ID));
+				String role = getRoleDescription(roleID);
+				
+				int personID = Integer.parseInt(rs.getString(CrewMemberTable.PEOPLE_INVOLVED_ID));
+				Person person = getPersonFromPeopleInvolvedTable(personID);
+				
+				// check the role of the person
+				// Director
+				if (role.equals(Role.DIRECTOR)) {
+					directorList.add(person);
+				// Script Writer
+				} else if (role.equals(Role.SCRIPT_WRITER)) {
+					scriptWriterList.add(person);
+				// Cast
+				} else if (role.equals(Role.CAST)) {
+					castList.add(person);
+				// Producer
+				} else if (role.equals(Role.PRODUCER)) {
+					producerList.add(person);
+				// Composer
+				} else if (role.equals(Role.COMPOSER)) {
+					composerList.add(person);
+				// Editor
+				} else if (role.equals(Role.EDITOR)) {
+					editorList.add(person);
+				// Costumer Designer
+				} else if (role.equals(Role.COSTUME_DESIGNER)) {
+					costumeDesignerList.add(person);
+				} else {
+					throw new SQLException();
+				}
+			}
+			
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		// Add to map
+		crewMemberMap.put(Role.DIRECTOR, directorList);
+		crewMemberMap.put(Role.SCRIPT_WRITER, directorList);
+		crewMemberMap.put(Role.CAST, castList);
+		crewMemberMap.put(Role.PRODUCER, producerList);
+		crewMemberMap.put(Role.COMPOSER, composerList);
+		crewMemberMap.put(Role.EDITOR, editorList);
+		crewMemberMap.put(Role.COSTUME_DESIGNER, costumeDesignerList);
+		
+		return crewMemberMap;
+	}
+	
+	/**
+	 * Get award of the movie
+	 * @param movie
+	 * @return the award
+	 * @throws SQLException 
+	 */
+	private static int getAward(Movie movie) throws SQLException {
+		int result;
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			System.out.println("SELECT " + AwardTable.AWARD + " FROM " + AwardTable.TABLE_NAME + " "
+					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
+			ResultSet rs = stmt.executeQuery("SELECT " + AwardTable.AWARD + " FROM " + AwardTable.TABLE_NAME + " "
+					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
+			
+			result = Integer.parseInt(rs.getString(AwardTable.AWARD));
 			
 		} catch (SQLException e) {
 		    throw new SQLException(e);

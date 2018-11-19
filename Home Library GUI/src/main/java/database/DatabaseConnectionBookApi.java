@@ -250,6 +250,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
 			if (rs.next()) {
 				result = rs.getString(BookTable.ISBN);
@@ -273,6 +274,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
 			
 			String bookISBN = rs.getString(BookTable.ISBN);
@@ -286,6 +288,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			book = new Book(bookISBN, bookTitle, bookPublisher, bookNumberOfPages, bookYear);
 			book.setEditionNumber(bookEdition);
 			book.setBookDescription(bookAbstract);
+			
+			book.setAuthorList(getAuthorList(bookISBN));
+			book.setKeyWords(getTagList(bookISBN));
 			
 		} catch (SQLException e) {
 		    throw new SQLException(e);
@@ -306,6 +311,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
 			tag = rs.getString(KeywordTable.TAG);
 			
@@ -326,9 +332,12 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT " + BookKeywordTable.KEYWORD_ID + " "
+					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
+					+ "WHERE " + BookKeywordTable.ISBN + " = '" + bookISBN + "'");
 			ResultSet rs = stmt.executeQuery("SELECT " + BookKeywordTable.KEYWORD_ID + " "
 					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN);
+					+ "WHERE " + BookKeywordTable.ISBN + " = '" + bookISBN + "'");
 			
 			while(rs.next()) {
 				String tagID = rs.getString(BookKeywordTable.KEYWORD_ID);
@@ -353,9 +362,12 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SELECT " + BookAuthorTable.AUTHOR_ID + " "
+					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "'");
 			ResultSet rs = stmt.executeQuery("SELECT " + BookAuthorTable.AUTHOR_ID + " "
 					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN);
+					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "'");
 			
 			while(rs.next()) {
 				String authorID = rs.getString(BookAuthorTable.AUTHOR_ID);
