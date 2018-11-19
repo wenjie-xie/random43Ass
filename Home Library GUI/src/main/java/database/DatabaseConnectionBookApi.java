@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import database.tables.BookAuthorTable;
 import database.tables.BookKeywordTable;
@@ -259,5 +260,112 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Get all info of a given Book Name into a Book object
+	 * @param bookName the name of the book that you are trying to get info from
+	 * @return a book object
+	 * @throws SQLException 
+	 */
+	public static Book getBookInfo(String bookName) throws SQLException {
+		Book book;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
+			
+			String bookISBN = rs.getString(BookTable.ISBN);
+			String bookTitle = rs.getString(BookTable.TITLE);
+			String bookPublisher = rs.getString(BookTable.PUBLISHER);
+			int bookNumberOfPages = Integer.parseInt(rs.getString(BookTable.NUMBER_OF_PAGES));
+			int bookYear = Integer.parseInt(rs.getString(BookTable.YEAR_OF_PUBLICATION));
+			int bookEdition = Integer.parseInt(rs.getString(BookTable.EDITION_NUMBER));
+			String bookAbstract = rs.getString(BookTable.ABSTRACT);
+			
+			book = new Book(bookISBN, bookTitle, bookPublisher, bookNumberOfPages, bookYear);
+			book.setEditionNumber(bookEdition);
+			book.setBookDescription(bookAbstract);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return book;
+	}
+	
+	
+	/**
+	 * Get Tag from Keyword table
+	 * @param id the id of the keyword
+	 * @return the tag name
+	 * @throws SQLException 
+	 */
+	private static String getTagFromKeywordTable(int id) throws SQLException {
+		String tag;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
+			tag = rs.getString(KeywordTable.TAG);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		return tag;
+	}
+	
+	/**
+	 * Get all the tag as a list with the given ISBN of the book
+	 * @param bookISBN the isbn of the book
+	 * @return a list of tags that belong to this book
+	 * @throws SQLException 
+	 */
+	private static ArrayList<String> getTagList(String bookISBN) throws SQLException {
+		ArrayList<String> tagList = new ArrayList<>();
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT " + BookKeywordTable.KEYWORD_ID + " "
+					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
+					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN);
+			
+			while(rs.next()) {
+				String tagID = rs.getString(BookKeywordTable.KEYWORD_ID);
+				tagList.add(getTagFromKeywordTable(Integer.parseInt(tagID)));
+			}
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return tagList;
+	}
+	
+	/**
+	 * Get all the author of the given book
+	 * @param bookISBN
+	 * @return a list of author
+	 * @throws SQLException 
+	 */
+	private static ArrayList<Person> getAuthorList(String bookISBN) throws SQLException {
+		ArrayList<Person> authorList = new ArrayList<>();
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT " + BookAuthorTable.AUTHOR_ID + " "
+					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN);
+			
+			while(rs.next()) {
+				String authorID = rs.getString(BookAuthorTable.AUTHOR_ID);
+				authorList.add(getPersonFromPeopleInvolvedTable(Integer.parseInt(authorID)));
+			}
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return authorList;
 	}
 }

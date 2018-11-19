@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedTable;
 import items.Book;
 import items.Movie;
@@ -102,5 +103,33 @@ public class DatabaseConnectionApi {
 		}
 		
 		return personID;
+	}
+	
+	/**
+	 * Get Person from PeopleInvolved table
+	 * @param id the id of Person in the PeopleInolved Table
+	 * @return a Person representing the person with the given id
+	 * @throws SQLException 
+	 */
+	protected static Person getPersonFromPeopleInvolvedTable(int id) throws SQLException {
+		Person person;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
+			
+			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
+			String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
+			String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+			int gender = Integer.parseInt(rs.getString(PeopleInvolvedTable.GENDER)); 
+			
+			person = new Person(familyName, firstName);
+			person.setMiddleName(middleName);
+			person.setGender(gender);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		return person;
 	}
 }

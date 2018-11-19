@@ -13,6 +13,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import app.HL_xiewen4;
+import database.DatabaseConnectionBookApi;
+import database.DatabaseConnectionMovieApi;
+import database.DatabaseConnectionMusicAlbumApi;
+import items.Book;
+import items.Movie;
+import items.MusicAlbum;
+
 /**
  * Data > Update
  * @author xiewen4
@@ -72,25 +80,18 @@ public class DataUpdateSearchPanel extends JPanel {
 		
 		try {
 			// Check if the target is a book, music album, movie or neither
-			String target = DatabaseConnectionApi.verifyTargetName(targetName);
-			
-			switch (target) {
-				case "Book":
+			if (DatabaseConnectionBookApi.tryToFindBookName(targetName) != null) {
 					Book targetBook = DatabaseConnectionApi.getBook(targetName);
 					// if it is a book navigate to the DataUpdateBookEditPanel
 					HL_xiewen4.mainFrame.flipPageTo(new DataUpdateBookEditPanel(targetBook));
-					break;
-				case "Music Album":
+					
+			} else if (DatabaseConnectionMusicAlbumApi.tryToFindMusicAlbumName(targetName) != null) {
 					MusicAlbum targetMusicAlbum = DatabaseConnectionApi.getMusicAlbum(targetName);
+					
 					// if it is a music album navigate to the DataUpdateMusicAlbumEditPanel
-					break;
-				case "Movie":
+			} else if (DatabaseConnectionMovieApi.tryToFindMovieName(targetName) != null) {
 					Movie targetMovie = DatabaseConnectionApi.getMovie(targetName);
 					// If it is a movie navigate to the DataUpdateMovieEditPanel
-					break;
-				default:
-					// If it is neither respond by showing a message dialog
-					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Invalid Name");
 			}
 			
 		} catch (SQLException e) {
