@@ -148,6 +148,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 						+ musicAlbum.getDiskType() + ", " + producerID + ")");
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -178,6 +179,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 						+ "VALUES (" + musicAlbum.getAlbumName() + ", " + musicAlbum.getYearPublished() + ", "
 						+ music.getMusicName() + ", " + singerID + ")");
 			}
+			connection.close();
 			
 		} catch (SQLException e) {
 		    throw new SQLException(e);
@@ -191,7 +193,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	private static void insertIntoPeopleInvolvedMusic(MusicAlbum musicAlbum, Music music) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 			
 			// check if the song writer, composer and the arranger is the same person
 			Person sw = music.getSongWriter();
@@ -268,6 +270,8 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ "VALUES (" + musicAlbum.getAlbumName() + ", " + musicAlbum.getYearPublished() + ", "
 					+ music.getMusicName() + ", " + peopleInvolvedID + ", " + sw + ", " + com + ", " + arr + ")");
 			
+			connection.close();
+			
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -296,6 +300,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				result = rs.getString(MusicTable.ALBUM_NAME);
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -369,7 +374,8 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			}
 			
 			musicAlbum.setMusicTrackList(musicList);
-					
+			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -395,7 +401,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				musicNameList.add(rs.getString(MusicTable.MUSIC_NAME));
 			}
 			
-					
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -453,6 +459,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			peopleInvolvedMap.put(Role.COMPOSER, composerList);
 			peopleInvolvedMap.put(Role.ARRANGER, arrangerList);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -489,6 +496,8 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				
 				singerList.add(personID);
 			}
+			
+			connection.close();
 			
 		} catch (SQLException e) {
 		    throw new SQLException(e);
@@ -617,9 +626,9 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			
 			// update other fields for the music that stays the same
 			int producerID = Integer.parseInt(findOrCreatePerson(producer));
+			Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword);
 			for (Music music : sameMusicList) {
-				Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword);
-	
+				
 				Statement stmt = null;
 				stmt = connection.createStatement();
 				stmt.executeUpdate("UPDATE " + MusicTable.MUSIC_NAME + " "
@@ -634,6 +643,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 								+ "and " + MusicTable.MUSIC_NAME + " = " + music.getMusicName());
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -641,19 +651,70 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	
 	/**
+	 * Return the object within the musicList containing with its music name as musicName
+	 * @param musicList
+	 * @param musicName
+	 * @return a Music object, if no such musicName is found then return null
+	 */
+	private static Music getMusicWithName(ArrayList<Music> musicList, String musicName) {
+		Music result = null;
+		for (Music music : musicList) {
+			if (music.getMusicName().replaceAll("'", "").equals(musicName)) {
+				result = music;
+			}
+		}
+		return result;
+	}
+	
+	
+	/**
 	 * Compare and update music singer table
 	 * @param oldMusicAlbum
 	 * @param newMusicAlbum
+	 * @throws SQLException 
 	 */
-	private static void compareAndUpdateMusicSingerTable(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
+	private static void compareAndUpdateMusicSingerTable(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) throws SQLException {
 		HashMap<String, ArrayList<Music>> sameRemovedNewMap = determineRemovedSameAndNewMusicTrack(oldMusicAlbum, newMusicAlbum);
 		ArrayList<Music> sameMusicList = sameRemovedNewMap.get("same");
 		ArrayList<Music> removedMusicList = sameRemovedNewMap.get("removed");
 		ArrayList<Music> newMusicList = sameRemovedNewMap.get("new");
 		
-		// Remove the music that no longer exists
-		// Remove the singer that no longer exists in each music
-		// 
+		try {
+			// Remove the music that no longer exists
+			String albumName = oldMusicAlbum.getAlbumName().replaceAll("'", "");
+			int year = Integer.parseInt(oldMusicAlbum.getYearPublished());
+			for (Music music : removedMusicList) {
+				String musicName = music.getMusicName().replaceAll("'", "");
+				removeMusicFromMusicSingerTable(albumName, year, musicName);
+			}
+			
+			// Remove the singer that no longer exists in each same music
+			for (Music music : sameMusicList) {
+				String musicName = music.getMusicName().replaceAll("'", "");
+				Music oldMusic = getMusicWithName(oldMusicAlbum.getMusicTrackList(), musicName);
+				Music newMusic = getMusicWithName(newMusicAlbum.getMusicTrackList(), musicName);
+				compareAndUpdateSingersForMusic(albumName, year, oldMusic, newMusic);
+			}
+			
+			// Insert new Music
+			for (Music music : newMusicList) {
+				insertIntoMusicSinger(newMusicAlbum, music);
+			}
+			
+			// update the old music info with the new music info
+			// for the columns such as album name and year
+			Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword);
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + MusicSingerTable.TABLE_NAME + " "
+					+ "SET " + MusicSingerTable.ALBUM_NAME + " = " + newMusicAlbum.getAlbumName() + ", "
+					+ MusicSingerTable.YEAR + " = " + newMusicAlbum.getYearPublished() + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName() + " "
+							+ "and " + MusicSingerTable.YEAR + " = " + oldMusicAlbum.getYearPublished());
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
 	}
 	
 	
@@ -664,12 +725,27 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @param year
 	 * @param oldMusic the old music
 	 * @param newMusic the new music
+	 * @throws SQLException 
+	 * @throws NumberFormatException 
 	 */
-	private static void compareAndUpdateSingersForMusic(String albumName, int year, Music oldMusic, Music newMusic) {
+	private static void compareAndUpdateSingersForMusic(String albumName, int year, Music oldMusic, Music newMusic) throws NumberFormatException, SQLException {
 		HashMap<String, ArrayList<Person>> removedSameAndNewMap = determineRemovedSameAndNewPerson(oldMusic.getSingerList(), newMusic.getSingerList());
 		ArrayList<Person> sameSingerList = removedSameAndNewMap.get("same");
 		ArrayList<Person> newSingerList = removedSameAndNewMap.get("new");
 		ArrayList<Person> removedSingerList = removedSameAndNewMap.get("removed");
+		
+		// remove singer that no longer exists
+		for (Person singer : removedSingerList) {
+			int singerID = Integer.parseInt(findOrCreatePerson(singer));
+			removeARowFromMusicSingerTable(albumName, year, oldMusic.getMusicName(), singerID);
+		}
+		
+		// insert new singer
+		String musicName = newMusic.getMusicName().replaceAll("'", "");
+		Music dummMusic = new Music(musicName);
+		dummMusic.setSingerList(newSingerList);
+		MusicAlbum dummyMusicAlbum = new MusicAlbum(albumName, year, null);
+		insertIntoMusicSinger(dummyMusicAlbum, dummMusic);
 	}
 	
 	
@@ -693,6 +769,55 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + albumName + "' "
 					+ "and " + MusicTable.YEAR + " = " + year + " "
 					+ "and " + MusicTable.MUSIC_NAME + " = '" + musicName + "'");
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove a row from music singer table
+	 * @param albumName with no ''
+	 * @param year
+	 * @param musicName with no ''
+	 * @throws SQLException 
+	 */
+	private static void removeMusicFromMusicSingerTable(String albumName, int year, String musicName) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = '" + albumName + "' "
+					+ "and " + MusicSingerTable.YEAR + " = " + year + " "
+					+ "and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove a row from music singer table
+	 * @param albumName with no ''
+	 * @param year
+	 * @param musicName with no ''
+	 * @param singerID
+	 * @throws SQLException 
+	 */
+	private static void removeARowFromMusicSingerTable(String albumName, int year, String musicName, int singerID) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = '" + albumName + "' "
+					+ "and " + MusicSingerTable.YEAR + " = " + year + " "
+					+ "and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "' "
+					+ "and " + MusicSingerTable.PEOPLE_INVOLVED_ID + " = " + singerID);
+			connection.close();
 			
 		} catch (SQLException e) {
 		    throw new SQLException(e);

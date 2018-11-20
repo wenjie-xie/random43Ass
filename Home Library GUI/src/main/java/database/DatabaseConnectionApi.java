@@ -65,6 +65,7 @@ public class DatabaseConnectionApi {
 				}
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -92,6 +93,7 @@ public class DatabaseConnectionApi {
 					+ "VALUES (" + person.getFirstName() + ", " + person.getMiddleName() + ", "
 							+ person.getSurname() + ", " + person.getGender() + ")");
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -106,7 +108,7 @@ public class DatabaseConnectionApi {
 	 */
 	protected static String findOrCreatePerson(Person person) throws SQLException {
 		String personID = null;
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 			personID = tryToFindPerson(person);
 			
 			if (personID == null) {
@@ -144,6 +146,7 @@ public class DatabaseConnectionApi {
 			person.setMiddleName(middleName);
 			person.setGender(gender);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -169,6 +172,7 @@ public class DatabaseConnectionApi {
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -193,6 +197,7 @@ public class DatabaseConnectionApi {
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -254,6 +259,7 @@ public class DatabaseConnectionApi {
 					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
 					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -274,6 +280,7 @@ public class DatabaseConnectionApi {
 			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}

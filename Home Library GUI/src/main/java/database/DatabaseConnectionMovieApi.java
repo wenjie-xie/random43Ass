@@ -65,6 +65,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 				result = rs.getString(RoleTable.ID);
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -88,6 +89,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "(" + RoleTable.DESCRIPTION + ") "
 					+ "VALUES (" + role + ")");
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -102,7 +104,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static String findOrCreateRole(String role) throws SQLException {
 		String roleID = null;
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 			roleID = tryToFindRole(role);
 			
 			if (roleID == null) {
@@ -133,6 +135,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "(" + MovieTable.MOVIE_NAME + ", " + MovieTable.YEAR + ") "
 					+ "VALUES (" + movie.getMovieName() + ", " + movie.getReleaseYear() + ")");
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -165,6 +168,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "VALUES (" + personID + ", " + movie.getMovieName() + ", "
 					+ movie.getReleaseYear() + ", " + roleID + ")");
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -176,7 +180,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	private static void insertIntoCrewMember(Movie movie) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 			// Insert directors
 			for (Person director : movie.getDirectorList()) {
 				insertIntoCrewMemberHelper(movie, director, Role.DIRECTOR);
@@ -244,6 +248,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 						+ movie.getReleaseYear() + ", " + movie.getAward() + ")");
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -274,6 +279,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 				result = rs.getString(MovieTable.MOVIE_NAME);
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -326,6 +332,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// Award
 			movie.setAward(getAward(movie));
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -352,7 +359,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			
 			result = rs.getString(RoleTable.DESCRIPTION);
 			
-			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -390,7 +397,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 				personIDList.add(personID);
 			}
 			
-			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -419,7 +426,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		ArrayList<Person> editorList = new ArrayList<>();
 		ArrayList<Person> costumeDesignerList = new ArrayList<>();
 		
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 			
 			ArrayList<Integer> personIDList = new ArrayList<>();
 			ArrayList<Integer> roleIDList = new ArrayList<>();
@@ -496,6 +503,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			
 			result = Integer.parseInt(rs.getString(AwardTable.AWARD));
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}

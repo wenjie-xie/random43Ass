@@ -70,7 +70,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "VALUES (" + book.getBookISBN() + ", " + book.getBookName() + ", " + book.getPublisherName() + ", "
 					+ book.getNumOfPage() + ", " + book.getPublicationYear() + ", "
 					+ book.getEditionNumber() + ", " + book.getBookDescription() + ")");
-			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -99,6 +99,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 						+ "VALUES (" + book.getBookISBN() + ", " + tagID + ")");
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -136,6 +137,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				result = rs.getString(KeywordTable.ID);
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -159,6 +161,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "(" + KeywordTable.TAG + ") "
 					+ "VALUES (" + tag + ")");
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -187,6 +190,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 						+ "VALUES (" + book.getBookISBN() + ", " + authorID + ")");
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -262,6 +266,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				result = rs.getString(BookTable.ISBN);
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -303,6 +308,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			book.setAuthorList(getAuthorList(bookISBN));
 			book.setKeyWords(getTagList(bookISBN));
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -326,6 +332,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
 			tag = rs.getString(KeywordTable.TAG);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -373,6 +380,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				tagList.add(Integer.parseInt(tagID));
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -422,6 +430,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				authorIDList.add(Integer.parseInt(authorID));
 			}
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -485,6 +494,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
 					+ "and " + BookTable.TITLE + " = " + oldBookInfo.getBookName());
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -509,6 +519,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -522,7 +533,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	private static void compareAndUpdateBookAuthorTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 
 			if (!oldBookInfo.getBookISBN().equals(newBookInfo.getBookISBN())) {
 				updateBookAuthorTableWithNewData(oldBookInfo, BookAuthorTable.ISBN, newBookInfo.getBookISBN());
@@ -574,6 +585,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "SET " + columnName + " = " + newData + " "
 					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -588,7 +600,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	private static void compareAndUpdateBookKeywordTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+		try {
 
 			if (!oldBookInfo.getBookISBN().equals(newBookInfo.getBookISBN())) {
 				updateBookKeywordTableWithNewData(oldBookInfo, BookAuthorTable.ISBN, newBookInfo.getBookISBN());
@@ -643,6 +655,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN + " "
 					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
@@ -666,6 +679,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN + " "
 					+ "and " + BookKeywordTable.KEYWORD_ID + " = " + keywordID);
 			
+			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
