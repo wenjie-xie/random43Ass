@@ -20,9 +20,6 @@ import items.MusicAlbum;
 import items.Person;
 
 public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
-	private static final String URL = "jdbc:mysql://localhost:3306/HL?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-	private static final String sqlUsername = "root";
-	private static final String sqlPassword = "a";
 	
 	/******************************
 	 * INSERT MUSIC ALBUM *
@@ -535,25 +532,52 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	
 	/**
-	 * compare the music track in both album and return a map to 3 list; "old" and "new"
+	 * compare the music track in both album and return a map to 2 list; "removed", "same" and "new"
 	 * @param oldMusicAlbum
 	 * @param newMusicAlbum
-	 * @return
+	 * @return a map of two list one containing a list of music name that should be removed and one containing
+	 * a list of music name that should be inserted
 	 */
-	private static HashMap<String, ArrayList<Music>> determineOldSameNewMusicTrack(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
-		HashMap<String, ArrayList<Music>> result = new HashMap<>();
-		ArrayList<Music> oldMusicList = new ArrayList<>();
-		ArrayList<Music> newMusicList = newMusicAlbum.getMusicTrackList();
+	private static HashMap<String, ArrayList<String>> determineRemovedAndNewMusicTrack(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		ArrayList<String> removedMusicList = new ArrayList<>();
+		ArrayList<String> newMusicList = new ArrayList<>();
+		ArrayList<String> sameMusicList = new ArrayList<>();
 		
-		// loop through all the old music in oldMusicAlbum
-		for (Music oldMusic : oldMusicAlbum.getMusicTrackList()) {
-			// find old music
-			if (newMusicList.contains(oldMusic)) {
-				oldMusicList.add(oldMusic);
-				newMusicList.remove(oldMusic);
+		ArrayList<String> oldMusicNameList = getMusicNamesFromMusicList(oldMusicAlbum.getMusicTrackList());
+		ArrayList<String> newMusicNameList = getMusicNamesFromMusicList(newMusicAlbum.getMusicTrackList());
+		
+		// Determine the music that should be removed
+		for (String oldMusic : oldMusicNameList) {
+			if (!newMusicNameList.contains(oldMusic)) {
+				removedMusicList.add(oldMusic);
+			} else {
+				sameMusicList.add(oldMusic);
 			}
 		}
+		
+		// Determine the music that is new
+		for (String newMusic : newMusicNameList) {
+			if (!oldMusicNameList.contains(newMusic)) {
+				newMusicList.add(newMusic);
+			}
+		}
+		
+		result.put("removed", removedMusicList);
+		result.put("new", newMusicList);
+		result.put("same", sameMusicList);
+		
+		return result;
 	}
+	
+	private static ArrayList<String> getMusicNamesFromMusicList(ArrayList<Music> musicList) {
+		ArrayList<String> result = new ArrayList<>();
+		for (Music music : musicList) {
+			result.add(music.getMusicName());
+		}
+		return result;
+	}
+	
 	/**
 	 * Compare and update the Music Table
 	 * @param oldMusicAlbum
@@ -561,21 +585,11 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void compareAndUpdateMusicTable(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
 		
-		// Determine 
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + MusicTable.TABLE_NAME + " "
-					+ "SET " + MusicTable.ALBUM_NAME + " = " + newMusicAlbum.getAlbumName() + " "
-					+ MusicTable.YEAR + " = " + newMusicAlbum.getYearPublished() + " "
-					+ MusicTable.MUSIC_NAME + " = " + newMusicAlbum.get
-					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + musicAlbum.getAlbumName() + " "
-					+ " and " + MusicSingerTable.YEAR + " = " + musicAlbum.getYearPublished() + " "
-					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
-
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
+		HashMap<String, ArrayList<String>> sameRemovedNewMap = determineRemovedAndNewMusicTrack(oldMusicAlbum, newMusicAlbum);
+		ArrayList<String> sameMusicList = sameRemovedNewMap.get("same");
+		ArrayList<String> removedMusicList = sameRemovedNewMap.get("removed");
+		ArrayList<String> newMusicList = sameRemovedNewMap.get("new");
+		
 	}
 	
 }
