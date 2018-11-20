@@ -359,6 +359,49 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		
 		return result;
 	}
+	
+	/**
+	 * Get every crew member's person id and role id
+	 * 
+	 * @param movie a movie object containing movie info
+	 * @return a map that contains two list {("personID", [personID]), ("roleID", [roleID])}
+	 * @throws SQLException 
+	 */
+	private static HashMap<String, ArrayList<Integer>> getPersonIDRoleIDLists(Movie movie) throws SQLException {
+		HashMap<String, ArrayList<Integer>> crewMemberMap = new HashMap<>();
+		ArrayList<Integer> personIDList = new ArrayList<>();
+		ArrayList<Integer> roleIDList = new ArrayList<>();
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			System.out.println("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+			ResultSet rs = stmt.executeQuery("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+			
+			while (rs.next()) {
+				int roleID = Integer.parseInt(rs.getString(CrewMemberTable.ROLE_ID));
+				roleIDList.add(roleID);
+				
+				int personID = Integer.parseInt(rs.getString(CrewMemberTable.PEOPLE_INVOLVED_ID));
+				personIDList.add(personID);
+			}
+			
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		crewMemberMap.put("personID", personIDList);
+		crewMemberMap.put("roleID", roleIDList);
+		
+		return crewMemberMap;
+	}
+	
+	
 	/**
 	 * Put every person that is in the movie crew into a map and return them
 	 * 
@@ -377,20 +420,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		ArrayList<Person> costumeDesignerList = new ArrayList<>();
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
 			
-			while (rs.next()) {
-				int roleID = Integer.parseInt(rs.getString(CrewMemberTable.ROLE_ID));
+			ArrayList<Integer> personIDList = new ArrayList<>();
+			ArrayList<Integer> roleIDList = new ArrayList<>();
+			
+			for (int i = 0; i < personIDList.size(); i++) {
+				int roleID = roleIDList.get(i);
 				String role = getRoleDescription(roleID);
 				
-				int personID = Integer.parseInt(rs.getString(CrewMemberTable.PEOPLE_INVOLVED_ID));
+				int personID = personIDList.get(i);
 				Person person = getPersonFromPeopleInvolvedTable(personID);
 				
 				// check the role of the person

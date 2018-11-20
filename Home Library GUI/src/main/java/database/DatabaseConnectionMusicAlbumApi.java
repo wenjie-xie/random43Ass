@@ -464,14 +464,14 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	}
 	
 	/**
-	 * Get all the singer of the given music
+	 * Get all the singer id of the given music
 	 * @param musicAlbum
 	 * @param musicName
 	 * @return a list of song writer
 	 * @throws SQLException
 	 */
-	private static ArrayList<Person> getSingerList(MusicAlbum musicAlbum, String musicName) throws SQLException {
-		ArrayList<Person> singerList = new ArrayList<>();
+	private static ArrayList<Integer> getSingerIDList(MusicAlbum musicAlbum, String musicName) throws SQLException {
+		ArrayList<Integer> singerList = new ArrayList<>();
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -490,7 +490,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			while(rs.next()) {
 				int personID = Integer.parseInt(rs.getString(MusicSingerTable.PEOPLE_INVOLVED_ID));
 				
-				singerList.add(getPersonFromPeopleInvolvedTable(personID));
+				singerList.add(personID);
 			}
 			
 		} catch (SQLException e) {
@@ -499,4 +499,83 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		
 		return singerList;
 	}
+	
+	/**
+	 * Get all the singer of the given music
+	 * @param musicAlbum
+	 * @param musicName
+	 * @return a list of song writer
+	 * @throws SQLException
+	 */
+	private static ArrayList<Person> getSingerList(MusicAlbum musicAlbum, String musicName) throws SQLException {
+		ArrayList<Person> singerList = new ArrayList<>();
+		
+		ArrayList<Integer> singerIDList = getSingerIDList(musicAlbum, musicName);
+		
+		for (int singerID : singerIDList) {
+			singerList.add(getPersonFromPeopleInvolvedTable(singerID));
+		}
+		
+		return singerList;
+	}
+	
+	
+	/*******************************
+	 * UPDATE MUSIC ALBUM *
+	 *******************************/
+	
+	/**
+	 * Compare and update the oldMusicAlbum to the newMusicAlbum
+	 * @param oldMusicAlbum
+	 * @param newMusicAlbum
+	 */
+	public static void compareAndUpdateMusicAlbum(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
+		
+	}
+	
+	
+	/**
+	 * compare the music track in both album and return a map to 3 list; "old" and "new"
+	 * @param oldMusicAlbum
+	 * @param newMusicAlbum
+	 * @return
+	 */
+	private static HashMap<String, ArrayList<Music>> determineOldSameNewMusicTrack(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
+		HashMap<String, ArrayList<Music>> result = new HashMap<>();
+		ArrayList<Music> oldMusicList = new ArrayList<>();
+		ArrayList<Music> newMusicList = newMusicAlbum.getMusicTrackList();
+		
+		// loop through all the old music in oldMusicAlbum
+		for (Music oldMusic : oldMusicAlbum.getMusicTrackList()) {
+			// find old music
+			if (newMusicList.contains(oldMusic)) {
+				oldMusicList.add(oldMusic);
+				newMusicList.remove(oldMusic);
+			}
+		}
+	}
+	/**
+	 * Compare and update the Music Table
+	 * @param oldMusicAlbum
+	 * @param newMusicAlbum
+	 */
+	private static void compareAndUpdateMusicTable(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
+		
+		// Determine 
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + MusicTable.TABLE_NAME + " "
+					+ "SET " + MusicTable.ALBUM_NAME + " = " + newMusicAlbum.getAlbumName() + " "
+					+ MusicTable.YEAR + " = " + newMusicAlbum.getYearPublished() + " "
+					+ MusicTable.MUSIC_NAME + " = " + newMusicAlbum.get
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + musicAlbum.getAlbumName() + " "
+					+ " and " + MusicSingerTable.YEAR + " = " + musicAlbum.getYearPublished() + " "
+					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
+
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
 }
