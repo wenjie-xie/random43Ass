@@ -8,12 +8,15 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import database.tables.BookAuthorTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedTable;
 import items.Book;
 import items.Movie;
+import items.Music;
 import items.MusicAlbum;
 import items.Person;
 
@@ -47,7 +50,19 @@ public class DatabaseConnectionApi {
 					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
 							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
 			if (rs.next()) {
-				result = rs.getString(PeopleInvolvedTable.ID);
+				// make sure the person exists
+				// check both middle name and gender
+				String actualMiddleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
+				String expectedMiddleName = person.getMiddleName().replaceAll("'", "");
+				int actualGender = Integer.parseInt(rs.getString(PeopleInvolvedTable.GENDER));
+				int expectedGender = Integer.parseInt(person.getGender());
+				
+				if ((actualGender == expectedGender)
+						&& ((actualMiddleName == null && expectedMiddleName == null) 
+								|| (actualMiddleName.equals(expectedMiddleName)))) {
+					
+					result = rs.getString(PeopleInvolvedTable.ID);
+				}
 			}
 			
 		} catch (SQLException e) {
@@ -262,5 +277,41 @@ public class DatabaseConnectionApi {
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
+	}
+	
+	/**
+	 * Determine removed, same and new people from the two given people list
+	 * @param oldPeopleList
+	 * @param newPeopleList
+	 * @return a map to each of the three list with keys "removed", "same", and "new"
+	 */
+	protected static HashMap<String, ArrayList<Person>> determineRemovedSameAndNewPerson(ArrayList<Person> oldPeopleList, ArrayList<Person> newPeopleList) {
+		HashMap<String, ArrayList<Person>> result = new HashMap<>();
+		ArrayList<Person> removedPersonList = new ArrayList<>();
+		ArrayList<Person> newPersonList = new ArrayList<>();
+		ArrayList<Person> samePersonList = new ArrayList<>();
+		
+		
+		// Determine the person that should be removed
+		for (Person oldPerson : oldPeopleList) {
+			if (!newPeopleList.contains(oldPerson)) {
+				removedPersonList.add(oldPerson);
+			} else {
+				samePersonList.add(oldPerson);
+			}
+		}
+		
+		// Determine the person that is new
+		for (Person newPerson : newPeopleList) {
+			if (!oldPeopleList.contains(newPerson)) {
+				newPersonList.add(newPerson);
+			}
+		}
+		
+		result.put("removed", removedPersonList);
+		result.put("new", newPersonList);
+		result.put("same", samePersonList);
+		
+		return result;
 	}
 }
