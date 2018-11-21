@@ -42,9 +42,9 @@ public class DataInsertMoviePanel extends JPanel {
 	protected JTextArea yearOfRelease;
 	protected JButton addCastBtn;
 	
-	public DataInsertMoviePanel() {
+	public DataInsertMoviePanel(String title) {
 		super();
-		instantiateMoviePanel("Add New Movie:", this.createSubmitButton());
+		instantiateMoviePanel(title, this.createSubmitButton());
 		
 	}
 	

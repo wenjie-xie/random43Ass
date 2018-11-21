@@ -21,10 +21,8 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 	private Movie oldMovie;
 	
 	public DataUpdateMovieEditPanel(Movie movie) {
+		super("Update Movie:");
 		this.oldMovie = movie;
-		
-		// initialize fields
-		super.instantiateMoviePanel("Update Movie:", this.createSubmitButton());
 		
 		// setup fields
 		setUpFieldEnvirnment(movie);
@@ -212,7 +210,17 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 	}
 	
 	
-	private String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("null", "");
+	private static String formatString(String str) {
+		
+		String result = str.replaceAll("'", "");
+		
+		if (str.length() == 4) {
+			result = result.replaceAll("NULL", "").replaceAll("null", "");
+		}
+		
+		if (result.equals("")) {
+			result = null;
+		}
+		return result;
 	}
 }

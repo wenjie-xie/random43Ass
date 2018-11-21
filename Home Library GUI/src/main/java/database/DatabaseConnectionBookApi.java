@@ -191,53 +191,6 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	/**
-	 * Try to find the ID for the book author
-	 * @param author
-	 * @return ID of the author iff the author already exists, else return null
-	 * @throws SQLException 
-	 *//*
-	private static String tryToFindAuthor(Person author) throws SQLException {
-		String result = null;
-		
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + author.getSurname() + " "
-							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + author.getFirstName() + " "
-							+ "and " + PeopleInvolvedTable.MIDDLE_NAME + " = " + author.getMiddleName() + "");
-			if (rs.next()) {
-				result = rs.getString(PeopleInvolvedTable.ID);
-			}
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-		
-		return result;
-	}
-	
-	*//**
-	 * Add a new person to PeopleInvolved
-	 * @param author the new author that is going to be put into the database
-	 * @throws SQLException 
-	 *//*
-	private static void insertIntoPeopleInvolved(Person author) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "(" + PeopleInvolvedTable.FIRST_NAME + ", " + PeopleInvolvedTable.MIDDLE_NAME + ", "
-						+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
-					+ "VALUES (" + author.getFirstName() + ", " + author.getMiddleName() + ", "
-							+ author.getSurname() + ", " + author.getGender() + ")");
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-	}*/
-	
 	
 	/***********************************
 	 * SEARCH BOOK *
@@ -288,6 +241,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
 			
+			rs.next();
 			String bookISBN = rs.getString(BookTable.ISBN);
 			String bookTitle = rs.getString(BookTable.TITLE);
 			String bookPublisher = rs.getString(BookTable.PUBLISHER);
@@ -325,6 +279,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			stmt = connection.createStatement();
 			System.out.println("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
+			rs.next();
 			tag = rs.getString(KeywordTable.TAG);
 			
 			connection.close();

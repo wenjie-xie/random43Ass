@@ -27,11 +27,9 @@ public class DataUpdateMusicAlbumEditPanel extends DataInsertMusicPanel {
 	private MusicAlbum oldMusicAlbum;
 	
 	public DataUpdateMusicAlbumEditPanel(MusicAlbum oldMusicAlbum) {
-		super();
+		super("Update Music:");
+		
 		this.oldMusicAlbum = oldMusicAlbum;
-		 
-		// Initialize all music album fields
-		instantiateMusicPanel("Update Music:", this.createSubmitButton());
 		
 		// Set up field
 		setUpFieldEnvirnment(oldMusicAlbum);
@@ -180,7 +178,17 @@ public class DataUpdateMusicAlbumEditPanel extends DataInsertMusicPanel {
 		}
 	}
 	
-	private String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("null", "");
+	private static String formatString(String str) {
+		
+		String result = str.replaceAll("'", "");
+		
+		if (str.length() == 4) {
+			result = result.replaceAll("NULL", "").replaceAll("null", "");
+		}
+		
+		if (result.equals("")) {
+			result = null;
+		}
+		return result;
 	}
 }

@@ -3,7 +3,6 @@
  */
 package gui;
 
-import java.awt.MenuBar;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,7 +11,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import gui.pages.DataInsertBookPanel;
@@ -29,16 +27,17 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 7595726794122456110L;
 	
-	private JPanel currPanel;
+	private JScrollPane currPanel;
 	
 	public MainFrame(String title) {
 		super(title);
 		
 		// Set the default page as home page
 		HomePagePanel homePagePanel = new HomePagePanel();
-		homePagePanel.setBounds(0, 0, 1000, 800);
-		this.currPanel = homePagePanel;
-		this.getContentPane().add(homePagePanel);
+		homePagePanel.setBounds(0, 0, 1500, 800);
+		JScrollPane panelScroll = new JScrollPane(homePagePanel);
+		this.currPanel = panelScroll;
+		this.getContentPane().add(panelScroll);
 		
 		
 		// Create the navigation menu
@@ -94,7 +93,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				flipPageTo(new DataInsertBookPanel());
+				flipPageTo(new DataInsertBookPanel("Add New Book:"));
 			}
 		});
 		dataInsert.add(book);
@@ -105,7 +104,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				flipPageTo(new DataInsertMusicPanel());
+				flipPageTo(new DataInsertMusicPanel("Add New Music Album:"));
 			}
 		});
 		dataInsert.add(music);
@@ -116,7 +115,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				flipPageTo(new DataInsertMoviePanel());
+				flipPageTo(new DataInsertMoviePanel("Add New Movie:"));
 			}
 		});
 		dataInsert.add(movie);
@@ -156,7 +155,7 @@ public class MainFrame extends JFrame {
 		JScrollPane panelScroll = new JScrollPane(nextPanel);
 		
 		this.getContentPane().add(panelScroll);
-		this.currPanel = nextPanel;
+		this.currPanel = panelScroll;
 		
 		// Refresh
 		this.revalidate();

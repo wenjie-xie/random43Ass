@@ -48,76 +48,6 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	/**
-	 * Try to find the ID for the person given in the PeopleInvolvedTable
-	 * @param person
-	 * @return ID of the person iff the person already exists, else return null
-	 * @throws SQLException 
-	 *//*
-	private static String tryToFindPerson(Person person) throws SQLException {
-		String result = null;
-		
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
-							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName() + " "
-							+ "and " + PeopleInvolvedTable.MIDDLE_NAME + " = " + person.getMiddleName() + "");
-			if (rs.next()) {
-				result = rs.getString(PeopleInvolvedTable.ID);
-			}
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-		
-		return result;
-	}
-	
-	*//**
-	 * Add a new person to PeopleInvolved
-	 * @param person the new person that is going to be put into the database
-	 * @throws SQLException 
-	 *//*
-	private static void insertIntoPeopleInvolved(Person person) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "(" + PeopleInvolvedTable.FIRST_NAME + ", " + PeopleInvolvedTable.MIDDLE_NAME + ", "
-						+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
-					+ "VALUES (" + person.getFirstName() + ", " + person.getMiddleName() + ", "
-							+ person.getSurname() + ", " + person.getGender() + ")");
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-	}
-	
-	*//**
-	 * The purpose of this function is to find or create a person in the database
-	 * 	- find iff the person exist, otherwise create the person
-	 * @param person the person you are trying to find or create
-	 * @return the ID of the person
-	 * @throws SQLException 
-	 *//*
-	private static String findOrCreatePerson(Person person) throws SQLException {
-		String personID = null;
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			personID = tryToFindPerson(person);
-			
-			if (personID == null) {
-				insertIntoPeopleInvolved(person);
-				personID = tryToFindPerson(person);
-			}
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-		
-		return personID;
-	}*/
 	
 	/**
 	 * Insert a new Music Album
@@ -335,6 +265,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ "FROM " + MusicTable.TABLE_NAME + " "
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			
+			rs.next();
 			String albumName = rs.getString(MusicTable.ALBUM_NAME);
 			Integer year = rs.getInt(MusicTable.YEAR);
 			Integer producerID = rs.getInt(MusicTable.PRODUCER_ID);
@@ -355,6 +286,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 						+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'"
 						+ " and " + MusicTable.MUSIC_NAME + " = '" + musicName + "'");
 	
+				rs.next();
 				String language = rs.getString(MusicTable.LANGUAGE);
 				
 				ArrayList<Person> singerList = getSingerList(musicAlbum, musicName);

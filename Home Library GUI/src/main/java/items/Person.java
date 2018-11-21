@@ -148,5 +148,14 @@ public class Person {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Person [surname=" + surname + ", firstName=" + firstName + ", middleName=" + middleName + ", gender="
+				+ gender + "]";
+	}
+
 	
 }

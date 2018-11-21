@@ -33,8 +33,8 @@ public class DataInsertMusicPanel extends JPanel {
 	protected ArrayList<ArrayList<JTextArea>> musicTrackTable;
 	protected JButton addMusicTrackBtn;
 	
-	public DataInsertMusicPanel() {
-		instantiateMusicPanel("Add New Music:", this.createSubmitButton());
+	public DataInsertMusicPanel(String title) {
+		instantiateMusicPanel(title, this.createSubmitButton());
 		
 	}
 	

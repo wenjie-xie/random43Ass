@@ -43,14 +43,14 @@ public class DataInsertBookPanel extends JPanel {
 	protected JButton addMoreTagBtn;
 	protected JTextArea description;
 
-	public DataInsertBookPanel() {
-		instantiateBookPanel("Add New Book:", this.createSubmitButton());
+	public DataInsertBookPanel(String title) {
+		instantiateBookPanel(title , this.createSubmitButton());
 	}
 	
 	/**
 	 * Instantiate book panel
 	 */
-	protected void instantiateBookPanel(String title, JButton submitButton) {
+	private void instantiateBookPanel(String title, JButton submitButton) {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets.top = 2;
@@ -265,6 +265,9 @@ public class DataInsertBookPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Book object
 				Book book = getBookInfo();
+				System.out.println("*******************************");
+				System.out.println(book.toString());
+				System.out.println("*******************************");
 				
 				try {
 					DatabaseConnectionBookApi.insertBook(book);
@@ -383,6 +386,9 @@ public class DataInsertBookPanel extends JPanel {
 		try {
 			target = textArea.getText();
 		} catch (NullPointerException e) {
+			target = null;
+		}
+		if (textArea.getText().equals("")) {
 			target = null;
 		}
 		return target;

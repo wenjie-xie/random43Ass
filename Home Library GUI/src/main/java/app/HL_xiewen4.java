@@ -18,7 +18,7 @@ public class HL_xiewen4 {
 			
 			@Override
 			public void run() {
-				mainFrame.setSize(1000, 800);
+				mainFrame.setSize(1500, 800);
 				mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				mainFrame.setVisible(true);
 			}

@@ -27,10 +27,9 @@ public class DataUpdateBookEditPanel extends DataInsertBookPanel {
 	private Book oldBookInfo;
 
 	public DataUpdateBookEditPanel(Book book) {
-		this.oldBookInfo = book;
+		super("Update Book:");
 		
-		// instantiate book panel
-		super.instantiateBookPanel("Update Book:", this.createSubmitButton());
+		this.oldBookInfo = book;
 		
 		// instantiate the field so there will be enough fields for tags and author
 		setUpFieldEnvirnment(book);
@@ -111,8 +110,18 @@ public class DataUpdateBookEditPanel extends DataInsertBookPanel {
 		description.setText(this.formatString(book.getBookDescription()));
 	}
 	
-	private String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "");
+	private static String formatString(String str) {
+		
+		String result = str.replaceAll("'", "");
+		
+		if (str.length() == 4) {
+			result = result.replaceAll("NULL", "").replaceAll("null", "");
+		}
+		
+		if (result.equals("")) {
+			result = null;
+		}
+		return result;
 	}
 	
 	/**

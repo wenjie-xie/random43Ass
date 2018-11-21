@@ -303,6 +303,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MovieTable.TABLE_NAME + " "
 					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
 			
+			rs.next();
 			Integer year = rs.getInt(MovieTable.YEAR);
 			
 			movie = new Movie(movieName, year);
@@ -352,6 +353,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + " "
 					+ "WHERE " + RoleTable.ID + " = " + id);
 			
+			rs.next();
 			result = rs.getString(RoleTable.DESCRIPTION);
 			
 			connection.close();
@@ -496,6 +498,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
 					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
 			
+			rs.next();
 			result = rs.getInt(AwardTable.AWARD);
 			
 			connection.close();

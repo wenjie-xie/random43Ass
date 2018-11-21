@@ -31,7 +31,17 @@ public class DatabaseConnectionApi {
 	protected static final String sqlPassword = "a";
 	
 	protected static String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "");
+		
+		String result = str.replaceAll("'", "");
+		
+		if (str.length() == 4) {
+			result = result.replaceAll("NULL", "").replaceAll("null", "");
+		}
+		
+		if (result.equals("")) {
+			result = null;
+		}
+		return result;
 	}
 	
 	/**
@@ -60,11 +70,10 @@ public class DatabaseConnectionApi {
 				Integer actualGender = rs.getInt(PeopleInvolvedTable.GENDER);
 				Integer expectedGender = person.getGenderInt();
 				
-				if ((actualGender == expectedGender)
-						&& ((actualMiddleName == null && expectedMiddleName == null) 
-								|| (actualMiddleName.equals(expectedMiddleName)))) {
-					
-					result = rs.getInt(PeopleInvolvedTable.ID);
+				if (actualGender == expectedGender) {
+					if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
+						result = rs.getInt(PeopleInvolvedTable.ID);
+					}
 				}
 			}
 			
@@ -140,6 +149,7 @@ public class DatabaseConnectionApi {
 			System.out.println("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
 			
+			rs.next();
 			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
 			String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 			String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);

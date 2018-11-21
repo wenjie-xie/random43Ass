@@ -208,4 +208,17 @@ public class Book {
 	public void setBookDescription(String bookDescription) {
 		this.bookDescription = bookDescription;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Book [bookName=" + bookName + ", bookISBN=" + bookISBN + ", publisherName=" + publisherName
+				+ ", editionNumber=" + editionNumber + ", authorList=" + authorList + ", numOfPage=" + numOfPage
+				+ ", publicationYear=" + publicationYear + ", keyWords=" + keyWords + ", bookDescription="
+				+ bookDescription + "]";
+	}
+	
+	
 }
