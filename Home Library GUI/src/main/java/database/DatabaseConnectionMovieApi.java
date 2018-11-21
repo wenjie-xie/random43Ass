@@ -510,4 +510,84 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		
 		return result;
 	}
+	
+	/*********************
+	 * UPDATE MOVIE *
+	 *********************/
+	
+	/**
+	 * Compare and update the old movie info in the data base into the new movie info given
+	 * @param oldMovieInfo
+	 * @param newMovieInfo
+	 */
+	public static void compareAndUpdateMovie(Movie oldMovieInfo, Movie newMovieInfo) {
+		
+	}
+	
+	/*****************************
+	 * REMOVE MOVIE *
+	 *****************************/
+	
+	/**
+	 * Remove the movie given completely from the database
+	 * @param movie
+	 */
+	public static void removeMovie(Movie movie) {
+		
+	}
+	
+	
+	/**
+	 * Remove movie from Movie Table
+	 * @throws SQLException 
+	 */
+	private static void removeMovieFromMovieTable(Movie movie) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeQuery("DELETE FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + MovieTable.YEAR + " = " + movie.getReleaseYear());
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove movie from Crew Member Table
+	 * @throws SQLException 
+	 */
+	private static void removeMovieFromCrewMemberTable(Movie movie) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeQuery("DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove movie from Award Table
+	 * @throws SQLException 
+	 */
+	private static void removeMovieFromAwardTable(Movie movie) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeQuery("DELETE FROM " + AwardTable.TABLE_NAME + " "
+					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
+					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
 }
