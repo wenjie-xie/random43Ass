@@ -522,12 +522,40 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	public static void compareAndUpdateMovie(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
-		// remove the everything from the old movie
-		removeMovie(oldMovieInfo);
+		// compare and update Movie Table
+		compareAndUpdateMovieTable(oldMovieInfo, newMovieInfo);
 		
-		// insert the new movie
-		insertMovie(newMovieInfo);
+		// compare and update Crew member table
+		removeMovieFromCrewMemberTable(oldMovieInfo);
+		insertIntoCrewMember(newMovieInfo);
+		
+		// compare and update Award table
+		removeMovieFromAwardTable(oldMovieInfo);
+		insertIntoAward(newMovieInfo);
 	}
+	
+	
+	/**
+	 * Compare and update movie table
+	 * @param oldMovieInfo
+	 * @param newMovieInfo
+	 * @throws SQLException 
+	 */
+	private static void compareAndUpdateMovieTable(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + MovieTable.TABLE_NAME + " "
+					+ "SET " + MovieTable.MOVIE_NAME + " = " + newMovieInfo.getMovieName() + ", "
+							+ MovieTable.YEAR + " = " + newMovieInfo.getReleaseYear() + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = " + oldMovieInfo.getMovieName());
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
 	
 	/*****************************
 	 * REMOVE MOVIE *
