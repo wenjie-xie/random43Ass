@@ -95,7 +95,7 @@ public class Person {
 	/**
 	 * @param isMale the isMale to set
 	 */
-	public void setGender(int gender) {
+	public void setGender(Integer gender) {
 		this.gender = gender;
 	}
 

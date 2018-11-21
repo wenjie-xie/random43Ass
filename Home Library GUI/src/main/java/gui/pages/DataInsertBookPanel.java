@@ -44,7 +44,13 @@ public class DataInsertBookPanel extends JPanel {
 
 	public DataInsertBookPanel() {
 		super();
-		
+		instantiateBookPanel();
+	}
+	
+	/**
+	 * Instantiate book panel
+	 */
+	protected void instantiateBookPanel() {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets.top = 2;
@@ -241,7 +247,8 @@ public class DataInsertBookPanel extends JPanel {
 		JTextArea authorSurname = this.createTextField("Author Surname:", targetRow, 0);
 		JTextArea authorFirstName = this.createTextField("Author First Name:", targetRow, 2);
 		JTextArea authorMiddleName = this.createTextField("Author Middle Name:", targetRow, 4);
-		authorNameList.addAll(Arrays.asList(authorSurname, authorFirstName, authorMiddleName));
+		JTextArea authorGender = this.createTextField("Author Gender:", targetRow, 6);
+		authorNameList.addAll(Arrays.asList(authorSurname, authorFirstName, authorMiddleName, authorGender));
 		
 		return authorNameList;
 	}
@@ -321,6 +328,10 @@ public class DataInsertBookPanel extends JPanel {
 				// author middle name
 				String targetAuthorMiddleName = textAreaToString(authorList.get(2));
 				author.setMiddleName(targetAuthorMiddleName);
+				
+				// author middle name
+				Integer targetAuthorGender = textAreaToInt(authorList.get(3));
+				author.setGender(targetAuthorGender);
 				
 				// Append to targetAuthorList
 				targetAuthorList.add(author);

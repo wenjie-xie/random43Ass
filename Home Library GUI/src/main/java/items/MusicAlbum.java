@@ -44,7 +44,7 @@ public class MusicAlbum {
 	/**
 	 * @param diskType the diskType to set
 	 */
-	public void setDiskType(int diskType) {
+	public void setDiskType(Integer diskType) {
 		this.diskType = diskType;
 	}
 
@@ -89,7 +89,7 @@ public class MusicAlbum {
 	/**
 	 * @param yearPublished the yearPublished to set
 	 */
-	public void setYearPublished(int yearPublished) {
+	public void setYearPublished(Integer yearPublished) {
 		this.yearPublished = yearPublished;
 	}
 

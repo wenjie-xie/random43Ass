@@ -223,7 +223,8 @@ public class DataInsertMoviePanel extends JPanel {
 		JTextArea surname = this.createTextField(role + " Surname:", targetRowNum, 0);
 		JTextArea firstName = this.createTextField(role + " First Name:", targetRowNum, 2);
 		JTextArea middleName = this.createTextField(role + " Middle Name:", targetRowNum, 4);
-		nameList.addAll(Arrays.asList(surname, firstName, middleName));
+		JTextArea gender = this.createTextField(role + " Gender:", targetRowNum, 6);
+		nameList.addAll(Arrays.asList(surname, firstName, middleName, gender));
 		
 		return nameList;
 	}
@@ -315,6 +316,10 @@ public class DataInsertMoviePanel extends JPanel {
 				// Middle Name
 				String targetPersonMiddleName = textAreaToString(person.get(2));
 				targetPerson.setMiddleName(targetPersonMiddleName);
+				
+				// Gender
+				Integer targetGender = textAreaToInt(person.get(3));
+				targetPerson.setGender(targetGender);
 				
 				// Add person
 				targetPersonList.add(targetPerson);

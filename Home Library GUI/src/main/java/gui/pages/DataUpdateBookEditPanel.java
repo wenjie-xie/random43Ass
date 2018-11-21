@@ -26,7 +26,7 @@ import items.Person;
  * @author xiewen4
  *
  */
-public class DataUpdateBookEditPanel extends JPanel {
+public class DataUpdateBookEditPanel extends DataInsertBookPanel {
 
 	private static final long serialVersionUID = 6514547048807147368L;
 	

@@ -199,7 +199,7 @@ public class Movie {
 	/**
 	 * @param releaseYear the releaseYear to set
 	 */
-	public void setReleaseYear(int releaseYear) {
+	public void setReleaseYear(Integer releaseYear) {
 		this.releaseYear = releaseYear;
 	}
 
@@ -224,7 +224,7 @@ public class Movie {
 	/**
 	 * @param award the award to set
 	 */
-	public void setAward(int award) {
+	public void setAward(Integer award) {
 		this.award = award;
 	}
 }

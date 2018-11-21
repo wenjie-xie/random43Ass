@@ -103,7 +103,7 @@ public class Book {
 	/**
 	 * @param editionNumber the editionNumber to set
 	 */
-	public void setEditionNumber(int editionNumber) {
+	public void setEditionNumber(Integer editionNumber) {
 		this.editionNumber = editionNumber;
 	}
 
@@ -145,7 +145,7 @@ public class Book {
 	/**
 	 * @param numOfPage the numOfPage to set
 	 */
-	public void setNumOfPage(int numOfPage) {
+	public void setNumOfPage(Integer numOfPage) {
 		this.numOfPage = numOfPage;
 	}
 
@@ -169,7 +169,7 @@ public class Book {
 	/**
 	 * @param publicationYear the publicationYear to set
 	 */
-	public void setPublicationYear(int publicationYear) {
+	public void setPublicationYear(Integer publicationYear) {
 		this.publicationYear = publicationYear;
 	}
 
