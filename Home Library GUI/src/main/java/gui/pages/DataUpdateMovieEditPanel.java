@@ -248,10 +248,10 @@ public class DataUpdateMovieEditPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Music Album object
-				Movie movie = getMovieInfo();
+				Movie newMovie = getMovieInfo();
 				
 				try {
-					DatabaseConnectionMovieApi.;
+					DatabaseConnectionMovieApi.compareAndUpdateMovie(oldMovie, newMovie);
 					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 					
 				} catch (SQLException e1) {

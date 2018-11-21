@@ -73,7 +73,8 @@ public class MainFrame extends JFrame {
 		dataMenuBar.add(dataInsertMenu);
 		
 		// Data > Update
-		
+		JMenu dataUpdateMenu = this.createDataUpdateMenu();
+		dataMenuBar.add(dataUpdateMenu);
 		
 		return dataMenuBar;
 	}
@@ -120,6 +121,28 @@ public class MainFrame extends JFrame {
 		dataInsert.add(movie);
 		
 		return dataInsert;
+	}
+	
+	
+	/**
+	 * Create Update Menu
+	 * @return update menu
+	 */
+	private JMenu createDataUpdateMenu() {
+		// Data > Update
+		JMenu dataUpdate = new JMenu("Update");
+		// Data > Update
+		JMenuItem book = new JMenuItem("Book");
+		book.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flipPageTo(new DataInsertBookPanel());
+			}
+		});
+		dataUpdate.add(book);
+		
+		return dataUpdate;
 	}
 	
 	

@@ -519,9 +519,14 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * Compare and update the old movie info in the data base into the new movie info given
 	 * @param oldMovieInfo
 	 * @param newMovieInfo
+	 * @throws SQLException 
 	 */
-	public static void compareAndUpdateMovie(Movie oldMovieInfo, Movie newMovieInfo) {
+	public static void compareAndUpdateMovie(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
+		// remove the everything from the old movie
+		removeMovie(oldMovieInfo);
 		
+		// insert the new movie
+		insertMovie(newMovieInfo);
 	}
 	
 	/*****************************
@@ -531,9 +536,17 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	/**
 	 * Remove the movie given completely from the database
 	 * @param movie
+	 * @throws SQLException 
 	 */
-	public static void removeMovie(Movie movie) {
+	public static void removeMovie(Movie movie) throws SQLException {
+		// remove movie from Movie table
+		removeMovieFromMovieTable(movie);
 		
+		// remove movie from crew member table
+		removeMovieFromCrewMemberTable(movie);
+		
+		// remove movie from award table
+		removeMovieFromAwardTable(movie);
 	}
 	
 	
