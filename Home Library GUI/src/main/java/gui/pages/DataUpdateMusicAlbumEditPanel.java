@@ -100,6 +100,9 @@ public class DataUpdateMusicAlbumEditPanel extends DataInsertMusicPanel {
 		// producerMiddleName
 		this.producerMiddleName.setText(this.formatString(musicAlbum.getProducer().getMiddleName()));
 		
+		// producerMiddleName
+		this.producerGender.setText(this.formatString(musicAlbum.getProducer().getGender()));
+		
 		// musicTrackTable
 		int i = 0;
 		for (Music music : musicAlbum.getMusicTrackList()) {
@@ -111,60 +114,73 @@ public class DataUpdateMusicAlbumEditPanel extends DataInsertMusicPanel {
 			// languageOfLyrics
 			musicTextAreaList.get(1).setText(formatString(music.getLanguage()));
 			
-			if (music.getSingerList().size() >= 1) {
-				// singer1Surname
-				musicTextAreaList.get(2).setText(formatString(music.getSingerList().get(0).getSurname()));
-				
-				// singer1FirstName
-				musicTextAreaList.get(3).setText(formatString(music.getSingerList().get(0).getFirstName()));
-				
-				// singer1MiddleName
-				musicTextAreaList.get(4).setText(formatString(music.getSingerList().get(0).getMiddleName()));
-			}
+			// singer1Surname
+			musicTextAreaList.get(2).setText(formatString(music.getSingerList().get(0).getSurname()));
+			
+			// singer1FirstName
+			musicTextAreaList.get(3).setText(formatString(music.getSingerList().get(0).getFirstName()));
+			
+			// singer1MiddleName
+			musicTextAreaList.get(4).setText(formatString(music.getSingerList().get(0).getMiddleName()));
+			
+			// singer1Gender
+			musicTextAreaList.get(5).setText(formatString(music.getSingerList().get(0).getGender()));
 			
 			if (music.getSingerList().size() >= 2) {
 				// singer2Surname
-				musicTextAreaList.get(5).setText(formatString(music.getSingerList().get(1).getSurname()));
+				musicTextAreaList.get(6).setText(formatString(music.getSingerList().get(1).getSurname()));
 				
 				// singer2FirstName
-				musicTextAreaList.get(6).setText(formatString(music.getSingerList().get(1).getFirstName()));
+				musicTextAreaList.get(7).setText(formatString(music.getSingerList().get(1).getFirstName()));
 				
 				// singer2MiddleName
-				musicTextAreaList.get(7).setText(formatString(music.getSingerList().get(1).getMiddleName()));
+				musicTextAreaList.get(8).setText(formatString(music.getSingerList().get(1).getMiddleName()));
+				
+				// singer2Gender
+				musicTextAreaList.get(9).setText(formatString(music.getSingerList().get(1).getGender()));
 			}
 			
 			// songWriterSurname
-			musicTextAreaList.get(8).setText(formatString(music.getSongWriter().getSurname()));
+			musicTextAreaList.get(10).setText(formatString(music.getSongWriter().getSurname()));
 			
 			// songWriterFirstName
-			musicTextAreaList.get(9).setText(formatString(music.getSongWriter().getFirstName()));
+			musicTextAreaList.get(11).setText(formatString(music.getSongWriter().getFirstName()));
 			
 			// songWriterMiddleName
-			musicTextAreaList.get(10).setText(formatString(music.getSongWriter().getMiddleName()));
+			musicTextAreaList.get(12).setText(formatString(music.getSongWriter().getMiddleName()));
+			
+			// songWriterGender
+			musicTextAreaList.get(13).setText(formatString(music.getSongWriter().getGender()));
 			
 			// composerSurname
-			musicTextAreaList.get(11).setText(formatString(music.getComposer().getSurname()));
+			musicTextAreaList.get(14).setText(formatString(music.getComposer().getSurname()));
 			
 			// composerFirstName
-			musicTextAreaList.get(12).setText(formatString(music.getComposer().getFirstName()));
+			musicTextAreaList.get(15).setText(formatString(music.getComposer().getFirstName()));
 			
 			// composerMiddleName
-			musicTextAreaList.get(13).setText(formatString(music.getComposer().getMiddleName()));
+			musicTextAreaList.get(16).setText(formatString(music.getComposer().getMiddleName()));
+			
+			// composerGender
+			musicTextAreaList.get(17).setText(formatString(music.getComposer().getGender()));
 			
 			// arrangerSurname
-			musicTextAreaList.get(14).setText(formatString(music.getArranger().getSurname()));
+			musicTextAreaList.get(18).setText(formatString(music.getArranger().getSurname()));
 			
 			// arrangerFirstName
-			musicTextAreaList.get(15).setText(formatString(music.getArranger().getFirstName()));
+			musicTextAreaList.get(19).setText(formatString(music.getArranger().getFirstName()));
 			
 			// arrangerMiddleName
-			musicTextAreaList.get(16).setText(formatString(music.getArranger().getMiddleName()));
+			musicTextAreaList.get(20).setText(formatString(music.getArranger().getMiddleName()));
+			
+			// arrangerGender
+			musicTextAreaList.get(21).setText(formatString(music.getArranger().getGender()));
 			
 			i = i + 1;
 		}
 	}
 	
 	private String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("-1", "");
+		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("null", "");
 	}
 }

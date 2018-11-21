@@ -94,6 +94,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			directorNameList.get(2).setText(formatString(director.getMiddleName()));
+			
+			// gender
+			directorNameList.get(3).setText(formatString(director.getGender()));
 		}
 		
 		// scriptWriterNameTable
@@ -109,6 +112,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			scriptWriterNameList.get(2).setText(formatString(scriptWriter.getMiddleName()));
+			
+			// gender
+			scriptWriterNameList.get(3).setText(formatString(scriptWriter.getGender()));
 		}
 		
 		// castNameTable
@@ -124,6 +130,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			castNameList.get(2).setText(formatString(cast.getMiddleName()));
+			
+			// gender
+			castNameList.get(3).setText(formatString(cast.getGender()));
 		}
 		
 		// producerNameTable
@@ -139,6 +148,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			producerNameList.get(2).setText(formatString(producer.getMiddleName()));
+			
+			// gender
+			producerNameList.get(2).setText(formatString(producer.getGender()));
 		}
 		
 		// composerNameTable
@@ -154,6 +166,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			composerNameList.get(2).setText(formatString(composer.getMiddleName()));
+			
+			// middle name
+			composerNameList.get(3).setText(formatString(composer.getGender()));
 		}
 		
 		// editorNameTable
@@ -169,6 +184,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			editorNameList.get(2).setText(formatString(editor.getMiddleName()));
+			
+			// gender
+			editorNameList.get(3).setText(formatString(editor.getGender()));
 		}
 		
 		// costumeDesignerNameTable
@@ -184,6 +202,9 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			
 			// middle name
 			costumeDesignerNameList.get(2).setText(formatString(costumeDesigner.getMiddleName()));
+			
+			// gender
+			costumeDesignerNameList.get(3).setText(formatString(costumeDesigner.getGender()));
 		}
 		
 		// yearOfRelease
@@ -192,6 +213,6 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 	
 	
 	private String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("-1", "");
+		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("null", "");
 	}
 }
