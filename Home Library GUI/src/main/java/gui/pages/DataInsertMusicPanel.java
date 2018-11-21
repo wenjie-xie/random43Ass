@@ -15,9 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import app.HL_xiewen4;
-import database.DatabaseConnectionBookApi;
 import database.DatabaseConnectionMusicAlbumApi;
-import items.Book;
 import items.Music;
 import items.MusicAlbum;
 import items.Person;
@@ -26,17 +24,25 @@ public class DataInsertMusicPanel extends JPanel {
 
 	private static final long serialVersionUID = 5011747774458485854L;
 
-	private JTextArea nameOfDisk;
-	private JTextArea yearPublished;
-	private JTextArea producerSurname;
-	private JTextArea producerFirstName;
-	private JTextArea producerMiddleName;
-	private JTextArea producerGender;
-	private ArrayList<ArrayList<JTextArea>> musicTrackTable;
+	protected JTextArea nameOfDisk;
+	protected JTextArea yearPublished;
+	protected JTextArea producerSurname;
+	protected JTextArea producerFirstName;
+	protected JTextArea producerMiddleName;
+	protected JTextArea producerGender;
+	protected ArrayList<ArrayList<JTextArea>> musicTrackTable;
+	protected JButton addMusicTrackBtn;
 	
 	public DataInsertMusicPanel() {
-		super();
-		 
+		instantiateMusicPanel("Add New Music:", this.createSubmitButton());
+		
+	}
+	
+	
+	/**
+	 * Instantiate Music panel
+	 */
+	protected void instantiateMusicPanel(String title, JButton submitButton) {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets.top = 2;
@@ -45,7 +51,7 @@ public class DataInsertMusicPanel extends JPanel {
 		c.insets.right = 2;
 		
 		// Add Music message
-		JLabel message = new JLabel("Add New Music:");
+		JLabel message = new JLabel(title);
 		message.setFont(new Font(message.getName(), Font.PLAIN, 30));
 		c.weightx = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -70,7 +76,7 @@ public class DataInsertMusicPanel extends JPanel {
 		musicTrackTable.add(this.addOneMusicTrack(4, 1));
 		int nextRowNum = musicTrackTable.get(0).size() + 3;
 		
-		JButton addMusicTrackBtn = new JButton("Add Music Track");
+		this.addMusicTrackBtn = new JButton("Add Music Track");
 		addMusicTrackBtn.addActionListener(new ActionListener() {
 			private int rowStart = nextRowNum;
 			private int trackNum = 2;
@@ -90,7 +96,7 @@ public class DataInsertMusicPanel extends JPanel {
 		this.add(addMusicTrackBtn, c);
 		
 		// Submit
-		JButton submitBtn = createSubmitButton();
+		JButton submitBtn = submitButton;
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 999;
@@ -245,7 +251,7 @@ public class DataInsertMusicPanel extends JPanel {
 	 * Gather all the Music Album info into a MusicAlbum object
 	 * @return musicAlbum object that contains all the info from the user
 	 */
-	private MusicAlbum getMusicAlbumInfo() {
+	protected MusicAlbum getMusicAlbumInfo() {
 		// name of disk
 		String targetAlbumName = textAreaToString(this.nameOfDisk);
 		

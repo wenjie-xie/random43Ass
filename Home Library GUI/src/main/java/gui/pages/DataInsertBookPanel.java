@@ -3,7 +3,6 @@
  */
 package gui.pages;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,25 +31,26 @@ public class DataInsertBookPanel extends JPanel {
 	private static final long serialVersionUID = 2059922932338622502L;
 	
 	// Fields
-	private JTextArea bookName;
-	private JTextArea bookISBN;
-	private JTextArea publisherName;
-	private JTextArea editionNumber;
-	private ArrayList<ArrayList<JTextArea>> authorNameTable;
-	private JTextArea numberOfPage;
-	private JTextArea publicationYear;
-	private ArrayList<JTextArea> tagList;
-	private JTextArea description;
+	protected JTextArea bookName;
+	protected JTextArea bookISBN;
+	protected JTextArea publisherName;
+	protected JTextArea editionNumber;
+	protected ArrayList<ArrayList<JTextArea>> authorNameTable;
+	protected JButton addAuthorBtn;
+	protected JTextArea numberOfPage;
+	protected JTextArea publicationYear;
+	protected ArrayList<JTextArea> tagList;
+	protected JButton addMoreTagBtn;
+	protected JTextArea description;
 
 	public DataInsertBookPanel() {
-		super();
-		instantiateBookPanel();
+		instantiateBookPanel("Add New Book:", this.createSubmitButton());
 	}
 	
 	/**
 	 * Instantiate book panel
 	 */
-	protected void instantiateBookPanel() {
+	protected void instantiateBookPanel(String title, JButton submitButton) {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets.top = 2;
@@ -59,7 +59,7 @@ public class DataInsertBookPanel extends JPanel {
 		c.insets.right = 2;
 		
 		// Add Book message
-		JLabel message = new JLabel("Add New Book:");
+		JLabel message = new JLabel(title);
 		message.setFont(new Font(message.getName(), Font.PLAIN, 30));
 		c.weightx = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -85,7 +85,7 @@ public class DataInsertBookPanel extends JPanel {
 		int nextRowNum = 7;
 		
 		// Add more author button
-		JButton addAuthorBtn = new JButton("Add More Author");
+		this.addAuthorBtn = new JButton("Add More Author");
 		addAuthorBtn.addActionListener(new ActionListener() {
 			
 			private int startRowNum = nextRowNum;
@@ -125,7 +125,7 @@ public class DataInsertBookPanel extends JPanel {
 		tagList.add(tag);
 		
 		// Add more tag button
-		JButton addMoreTagBtn = new JButton("Add More KeyWord");
+		this.addMoreTagBtn = new JButton("Add More KeyWord");
 		addMoreTagBtn.addActionListener(new ActionListener() {
 			
 			private int numberOfTags = 0;
@@ -172,7 +172,7 @@ public class DataInsertBookPanel extends JPanel {
 		this.add(description, c);
 		
 		// Submit
-		JButton submitBtn = this.createSubmitButton();
+		JButton submitBtn = submitButton;
 		c.gridwidth = 1;
 		c.gridy = 31;
 		c.gridx = 0;
@@ -285,7 +285,7 @@ public class DataInsertBookPanel extends JPanel {
 	 * and add them to the book object
 	 * @return a book object containing all the info entered by the user
 	 */
-	private Book getBookInfo() {
+	protected Book getBookInfo() {
 		// bookName
 		String targetBookName = textAreaToString(this.bookName);
 		

@@ -31,19 +31,28 @@ public class DataInsertMoviePanel extends JPanel {
 	private static final long serialVersionUID = -618204154220577240L;
 	
 	// Fields
-	private JTextArea nameOfMovie;
-	private ArrayList<ArrayList<JTextArea>> directorNameTable;
-	private ArrayList<ArrayList<JTextArea>> scriptWriterNameTable;
-	private ArrayList<ArrayList<JTextArea>> castNameTable;
-	private ArrayList<ArrayList<JTextArea>> producerNameTable;
-	private ArrayList<ArrayList<JTextArea>> composerNameTable;
-	private ArrayList<ArrayList<JTextArea>> editorNameTable;
-	private ArrayList<ArrayList<JTextArea>> costumeDesignerNameTable;
-	private JTextArea yearOfRelease;
+	protected JTextArea nameOfMovie;
+	protected ArrayList<ArrayList<JTextArea>> directorNameTable;
+	protected ArrayList<ArrayList<JTextArea>> scriptWriterNameTable;
+	protected ArrayList<ArrayList<JTextArea>> castNameTable;
+	protected ArrayList<ArrayList<JTextArea>> producerNameTable;
+	protected ArrayList<ArrayList<JTextArea>> composerNameTable;
+	protected ArrayList<ArrayList<JTextArea>> editorNameTable;
+	protected ArrayList<ArrayList<JTextArea>> costumeDesignerNameTable;
+	protected JTextArea yearOfRelease;
+	protected JButton addCastBtn;
 	
 	public DataInsertMoviePanel() {
 		super();
+		instantiateMoviePanel("Add New Movie:", this.createSubmitButton());
 		
+	}
+	
+	
+	/**
+	 * Instantiate movie panel
+	 */
+	protected void instantiateMoviePanel(String title, JButton submitButton) {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets.top = 2;
@@ -52,7 +61,7 @@ public class DataInsertMoviePanel extends JPanel {
 		c.insets.right = 2;
 		
 		// Add Music message
-		JLabel message = new JLabel("Add New Movie:");
+		JLabel message = new JLabel(title);
 		message.setFont(new Font(message.getName(), Font.PLAIN, 30));
 		c.weightx = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -84,7 +93,7 @@ public class DataInsertMoviePanel extends JPanel {
 		castNameTable.add(this.createNameRow("Cast", 14, 1));
 		
 		// Add more cast button
-		JButton addCastBtn = new JButton("Add More Cast");
+		this.addCastBtn = new JButton("Add More Cast");
 		addCastBtn.addActionListener(new ActionListener() {
 			
 			private int nextRowNum = 16;
@@ -144,10 +153,10 @@ public class DataInsertMoviePanel extends JPanel {
 		costumeDesignerNameTable.add(this.createNameRow("Costume Designer", 57, 3));
 		
 		// Year of Release
-		JTextArea yearOfRelease = this.createTextField("Year of Release:", 59, 0);
+		this.yearOfRelease = this.createTextField("Year of Release:", 59, 0);
 		
 		// Submit
-		JButton submitBtn = this.createSubmitButton();
+		JButton submitBtn = submitButton;
 		c.gridwidth = 1;
 		c.gridy = 60;
 		c.gridx = 0;
@@ -260,7 +269,7 @@ public class DataInsertMoviePanel extends JPanel {
 	 * Put all info provided by the user into a Movie object
 	 * @return
 	 */
-	private Movie getMovieInfo() {
+	protected Movie getMovieInfo() {
 		// nameOfMovie
 		String targetMovieName = textAreaToString(this.nameOfMovie);
 		
