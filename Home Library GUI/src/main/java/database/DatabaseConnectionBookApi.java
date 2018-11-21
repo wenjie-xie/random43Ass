@@ -32,19 +32,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	public static void insertBook(Book book) throws SQLException {
-		try {
-			// insert into Book table
-			insertIntoBook(book);
-			
-			// insert into the Book Keyword table
-			insertIntoBookKeyword(book);
-			
-			// insert into the BookAuthor
-			insertIntoBookAuthor(book);
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
+		// insert into Book table
+		insertIntoBook(book);
+		
+		// insert into the Book Keyword table
+		insertIntoBookKeyword(book);
+		
+		// insert into the BookAuthor
+		insertIntoBookAuthor(book);
 	}
 	
 	/**
@@ -86,7 +81,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			
 			// Loop through each tag
 			for (String tag : book.getKeyWords()) {
-				String tagID = findOrCreateBookTag(tag);
+				Integer tagID = findOrCreateBookTag(tag);
 				
 				// SQL
 				Statement stmt = null;
@@ -105,8 +100,8 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	private static String findOrCreateBookTag(String tag) throws SQLException {
-		String tagID = tryToFindBookTag(tag);
+	private static Integer findOrCreateBookTag(String tag) throws SQLException {
+		Integer tagID = tryToFindBookTag(tag);
 		
 		// If tag does not exist then add it into the Keyword table
 		if (tagID == null) {
@@ -120,11 +115,11 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	/**
 	 * Try to find the ID for the given tag
 	 * @param tag the tag that is being searched
-	 * @return true iff the tag already exists
+	 * @return tag id iff the tag already exists
 	 * @throws SQLException 
 	 */
-	private static String tryToFindBookTag(String tag) throws SQLException {
-		String result = null;
+	private static Integer tryToFindBookTag(String tag) throws SQLException {
+		Integer result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -134,7 +129,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " "
 					+ "WHERE " + KeywordTable.TAG + " = '" + tag + "'");
 			if (rs.next()) {
-				result = rs.getString(KeywordTable.ID);
+				result = rs.getInt(KeywordTable.ID);
 			}
 			
 			connection.close();
@@ -147,7 +142,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Fill book info into Keyword Table
-	 * @param tag the new tag that is going to be added into the database
+	 * @param tag the new tag that is going to be added into the database, with no "'"
 	 * @throws SQLException 
 	 */
 	private static void insertIntoKeyword(String tag) throws SQLException {
@@ -156,10 +151,10 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			stmt = connection.createStatement();
 			System.out.println("INSERT INTO " + KeywordTable.TABLE_NAME + " "
 					+ "(" + KeywordTable.TAG + ") "
-					+ "VALUES (" + tag + ")");
+					+ "VALUES ('" + tag + "')");
 			stmt.executeUpdate("INSERT INTO " + KeywordTable.TABLE_NAME + " "
 					+ "(" + KeywordTable.TAG + ") "
-					+ "VALUES (" + tag + ")");
+					+ "VALUES ('" + tag + "')");
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -178,7 +173,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			for (Person author : book.getAuthorList()) {
 				// try to grab the author ID from the database
 				// if the author is new insert the author to the database
-				String authorID = findOrCreatePerson(author);
+				Integer authorID = findOrCreatePerson(author);
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
@@ -296,9 +291,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			String bookISBN = rs.getString(BookTable.ISBN);
 			String bookTitle = rs.getString(BookTable.TITLE);
 			String bookPublisher = rs.getString(BookTable.PUBLISHER);
-			int bookNumberOfPages = Integer.parseInt(rs.getString(BookTable.NUMBER_OF_PAGES));
-			int bookYear = Integer.parseInt(rs.getString(BookTable.YEAR_OF_PUBLICATION));
-			int bookEdition = Integer.parseInt(rs.getString(BookTable.EDITION_NUMBER));
+			Integer bookNumberOfPages = rs.getInt(BookTable.NUMBER_OF_PAGES);
+			Integer bookYear = rs.getInt(BookTable.YEAR_OF_PUBLICATION);
+			Integer bookEdition = rs.getInt(BookTable.EDITION_NUMBER);
 			String bookAbstract = rs.getString(BookTable.ABSTRACT);
 			
 			book = new Book(bookISBN, bookTitle, bookPublisher, bookNumberOfPages, bookYear);
@@ -323,7 +318,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @return the tag name
 	 * @throws SQLException 
 	 */
-	private static String getTagFromKeywordTable(int id) throws SQLException {
+	private static String getTagFromKeywordTable(Integer id) throws SQLException {
 		String tag;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -350,7 +345,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		
 		ArrayList<Integer> tagIDList = getTagIDList(bookISBN);
 			
-		for (int tagID : tagIDList) {
+		for (Integer tagID : tagIDList) {
 			tagList.add(getTagFromKeywordTable(tagID));
 		}
 		
@@ -399,7 +394,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		
 		ArrayList<Integer> authorIDList = getAuthorIDList(bookISBN);
 		
-		for (int authorID : authorIDList) {
+		for (Integer authorID : authorIDList) {
 			authorList.add(getPersonFromPeopleInvolvedTable(authorID));
 		}
 		
@@ -542,8 +537,8 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// remove the book author that should be removed
 			for (Person oldAuthor : oldBookInfo.getAuthorList()) {
 				if (!newBookInfo.getAuthorList().contains(oldAuthor)) {
-					int oldAuthorID = Integer.parseInt(tryToFindPerson(oldAuthor));
-					removeAuthorFromBookAuthor(newBookInfo.getBookISBN().replaceAll("'", ""),
+					Integer oldAuthorID = tryToFindPerson(oldAuthor);
+					removeAuthorFromBookAuthor(formatString(newBookInfo.getBookISBN()),
 							oldAuthorID);
 				}
 			}
@@ -555,8 +550,8 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					newAuthorList.add(newAuthor);
 				}
 			}
-			Book dummy = new Book(newBookInfo.getBookISBN().replaceAll("'", ""),
-					null, null, -1, -1);
+			Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
+					null, null, null, null);
 			dummy.setAuthorList(newAuthorList);
 			insertIntoBookAuthor(dummy);
 			
@@ -609,8 +604,8 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// remove the keyword that should be removed
 			for (String oldTag : oldBookInfo.getKeyWords()) {
 				if (!newBookInfo.getKeyWords().contains(oldTag)) {
-					int oldTagID = Integer.parseInt(tryToFindBookTag(oldTag));
-					removeKeywordFromBookKeyword(newBookInfo.getBookISBN().replaceAll("'", ""),
+					Integer oldTagID = tryToFindBookTag(oldTag);
+					removeKeywordFromBookKeyword(formatString(newBookInfo.getBookISBN()),
 							oldTagID);
 				}
 			}
@@ -622,8 +617,8 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 					newTagList.add(newTag);
 				}
 			}
-			Book dummy = new Book(newBookInfo.getBookISBN().replaceAll("'", ""),
-					null, null, -1, -1);
+			Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
+					null, null, null, null);
 			dummy.setKeyWords(newTagList);
 			insertIntoBookKeyword(dummy);
 			
@@ -643,7 +638,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @param authorID
 	 * @throws SQLException 
 	 */
-	private static void removeAuthorFromBookAuthor(String bookISBN, int authorID) throws SQLException {
+	private static void removeAuthorFromBookAuthor(String bookISBN, Integer authorID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
@@ -667,7 +662,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @param keywordID
 	 * @throws SQLException 
 	 */
-	private static void removeKeywordFromBookKeyword(String bookISBN, int keywordID) throws SQLException {
+	private static void removeKeywordFromBookKeyword(String bookISBN, Integer keywordID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;

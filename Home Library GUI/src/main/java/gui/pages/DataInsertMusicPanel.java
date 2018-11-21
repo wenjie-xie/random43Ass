@@ -243,7 +243,7 @@ public class DataInsertMusicPanel extends JPanel {
 		String targetAlbumName = textAreaToString(this.nameOfDisk);
 		
 		// year published
-		int targetYearPublished = textAreaToInt(this.yearPublished);
+		Integer targetYearPublished = textAreaToInt(this.yearPublished);
 		
 		// music track list
 		ArrayList<Music> musicList = new ArrayList<>();
@@ -337,16 +337,16 @@ public class DataInsertMusicPanel extends JPanel {
 	}
 	
 	/**
-	 * Get data from the text area as int
+	 * Get data from the text area as Integer
 	 * @param textArea
-	 * @return a int given, otherwise return -1
+	 * @return a Integer given, otherwise return -1
 	 */
-	private int textAreaToInt(JTextArea textArea) {
-		int target;
+	private Integer textAreaToInt(JTextArea textArea) {
+		Integer target;
 		try {
 			target = Integer.parseInt(textArea.getText());
 		} catch (Exception e) {
-			target = -1;
+			target = null;
 		}
 		return target;
 	}

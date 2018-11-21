@@ -10,14 +10,14 @@ public class Book {
 	private String bookName;
 	private String bookISBN;
 	private String publisherName;
-	private int editionNumber;
+	private Integer editionNumber;
 	private ArrayList<Person> authorList;
-	private int numOfPage;
-	private int publicationYear;
+	private Integer numOfPage;
+	private Integer publicationYear;
 	private ArrayList<String> keyWords;
 	private String bookDescription;
 	
-	public Book(String bookISBN, String bookName, String publisher, int numOfPage, int publicationYear) {
+	public Book(String bookISBN, String bookName, String publisher, Integer numOfPage, Integer publicationYear) {
 		this.bookISBN = bookISBN;
 		this.bookName = bookName;
 		this.publisherName = publisher;
@@ -25,7 +25,7 @@ public class Book {
 		this.publicationYear = publicationYear;
 		this.authorList = new ArrayList<>();
 		this.keyWords = new ArrayList<>();
-		this.editionNumber = -1;
+		this.editionNumber = null;
 	}
 
 	/**
@@ -87,10 +87,17 @@ public class Book {
 	 */
 	public String getEditionNumber() {
 		String result = "NULL";
-		if (this.editionNumber != -1) {
+		if (this.editionNumber != null) {
 			result = "" + this.editionNumber;
 		}
 		return result;
+	}
+	
+	/**
+	 * @return the editionNumber
+	 */
+	public Integer getEditionNumberInt() {
+		return this.editionNumber;
 	}
 
 	/**
@@ -123,9 +130,16 @@ public class Book {
 	 */
 	public String getNumOfPage() {
 		String result = "NULL";
-		if (this.numOfPage != -1)
+		if (this.numOfPage != null)
 			result = "" + this.numOfPage;
 		return result;
+	}
+	
+	/**
+	 * @return the numOfPage
+	 */
+	public Integer getNumOfPageInt() {
+		return this.numOfPage;
 	}
 
 	/**
@@ -140,9 +154,16 @@ public class Book {
 	 */
 	public String getPublicationYear() {
 		String result = "NULL";
-		if (this.numOfPage != -1)
+		if (this.numOfPage != null)
 			result = "" + this.publicationYear;
 		return result;
+	}
+	
+	/**
+	 * @return the publicationYear
+	 */
+	public Integer getPublicationYearInt() {
+		return this.publicationYear;
 	}
 
 	/**

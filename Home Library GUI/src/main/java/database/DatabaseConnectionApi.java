@@ -30,6 +30,9 @@ public class DatabaseConnectionApi {
 	protected static final String sqlUsername = "root";
 	protected static final String sqlPassword = "a";
 	
+	protected static String formatString(String str) {
+		return str.replaceAll("'", "").replaceAll("NULL", "");
+	}
 	
 	/**
 	 * Try to find the ID for the person given in the PeopleInvolvedTable
@@ -37,8 +40,8 @@ public class DatabaseConnectionApi {
 	 * @return ID of the person iff the person already exists, else return null
 	 * @throws SQLException 
 	 */
-	protected static String tryToFindPerson(Person person) throws SQLException {
-		String result = null;
+	protected static Integer tryToFindPerson(Person person) throws SQLException {
+		Integer result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -53,15 +56,15 @@ public class DatabaseConnectionApi {
 				// make sure the person exists
 				// check both middle name and gender
 				String actualMiddleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
-				String expectedMiddleName = person.getMiddleName().replaceAll("'", "");
-				int actualGender = Integer.parseInt(rs.getString(PeopleInvolvedTable.GENDER));
-				int expectedGender = Integer.parseInt(person.getGender());
+				String expectedMiddleName = formatString(person.getMiddleName());
+				Integer actualGender = rs.getInt(PeopleInvolvedTable.GENDER);
+				Integer expectedGender = person.getGenderInt();
 				
 				if ((actualGender == expectedGender)
 						&& ((actualMiddleName == null && expectedMiddleName == null) 
 								|| (actualMiddleName.equals(expectedMiddleName)))) {
 					
-					result = rs.getString(PeopleInvolvedTable.ID);
+					result = rs.getInt(PeopleInvolvedTable.ID);
 				}
 			}
 			
@@ -106,8 +109,8 @@ public class DatabaseConnectionApi {
 	 * @return the ID of the person
 	 * @throws SQLException 
 	 */
-	protected static String findOrCreatePerson(Person person) throws SQLException {
-		String personID = null;
+	protected static Integer findOrCreatePerson(Person person) throws SQLException {
+		Integer personID = null;
 		try {
 			personID = tryToFindPerson(person);
 			
@@ -129,7 +132,7 @@ public class DatabaseConnectionApi {
 	 * @return a Person representing the person with the given id
 	 * @throws SQLException 
 	 */
-	protected static Person getPersonFromPeopleInvolvedTable(int id) throws SQLException {
+	protected static Person getPersonFromPeopleInvolvedTable(Integer id) throws SQLException {
 		Person person;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -140,7 +143,7 @@ public class DatabaseConnectionApi {
 			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
 			String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 			String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
-			int gender = Integer.parseInt(rs.getString(PeopleInvolvedTable.GENDER)); 
+			Integer gender = rs.getInt(PeopleInvolvedTable.GENDER); 
 			
 			person = new Person(familyName, firstName);
 			person.setMiddleName(middleName);
@@ -160,7 +163,7 @@ public class DatabaseConnectionApi {
 	 * @param newData the new data with ''
 	 * @throws SQLException 
 	 */
-	private static void updatePeopleInvolvedTableWithNewData(int oldID, String columnName, String newData) throws SQLException {
+	private static void updatePeopleInvolvedTableWithNewData(Integer oldID, String columnName, String newData) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
@@ -185,7 +188,7 @@ public class DatabaseConnectionApi {
 	 * @param newData the new data as a int
 	 * @throws SQLException 
 	 */
-	private static void updatePeopleInvolvedTableWithNewData(int oldID, String columnName, int newData) throws SQLException {
+	private static void updatePeopleInvolvedTableWithNewData(Integer oldID, String columnName, Integer newData) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
@@ -210,7 +213,7 @@ public class DatabaseConnectionApi {
 	 * @param newPerson
 	 * @throws SQLException 
 	 */
-	protected static void compareAndUpdatePeopleInvolved(int oldPersonID, Person oldPerson, Person newPerson) throws SQLException {
+	protected static void compareAndUpdatePeopleInvolved(Integer oldPersonID, Person oldPerson, Person newPerson) throws SQLException {
 		try {
 			// check if old person id exists
 			// FirstName
@@ -270,7 +273,7 @@ public class DatabaseConnectionApi {
 	 * @param personID
 	 * @throws SQLException
 	 */
-	protected static void removePersonFromPeopleInvolvedTable(int personID) throws SQLException {
+	protected static void removePersonFromPeopleInvolvedTable(Integer personID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;

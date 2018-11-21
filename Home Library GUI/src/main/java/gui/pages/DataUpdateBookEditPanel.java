@@ -331,7 +331,7 @@ public class DataUpdateBookEditPanel extends JPanel {
 	}
 	
 	private String formatString(String str) {
-		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("-1", "");
+		return str.replaceAll("'", "").replaceAll("NULL", "");
 	}
 	
 	/**
@@ -377,10 +377,10 @@ public class DataUpdateBookEditPanel extends JPanel {
 		String targetPublisherName = textAreaToString(this.publisherName);
 		
 		// numberPage
-		int targetNumOfPage = textAreaToInt(this.numberOfPage);
+		Integer targetNumOfPage = textAreaToInt(this.numberOfPage);
 		
 		// publicationYear
-		int targetPublicationYear = textAreaToInt(this.publicationYear);
+		Integer targetPublicationYear = textAreaToInt(this.publicationYear);
 		
 		
 		Book book = new Book(targetBookISBN,
@@ -390,7 +390,7 @@ public class DataUpdateBookEditPanel extends JPanel {
 				targetPublicationYear);
 		
 		// editionNumber
-		int targetEditionNumber = textAreaToInt(this.editionNumber);
+		Integer targetEditionNumber = textAreaToInt(this.editionNumber);
 		book.setEditionNumber(targetEditionNumber);
 		
 		// authorNameTable
@@ -436,16 +436,16 @@ public class DataUpdateBookEditPanel extends JPanel {
 	
 	
 	/**
-	 * Get data from the text area as int
+	 * Get data from the text area as Integer
 	 * @param textArea
-	 * @return a int given, otherwise return -1
+	 * @return a Integer given, otherwise return -1
 	 */
-	private int textAreaToInt(JTextArea textArea) {
-		int target;
+	private Integer textAreaToInt(JTextArea textArea) {
+		Integer target;
 		try {
 			target = Integer.parseInt(textArea.getText());
 		} catch (Exception e) {
-			target = -1;
+			target = null;
 		}
 		return target;
 	}

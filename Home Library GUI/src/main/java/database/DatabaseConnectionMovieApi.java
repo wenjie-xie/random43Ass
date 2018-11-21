@@ -29,20 +29,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	public static void insertMovie(Movie movie) throws SQLException {
-		try {
 			
-			// insert into Movie table
-			insertIntoMovie(movie);
-			
-			// insert into Crew member table
-			insertIntoCrewMember(movie);
-			
-			// insert into Award table
-			insertIntoAward(movie);
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
+		// insert into Movie table
+		insertIntoMovie(movie);
+		
+		// insert into Crew member table
+		insertIntoCrewMember(movie);
+		
+		// insert into Award table
+		insertIntoAward(movie);
 	}
 	
 	/**
@@ -151,7 +146,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	private static void insertIntoCrewMemberHelper(Movie movie, Person person, String role) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			// Get the id of the person involved
-			String personID = findOrCreatePerson(person);
+			Integer personID = findOrCreatePerson(person);
 			// Get the id of the person's role
 			String roleID = findOrCreateRole(role);
 			
@@ -232,7 +227,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// loop through each cast
 			for (Person cast : movie.getCastList()) {
 				// Find the cast ID
-				String castID = findOrCreatePerson(cast);
+				Integer castID = findOrCreatePerson(cast);
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
@@ -308,7 +303,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MovieTable.TABLE_NAME + " "
 					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
 			
-			int year = Integer.parseInt(rs.getString(MovieTable.YEAR));
+			Integer year = rs.getInt(MovieTable.YEAR);
 			
 			movie = new Movie(movieName, year);
 			
@@ -347,7 +342,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @return a description of the role (Role class)
 	 * @throws SQLException 
 	 */
-	private static String getRoleDescription(int id) throws SQLException {
+	private static String getRoleDescription(Integer id) throws SQLException {
 		String result;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -390,10 +385,10 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
 			
 			while (rs.next()) {
-				int roleID = Integer.parseInt(rs.getString(CrewMemberTable.ROLE_ID));
+				Integer roleID = rs.getInt(CrewMemberTable.ROLE_ID);
 				roleIDList.add(roleID);
 				
-				int personID = Integer.parseInt(rs.getString(CrewMemberTable.PEOPLE_INVOLVED_ID));
+				Integer personID = rs.getInt(CrewMemberTable.PEOPLE_INVOLVED_ID);
 				personIDList.add(personID);
 			}
 			
@@ -432,10 +427,10 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			ArrayList<Integer> roleIDList = new ArrayList<>();
 			
 			for (int i = 0; i < personIDList.size(); i++) {
-				int roleID = roleIDList.get(i);
+				Integer roleID = roleIDList.get(i);
 				String role = getRoleDescription(roleID);
 				
-				int personID = personIDList.get(i);
+				Integer personID = personIDList.get(i);
 				Person person = getPersonFromPeopleInvolvedTable(personID);
 				
 				// check the role of the person
@@ -488,8 +483,8 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @return the award
 	 * @throws SQLException 
 	 */
-	private static int getAward(Movie movie) throws SQLException {
-		int result;
+	private static Integer getAward(Movie movie) throws SQLException {
+		Integer result;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
@@ -501,7 +496,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
 					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
 			
-			result = Integer.parseInt(rs.getString(AwardTable.AWARD));
+			result = rs.getInt(AwardTable.AWARD);
 			
 			connection.close();
 		} catch (SQLException e) {

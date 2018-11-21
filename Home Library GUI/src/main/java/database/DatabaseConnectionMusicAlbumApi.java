@@ -128,7 +128,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			// try to get the producer id
-			String producerID = findOrCreatePerson(musicAlbum.getProducer());
+			Integer producerID = findOrCreatePerson(musicAlbum.getProducer());
 					
 			// Go through each music in the album and add them
 			for (Music currMusic : musicAlbum.getMusicTrackList()) {
@@ -164,7 +164,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			// Add each singer
 			for (Person singer : music.getSingerList()) {
-				String singerID = findOrCreatePerson(singer);
+				Integer singerID = findOrCreatePerson(singer);
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
@@ -240,7 +240,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			// Find or create the person involved if it is new
-			String peopleInvolvedID = findOrCreatePerson(person);
+			Integer peopleInvolvedID = findOrCreatePerson(person);
 			
 			// check position to insert properly
 			String sw = "NULL";
@@ -336,10 +336,10 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			
 			String albumName = rs.getString(MusicTable.ALBUM_NAME);
-			int year = Integer.parseInt(rs.getString(MusicTable.YEAR));
-			int producerID = Integer.parseInt(rs.getString(MusicTable.PRODUCER_ID));
+			Integer year = rs.getInt(MusicTable.YEAR);
+			Integer producerID = rs.getInt(MusicTable.PRODUCER_ID);
 			Person producer = getPersonFromPeopleInvolvedTable(producerID);
-			int diskType = Integer.parseInt(rs.getString(MusicTable.DISK_TYPE));
+			Integer diskType = rs.getInt(MusicTable.DISK_TYPE);
 			
 			musicAlbum = new MusicAlbum(albumName, year, null);
 			
@@ -437,7 +437,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ " and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
-				int personID = Integer.parseInt(rs.getString(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID));
+				Integer personID = rs.getInt(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID);
 				String isSongWriter = rs.getString(PeopleInvolvedMusicTable.IS_SONG_WRITER);
 				String isComposer = rs.getString(PeopleInvolvedMusicTable.IS_COMPOSER);
 				String isArranger = rs.getString(PeopleInvolvedMusicTable.IS_ARRANGER);
@@ -492,7 +492,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
-				int personID = Integer.parseInt(rs.getString(MusicSingerTable.PEOPLE_INVOLVED_ID));
+				Integer personID = rs.getInt(MusicSingerTable.PEOPLE_INVOLVED_ID);
 				
 				singerList.add(personID);
 			}
@@ -518,7 +518,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		
 		ArrayList<Integer> singerIDList = getSingerIDList(musicAlbum, musicName);
 		
-		for (int singerID : singerIDList) {
+		for (Integer singerID : singerIDList) {
 			singerList.add(getPersonFromPeopleInvolvedTable(singerID));
 		}
 		
@@ -595,7 +595,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	private static ArrayList<String> getMusicNamesFromMusicList(ArrayList<Music> musicList) {
 		ArrayList<String> result = new ArrayList<>();
 		for (Music music : musicList) {
-			result.add(music.getMusicName().replaceAll("'", ""));
+			result.add(formatString(music.getMusicName()));
 		}
 		return result;
 	}
@@ -617,16 +617,16 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		try {
 			// Remove the music that no longer exist
 			for (Music music : removedMusicList) {
-				String musicName = music.getMusicName().replaceAll("'", "");
-				String albumName = oldMusicAlbum.getAlbumName().replaceAll("'", "");
-				int publishedYear = Integer.parseInt(oldMusicAlbum.getYearPublished());
+				String musicName = formatString(music.getMusicName());
+				String albumName = formatString(oldMusicAlbum.getAlbumName());
+				Integer publishedYear = oldMusicAlbum.getYearPublishedInt();
 				removeARowFromMusicTable(albumName, publishedYear, musicName);
 			}
 			
 			// insert the new music to the table
-			String albumName = newMusicAlbum.getAlbumName().replaceAll("'", "");
-			int publishedYear = Integer.parseInt(newMusicAlbum.getYearPublished());
-			int diskType = Integer.parseInt(newMusicAlbum.getDiskType());
+			String albumName = formatString(newMusicAlbum.getAlbumName());
+			Integer publishedYear = newMusicAlbum.getYearPublishedInt();
+			Integer diskType = newMusicAlbum.getDiskTypeInt();
 			Person producer = newMusicAlbum.getProducer();
 			MusicAlbum dummyAlbum = new MusicAlbum(albumName, publishedYear, newMusicList);
 			dummyAlbum.setDiskType(diskType);
@@ -634,7 +634,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			insertIntoMusic(dummyAlbum);
 			
 			// update other fields for the music that stays the same
-			int producerID = Integer.parseInt(findOrCreatePerson(producer));
+			Integer producerID = findOrCreatePerson(producer);
 			Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword);
 			for (Music music : sameMusicList) {
 				
@@ -668,7 +668,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	private static Music getMusicWithName(ArrayList<Music> musicList, String musicName) {
 		Music result = null;
 		for (Music music : musicList) {
-			if (music.getMusicName().replaceAll("'", "").equals(musicName)) {
+			if (formatString(music.getMusicName()).equals(musicName)) {
 				result = music;
 			}
 		}
@@ -690,16 +690,16 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		
 		try {
 			// Remove the music that no longer exists
-			String albumName = oldMusicAlbum.getAlbumName().replaceAll("'", "");
-			int year = Integer.parseInt(oldMusicAlbum.getYearPublished());
+			String albumName = formatString(oldMusicAlbum.getAlbumName());
+			Integer year = oldMusicAlbum.getYearPublishedInt();
 			for (Music music : removedMusicList) {
-				String musicName = music.getMusicName().replaceAll("'", "");
+				String musicName = formatString(music.getMusicName());
 				removeMusicFromMusicSingerTable(albumName, year, musicName);
 			}
 			
 			// Remove the singer that no longer exists in each same music
 			for (Music music : sameMusicList) {
-				String musicName = music.getMusicName().replaceAll("'", "");
+				String musicName = formatString(music.getMusicName());
 				Music oldMusic = getMusicWithName(oldMusicAlbum.getMusicTrackList(), musicName);
 				Music newMusic = getMusicWithName(newMusicAlbum.getMusicTrackList(), musicName);
 				compareAndUpdateSingersForMusic(albumName, year, oldMusic, newMusic);
@@ -738,7 +738,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 * @throws NumberFormatException 
 	 */
-	private static void compareAndUpdateSingersForMusic(String albumName, int year, Music oldMusic, Music newMusic) throws NumberFormatException, SQLException {
+	private static void compareAndUpdateSingersForMusic(String albumName, Integer year, Music oldMusic, Music newMusic) throws NumberFormatException, SQLException {
 		HashMap<String, ArrayList<Person>> removedSameAndNewMap = determineRemovedSameAndNewPerson(oldMusic.getSingerList(), newMusic.getSingerList());
 		ArrayList<Person> sameSingerList = removedSameAndNewMap.get("same");
 		ArrayList<Person> newSingerList = removedSameAndNewMap.get("new");
@@ -746,12 +746,12 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		
 		// remove singer that no longer exists
 		for (Person singer : removedSingerList) {
-			int singerID = Integer.parseInt(findOrCreatePerson(singer));
+			Integer singerID = findOrCreatePerson(singer);
 			removeARowFromMusicSingerTable(albumName, year, oldMusic.getMusicName(), singerID);
 		}
 		
 		// insert new singer
-		String musicName = newMusic.getMusicName().replaceAll("'", "");
+		String musicName = formatString(newMusic.getMusicName());
 		Music dummMusic = new Music(musicName);
 		dummMusic.setSingerList(newSingerList);
 		MusicAlbum dummyMusicAlbum = new MusicAlbum(albumName, year, null);
@@ -785,7 +785,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @param musicName with no ''
 	 * @throws SQLException 
 	 */
-	private static void removeARowFromMusicTable(String albumName, int year, String musicName) throws SQLException {
+	private static void removeARowFromMusicTable(String albumName, Integer year, String musicName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
@@ -808,7 +808,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @param musicName with no ''
 	 * @throws SQLException 
 	 */
-	private static void removeMusicFromMusicSingerTable(String albumName, int year, String musicName) throws SQLException {
+	private static void removeMusicFromMusicSingerTable(String albumName, Integer year, String musicName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
@@ -832,7 +832,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @param singerID
 	 * @throws SQLException 
 	 */
-	private static void removeARowFromMusicSingerTable(String albumName, int year, String musicName, int singerID) throws SQLException {
+	private static void removeARowFromMusicSingerTable(String albumName, Integer year, String musicName, Integer singerID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;

@@ -18,10 +18,10 @@ public class Movie {
 	private ArrayList<Person> composerList;
 	private ArrayList<Person> editorList;
 	private ArrayList<Person> costumeDesignerList;
-	private int releaseYear;
-	private int award;
+	private Integer releaseYear;
+	private Integer award;
 	
-	public Movie(String movieName, int releaseYear) {
+	public Movie(String movieName, Integer releaseYear) {
 		this.movieName = movieName;
 		this.releaseYear = releaseYear;
 		this.directorList = new ArrayList<>();
@@ -31,7 +31,7 @@ public class Movie {
 		this.composerList = new ArrayList<>();
 		this.editorList = new ArrayList<>();
 		this.costumeDesignerList = new ArrayList<>();
-		this.award = -1;
+		this.award = null;
 	}
 
 	/**
@@ -183,10 +183,17 @@ public class Movie {
 	 */
 	public String getReleaseYear() {
 		String result = "NULL";
-		if (this.releaseYear != -1) {
+		if (this.releaseYear != null) {
 			result = "" + this.releaseYear;
 		}
 		return result;
+	}
+	
+	/**
+	 * @return the releaseYear
+	 */
+	public Integer getReleaseYearInt() {
+		return this.releaseYear;
 	}
 
 	/**
@@ -201,10 +208,17 @@ public class Movie {
 	 */
 	public String getAward() {
 		String result = "NULL";
-		if (this.award != -1) {
+		if (this.award != null) {
 			result = "" + this.award;
 		}
 		return result;
+	}
+	
+	/**
+	 * @return the award
+	 */
+	public Integer getAwardInt() {
+		return this.award;
 	}
 
 	/**

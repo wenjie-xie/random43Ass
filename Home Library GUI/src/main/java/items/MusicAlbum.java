@@ -8,16 +8,17 @@ import java.util.ArrayList;
  */
 public class MusicAlbum {
 	private String albumName;
-	private int yearPublished;
-	private Person Producer;
-	private int diskType;
+	private Integer yearPublished;
+	private Person producer;
+	private Integer diskType;
 	private ArrayList<Music> musicTrackList;
 	
-	public MusicAlbum(String albumName, int yearPublished, ArrayList<Music> musicTrackList) {
+	public MusicAlbum(String albumName, Integer yearPublished, ArrayList<Music> musicTrackList) {
 		this.albumName = albumName;
 		this.yearPublished = yearPublished;
 		this.musicTrackList = musicTrackList;
-		this.diskType = -1;
+		this.diskType = null;
+		this.producer = null;
 	}
 	
 	
@@ -27,13 +28,18 @@ public class MusicAlbum {
 	 */
 	public String getDiskType() {
 		String result = "NULL";
-		if (this.diskType != -1) {
+		if (this.diskType != null) {
 			result = "" + this.diskType;
 		}
 		return result;
 	}
 
-
+	/**
+	 * @return the diskType
+	 */
+	public Integer getDiskTypeInt() {
+		return this.diskType;
+	}
 
 	/**
 	 * @param diskType the diskType to set
@@ -67,10 +73,17 @@ public class MusicAlbum {
 	 */
 	public String getYearPublished() {
 		String result = "NULL";
-		if (this.yearPublished != -1) {
+		if (this.yearPublished != null) {
 			result = "" + this.yearPublished;
 		}
 		return result;
+	}
+	
+	/**
+	 * @return the yearPublished
+	 */
+	public Integer getYearPublishedInt() {
+		return this.yearPublished;
 	}
 
 	/**
@@ -84,14 +97,14 @@ public class MusicAlbum {
 	 * @return the producer
 	 */
 	public Person getProducer() {
-		return Producer;
+		return this.producer;
 	}
 
 	/**
 	 * @param producer the producer to set
 	 */
 	public void setProducer(Person producer) {
-		Producer = producer;
+		this.producer = producer;
 	}
 
 	/**

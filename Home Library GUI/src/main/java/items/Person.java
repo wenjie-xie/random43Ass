@@ -11,12 +11,13 @@ public class Person {
 	private String surname;
 	private String firstName;
 	private String middleName;
-	private int gender;
+	private Integer gender;
 	
 	public Person(String surname, String firstName) {
 		this.firstName = firstName;
 		this.surname = surname;
-		this.gender = -1;
+		this.gender = null;
+		this.middleName = null;
 	}
 
 	/**
@@ -74,14 +75,21 @@ public class Person {
 	}
 
 	/**
-	 * @return the isMale
+	 * @return the gender
 	 */
 	public String getGender() {
 		String result = "NULL";
-		if (this.gender != -1) {
+		if (this.gender != null) {
 			result = "" + this.gender;
 		}
 		return result;
+	}
+	
+	/**
+	 * @return the gender
+	 */
+	public Integer getGenderInt() {
+		return this.gender;
 	}
 
 	/**
@@ -99,7 +107,7 @@ public class Person {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
-		result = prime * result + gender;
+		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
 		result = prime * result + ((middleName == null) ? 0 : middleName.hashCode());
 		result = prime * result + ((surname == null) ? 0 : surname.hashCode());
 		return result;
@@ -122,7 +130,10 @@ public class Person {
 				return false;
 		} else if (!firstName.equals(other.firstName))
 			return false;
-		if (gender != other.gender)
+		if (gender == null) {
+			if (other.gender != null)
+				return false;
+		} else if (!gender.equals(other.gender))
 			return false;
 		if (middleName == null) {
 			if (other.middleName != null)
@@ -136,4 +147,6 @@ public class Person {
 			return false;
 		return true;
 	}
+
+	
 }
