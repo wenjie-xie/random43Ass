@@ -46,7 +46,7 @@ public class DataUpdateBookEditPanel extends JPanel {
 
 	public DataUpdateBookEditPanel(Book book) {
 		super();
-		oldBookInfo = book;
+		this.oldBookInfo = book;
 		
 		// Create all the fields for a book
 		displayBookFields();
@@ -285,16 +285,16 @@ public class DataUpdateBookEditPanel extends JPanel {
 	 */
 	private void fillBookInfo(Book book) {
 		// bookName
-		bookName.setText(book.getBookName().replaceAll("'", ""));
+		bookName.setText(this.formatString(book.getBookName()));
 		
 		// bookISBN
-		bookISBN.setText(book.getBookISBN().replaceAll("'", ""));
+		bookISBN.setText(this.formatString(book.getBookISBN()));
 		
 		// publisherName
-		publisherName.setText(book.getPublisherName().replaceAll("'", ""));
+		publisherName.setText(this.formatString(book.getPublisherName()));
 		
 		// editionNumber
-		editionNumber.setText(book.getEditionNumber());
+		editionNumber.setText(this.formatString(book.getEditionNumber()));
 		
 		// authorNameTable
 		int authorIndex = 0;
@@ -302,32 +302,36 @@ public class DataUpdateBookEditPanel extends JPanel {
 			Person currAuthor = book.getAuthorList().get(authorIndex);
 			
 			// Surname
-			authorFields.get(0).setText(currAuthor.getSurname());
+			authorFields.get(0).setText(this.formatString(currAuthor.getSurname()));
 			
 			// FirstName
-			authorFields.get(1).setText(currAuthor.getFirstName());
+			authorFields.get(1).setText(this.formatString(currAuthor.getFirstName()));
 			
 			// MiddleName
-			authorFields.get(2).setText(currAuthor.getMiddleName());
+			authorFields.get(2).setText(this.formatString(currAuthor.getMiddleName()));
 			
 			authorIndex = authorIndex + 1;
 		}
 		
 		// numberOfPage
-		numberOfPage.setText(book.getNumOfPage());
+		numberOfPage.setText(this.formatString(book.getNumOfPage()));
 		
 		// publicationYear
-		publicationYear.setText(book.getPublicationYear());
+		publicationYear.setText(this.formatString(book.getPublicationYear()));
 		
 		// tagList
 		int tagIndex = 0;
 		for (JTextArea tagField : tagList) {
 			String currTag = book.getKeyWords().get(tagIndex).replaceAll("'", "");
-			tagField.setText(currTag);
+			tagField.setText(this.formatString(currTag));
 		}
 		
 		// description
-		description.setText(book.getBookDescription().replaceAll("'", ""));
+		description.setText(this.formatString(book.getBookDescription()));
+	}
+	
+	private String formatString(String str) {
+		return str.replaceAll("'", "").replaceAll("NULL", "").replaceAll("-1", "");
 	}
 	
 	/**

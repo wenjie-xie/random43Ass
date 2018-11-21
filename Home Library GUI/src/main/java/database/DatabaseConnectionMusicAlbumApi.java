@@ -534,9 +534,18 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * Compare and update the oldMusicAlbum to the newMusicAlbum
 	 * @param oldMusicAlbum
 	 * @param newMusicAlbum
+	 * @throws SQLException 
+	 * @throws NumberFormatException 
 	 */
-	public static void compareAndUpdateMusicAlbum(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) {
+	public static void compareAndUpdateMusicAlbum(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) throws NumberFormatException, SQLException {
+		// update Music table
+		compareAndUpdateMusicTable(oldMusicAlbum, newMusicAlbum);
+	
+		// update Music singer table
+		compareAndUpdateMusicSingerTable(oldMusicAlbum, newMusicAlbum);
 		
+		// update People involved music table
+		compareAndUpdatePeopleInvolvedMusicTable(oldMusicAlbum, newMusicAlbum);
 	}
 	
 	
@@ -718,6 +727,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	}
 	
 	
+	
 	/**
 	 * MusicSinger Table
 	 * Compare and update singer for each music in the Music singer table
@@ -748,6 +758,21 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		insertIntoMusicSinger(dummyMusicAlbum, dummMusic);
 	}
 	
+	/**
+	 * Compare and update PeopleInvolvedMusic Table
+	 * @param oldMusicAlbum
+	 * @param newMusicAlbum
+	 * @throws SQLException 
+	 */
+	private static void compareAndUpdatePeopleInvolvedMusicTable(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) throws SQLException {
+		// Remove all rows related to the old MusicAlbum
+		removeMusicAlbumFromPeopleInvolvedMusicTable(oldMusicAlbum);
+		
+		// insert everything in the newMusicAlbum
+		for (Music music : newMusicAlbum.getMusicTrackList()) {
+			insertIntoPeopleInvolvedMusic(newMusicAlbum, music);
+		}
+	}
 	
 	/**********************************
 	 * REMOVE MUSIC ALBUM *
@@ -817,6 +842,63 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ "and " + MusicSingerTable.YEAR + " = " + year + " "
 					+ "and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "' "
 					+ "and " + MusicSingerTable.PEOPLE_INVOLVED_ID + " = " + singerID);
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove a album from the Music singer table
+	 * @param oldMusicAlbum
+	 * @throws SQLException 
+	 */
+	private static void removeMusicAlbumFromMusicSingerTable(MusicAlbum oldMusicAlbum) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove a album from the Music table
+	 * @param oldMusicAlbum
+	 * @throws SQLException 
+	 */
+	private static void removeMusicAlbumFromMusicTable(MusicAlbum oldMusicAlbum) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + MusicTable.TABLE_NAME + " "
+					+ "WHERE " + MusicTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove a album from the People Involved music table
+	 * @param oldMusicAlbum
+	 * @throws SQLException 
+	 */
+	private static void removeMusicAlbumFromPeopleInvolvedMusicTable(MusicAlbum oldMusicAlbum) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
 			connection.close();
 			
 		} catch (SQLException e) {
