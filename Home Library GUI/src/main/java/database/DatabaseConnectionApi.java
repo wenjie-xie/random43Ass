@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import database.tables.BookAuthorTable;
+import database.tables.BookTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedTable;
 import items.Book;
@@ -416,5 +417,51 @@ public class DatabaseConnectionApi {
 		result.put("same", samePersonList);
 		
 		return result;
+	}
+	
+	
+	/**
+	 * Alter Table Constrain
+	 * @param tableName
+	 * @param foreignKeyName
+	 * @param foreignKeyReferenceTable
+	 * @param onUpdateCascade
+	 * @param onDeleteCascade
+	 * @throws SQLException 
+	 */
+	protected static void alterTableConstrain(String tableName, String foreignKeyName, String fkReferenceTableName, String fkReferenceName, boolean onUpdateCascade, boolean onDeleteCascade) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			String onDeleteAction;
+			String onUpdateAction;
+			if (onUpdateCascade) {
+				onUpdateAction = "CASCADE";
+			} else {
+				onUpdateAction = "NO ACTION";
+			}
+			
+			if (onDeleteCascade) {
+				onDeleteAction = "CASCADE";
+			} else {
+				onDeleteAction = "NO ACTION";
+			}
+			
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			
+			stmt.executeUpdate("ALTER TABLE " + tableName + " "
+					+ "DROP FOREIGN KEY " + foreignKeyName);
+
+			stmt.executeUpdate("ALTER TABLE " + tableName + " "
+					+ "ADD CONSTRAINT " + foreignKeyName + " "
+					+ "FOREIGN KEY (" + foreignKeyName + ")" + " "
+					+ "REFERENCES " + fkReferenceTableName + "(" + fkReferenceName + ")" + " "
+					+ "ON UPDATE " + onUpdateAction + " "
+					+ "ON DELETE " + onDeleteAction);
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
 	}
 }

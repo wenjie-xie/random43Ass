@@ -467,12 +467,6 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// disable auto commit
 			disableAutoCommit();
 			
-			// compare and update Book Author Table
-			compareAndUpdateBookAuthorTable(oldBookInfo, newBookInfo);
-			
-			// compare and update Book Keyword Table
-			compareAndUpdateBookKeywordTable(oldBookInfo, newBookInfo);
-			
 			// compare and update Book table
 			updateBookTable(oldBookInfo, newBookInfo);
 			
@@ -535,24 +529,21 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
+	
 	/**
-	 * Update the book author table with the new data
-	 * @param oldBookInfo
-	 * @param columnName
-	 * @param newData the new data with ''
+	 * Alter BookAuthor Table to cascade ISBN on update
 	 * @throws SQLException 
 	 */
-	private static void updateBookAuthorTableWithNewData(Book oldBookInfo, String columnName, String newData) throws SQLException {
+	private static void alterBookAuthorTableToOnUpdateCascade() throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			System.out.println("UPDATE " + BookAuthorTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
-			stmt.executeUpdate("UPDATE " + BookAuthorTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
+			stmt.executeUpdate("ALTER TABLE " + BookAuthorTable.TABLE_NAME + " "
+					+ "ADD CONSTRAINT " + BookAuthorTable.ISBN + " "
+					+ "FOREIGN KEY (" + BookAuthorTable.ISBN + ")" + " "
+					+ "REFERENCES " + BookTable.TABLE_NAME + "(" + BookTable.ISBN + ")" + " "
+					+ "ON UPDATE CASCADE");
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -560,113 +551,6 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	
-	/**
-	 * Compare and update the data in book author
-	 * @param oldBookInfo
-	 * @param newBookInfo
-	 * @throws SQLException 
-	 */
-	private static void compareAndUpdateBookAuthorTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
-		try {
-
-			if (!oldBookInfo.getBookISBN().equals(newBookInfo.getBookISBN())) {
-				updateBookAuthorTableWithNewData(oldBookInfo, BookAuthorTable.ISBN, newBookInfo.getBookISBN());
-			}
-			
-			// remove the book author that should be removed
-			for (Person oldAuthor : oldBookInfo.getAuthorList()) {
-				if (!newBookInfo.getAuthorList().contains(oldAuthor)) {
-					Integer oldAuthorID = tryToFindPerson(oldAuthor);
-					removeAuthorFromBookAuthor(formatString(newBookInfo.getBookISBN()),
-							oldAuthorID);
-				}
-			}
-			
-			// add the book author that should be added
-			ArrayList<Person> newAuthorList = new ArrayList<>();
-			for (Person newAuthor : newBookInfo.getAuthorList()) {
-				if (!oldBookInfo.getAuthorList().contains(newAuthor)) {
-					newAuthorList.add(newAuthor);
-				}
-			}
-			Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
-					null, null, null, null);
-			dummy.setAuthorList(newAuthorList);
-			insertIntoBookAuthor(dummy);
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-	}
-	
-	
-	/**
-	 * Update the book keyword table with the new data
-	 * @param oldBookInfo
-	 * @param columnName
-	 * @param newData the new data with ''
-	 * @throws SQLException 
-	 */
-	private static void updateBookKeywordTableWithNewData(Book oldBookInfo, String columnName, String newData) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("UPDATE " + BookKeywordTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
-			stmt.executeUpdate("UPDATE " + BookKeywordTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
-			
-			connection.close();
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-	}
-	
-	
-	
-	/**
-	 * Compare and update the data in book keyword
-	 * @param oldBookInfo
-	 * @param newBookInfo
-	 * @throws SQLException 
-	 */
-	private static void compareAndUpdateBookKeywordTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
-		try {
-
-			if (!oldBookInfo.getBookISBN().equals(newBookInfo.getBookISBN())) {
-				updateBookKeywordTableWithNewData(oldBookInfo, BookAuthorTable.ISBN, newBookInfo.getBookISBN());
-			}
-			
-			// remove the keyword that should be removed
-			for (String oldTag : oldBookInfo.getKeyWords()) {
-				if (!newBookInfo.getKeyWords().contains(oldTag)) {
-					Integer oldTagID = tryToFindBookTag(oldTag);
-					removeKeywordFromBookKeyword(formatString(newBookInfo.getBookISBN()),
-							oldTagID);
-				}
-			}
-			
-			// add the keyword that should be added
-			ArrayList<String> newTagList = new ArrayList<>();
-			for (String newTag : newBookInfo.getKeyWords()) {
-				if (!oldBookInfo.getKeyWords().contains(newTag)) {
-					newTagList.add(newTag);
-				}
-			}
-			Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
-					null, null, null, null);
-			dummy.setKeyWords(newTagList);
-			insertIntoBookKeyword(dummy);
-			
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-	}
 	
 	/****************************
 	 * REMOVE BOOK *
