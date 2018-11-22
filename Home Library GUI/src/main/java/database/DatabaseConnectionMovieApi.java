@@ -26,18 +26,40 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	/**
 	 * Insert a new Movie
 	 * @param movie takes in a movie object containing all the movie info from the front end
-	 * @throws SQLException 
 	 */
-	public static void insertMovie(Movie movie) throws SQLException {
+	public static void insertMovie(Movie movie) {
+		try {
 			
-		// insert into Movie table
-		insertIntoMovie(movie);
+			// disable auto commit
+			disableAutoCommit();
+			
+			// insert into Movie table
+			insertIntoMovie(movie);
+			
+			// insert into Crew member table
+			insertIntoCrewMember(movie);
+			
+			// insert into Award table
+			insertIntoAward(movie);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
 		
-		// insert into Crew member table
-		insertIntoCrewMember(movie);
-		
-		// insert into Award table
-		insertIntoAward(movie);
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -258,12 +280,14 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * Try to find the movie with the given movie Name
 	 * @param movieName the title of the album being searched
 	 * @return the movieName iff the movie name exists in the database, otherwise return null
-	 * @throws SQLException 
 	 */
-	public static String tryToFindMovieName(String movieName) throws SQLException {
+	public static String tryToFindMovieName(String movieName) {
 		String result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			// disable auto commit
+			disableAutoCommit();
+			
 			Statement stmt = null;
 			stmt = connection.createStatement();
 			System.out.println("SELECT * FROM " + MovieTable.TABLE_NAME + " "
@@ -275,8 +299,23 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			}
 			
 			connection.close();
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
 		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 		
 		return result;
@@ -291,11 +330,13 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * Get the info of a given movieName
 	 * @param movieName the name of a movie
 	 * @return a movie object containing all the info
-	 * @throws SQLException 
 	 */
-	public static Movie getMovieInfo(String movieName) throws SQLException {
-		Movie movie;
+	public static Movie getMovieInfo(String movieName) {
+		Movie movie = null;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			// disable auto commit
+			disableAutoCommit();
+			
 			Statement stmt = null;
 			stmt = connection.createStatement();
 			System.out.println("SELECT * FROM " + MovieTable.TABLE_NAME + " "
@@ -329,8 +370,24 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			movie.setAward(getAward(movie));
 			
 			connection.close();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
 		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 		
 		return movie;
@@ -517,19 +574,41 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * Compare and update the old movie info in the data base into the new movie info given
 	 * @param oldMovieInfo
 	 * @param newMovieInfo
-	 * @throws SQLException 
 	 */
-	public static void compareAndUpdateMovie(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
-		// compare and update Movie Table
-		compareAndUpdateMovieTable(oldMovieInfo, newMovieInfo);
+	public static void compareAndUpdateMovie(Movie oldMovieInfo, Movie newMovieInfo) {
+		try {
+			// disable auto commit
+			disableAutoCommit();
+			
+			// compare and update Movie Table
+			compareAndUpdateMovieTable(oldMovieInfo, newMovieInfo);
+			
+			// compare and update Crew member table
+			removeMovieFromCrewMemberTable(oldMovieInfo);
+			insertIntoCrewMember(newMovieInfo);
+			
+			// compare and update Award table
+			removeMovieFromAwardTable(oldMovieInfo);
+			insertIntoAward(newMovieInfo);
 		
-		// compare and update Crew member table
-		removeMovieFromCrewMemberTable(oldMovieInfo);
-		insertIntoCrewMember(newMovieInfo);
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
 		
-		// compare and update Award table
-		removeMovieFromAwardTable(oldMovieInfo);
-		insertIntoAward(newMovieInfo);
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -562,17 +641,39 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	/**
 	 * Remove the movie given completely from the database
 	 * @param movie
-	 * @throws SQLException 
 	 */
-	public static void removeMovie(Movie movie) throws SQLException {
-		// remove movie from Movie table
-		removeMovieFromMovieTable(movie);
+	public static void removeMovie(Movie movie) {
+		try {
+			// disable auto commit
+			disableAutoCommit();
+			
+			// remove movie from Movie table
+			removeMovieFromMovieTable(movie);
+			
+			// remove movie from crew member table
+			removeMovieFromCrewMemberTable(movie);
+			
+			// remove movie from award table
+			removeMovieFromAwardTable(movie);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
 		
-		// remove movie from crew member table
-		removeMovieFromCrewMemberTable(movie);
-		
-		// remove movie from award table
-		removeMovieFromAwardTable(movie);
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
 	}
 	
 	

@@ -45,13 +45,8 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 				// Add all the info into the Music Album object
 				Movie newMovie = getMovieInfo();
 				
-				try {
-					DatabaseConnectionMovieApi.compareAndUpdateMovie(oldMovie, newMovie);
-					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-					
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+				DatabaseConnectionMovieApi.compareAndUpdateMovie(oldMovie, newMovie);
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});

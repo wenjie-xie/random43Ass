@@ -240,13 +240,8 @@ public class DataInsertMusicPanel extends JPanel {
 				System.out.println(musicAlbum.toString());
 				System.out.println("******************************");
 				
-				try {
-					DatabaseConnectionMusicAlbumApi.insertMusicAlbum(musicAlbum);
-					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-					
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+				DatabaseConnectionMusicAlbumApi.insertMusicAlbum(musicAlbum);
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});

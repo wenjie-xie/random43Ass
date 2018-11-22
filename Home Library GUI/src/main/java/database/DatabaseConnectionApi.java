@@ -30,6 +30,69 @@ public class DatabaseConnectionApi {
 	protected static final String sqlUsername = "root";
 	protected static final String sqlPassword = "a";
 	
+	
+	/**
+	 * Disable Auto commit
+	 * @throws SQLException 
+	 */
+	protected static void disableAutoCommit() throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("SET AUTOCOMMIT = 0");
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	
+	/**
+	 * Enable Auto commit
+	 * @throws SQLException 
+	 */
+	protected static void enableAutoCommit() throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("SET AUTOCOMMIT = 1");
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Commit
+	 * @throws SQLException 
+	 */
+	protected static void sqlCommit() throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("COMMIT");
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Roll back
+	 * @throws SQLException 
+	 */
+	protected static void sqlRollBack() throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("ROLLBACK");
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	
 	protected static String formatString(String str) {
 		
 		String result = str.replaceAll("'", "");

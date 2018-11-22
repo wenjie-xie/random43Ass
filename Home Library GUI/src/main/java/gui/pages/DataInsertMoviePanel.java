@@ -251,13 +251,8 @@ public class DataInsertMoviePanel extends JPanel {
 				// Add all the info into the Music Album object
 				Movie movie = getMovieInfo();
 				
-				try {
-					DatabaseConnectionMovieApi.insertMovie(movie);
-					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-					
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+				DatabaseConnectionMovieApi.insertMovie(movie);
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});

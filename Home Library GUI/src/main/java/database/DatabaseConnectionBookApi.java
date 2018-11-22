@@ -31,15 +31,39 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @param book takes in a book object containing all the book info from the front end
 	 * @throws SQLException 
 	 */
-	public static void insertBook(Book book) throws SQLException {
-		// insert into Book table
-		insertIntoBook(book);
+	public static void insertBook(Book book) {
+
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			// insert into Book table
+			insertIntoBook(book);
 		
-		// insert into the Book Keyword table
-		insertIntoBookKeyword(book);
+			// insert into the Book Keyword table
+			insertIntoBookKeyword(book);
+			
+			// insert into the BookAuthor
+			insertIntoBookAuthor(book);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
 		
-		// insert into the BookAuthor
-		insertIntoBookAuthor(book);
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -206,6 +230,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		String result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			// disable auto commit
+			disableAutoCommit();
+			
 			Statement stmt = null;
 			stmt = connection.createStatement();
 			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
@@ -215,8 +242,24 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			}
 			
 			connection.close();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
 		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 		
 		return result;
@@ -234,8 +277,11 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	public static Book getBookInfo(String bookName) throws SQLException {
-		Book book;
+		Book book = null;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			// disable auto commit
+			disableAutoCommit();
+			
 			Statement stmt = null;
 			stmt = connection.createStatement();
 			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
@@ -258,8 +304,24 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			book.setKeyWords(getTagList(bookISBN));
 			
 			connection.close();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
 		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 		
 		return book;
@@ -401,14 +463,38 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	public static void compareAndUpdateBookInfo(Book oldBookInfo, Book newBookInfo) throws SQLException {
-		// compare and update Book table
-		updateBookTable(oldBookInfo, newBookInfo);
+	
+		try {
+			// disable auto commit
+			disableAutoCommit();
 		
-		// compare and update Book Author Table
-		compareAndUpdateBookAuthorTable(oldBookInfo, newBookInfo);
-		
-		// compare and update Book Keyword Table
-		compareAndUpdateBookKeywordTable(oldBookInfo, newBookInfo);
+			// compare and update Book table
+			updateBookTable(oldBookInfo, newBookInfo);
+			
+			// compare and update Book Author Table
+			compareAndUpdateBookAuthorTable(oldBookInfo, newBookInfo);
+			
+			// compare and update Book Keyword Table
+			compareAndUpdateBookKeywordTable(oldBookInfo, newBookInfo);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+	
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
 	}
 	
 	

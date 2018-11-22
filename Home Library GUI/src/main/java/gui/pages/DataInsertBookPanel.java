@@ -269,13 +269,8 @@ public class DataInsertBookPanel extends JPanel {
 				System.out.println(book.toString());
 				System.out.println("*******************************");
 				
-				try {
-					DatabaseConnectionBookApi.insertBook(book);
-					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-					
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+				DatabaseConnectionBookApi.insertBook(book);
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});

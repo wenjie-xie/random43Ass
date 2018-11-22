@@ -28,18 +28,40 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	/**
 	 * Insert a new music album
 	 * @param musicAlbum takes in a musicAlbum object containing all the book info from the front end
-	 * @throws SQLException 
 	 */
-	public static void insertMusicAlbum(MusicAlbum musicAlbum) throws SQLException {
-		// insert into Music table
-		insertIntoMusic(musicAlbum);
-		
-		for (Music music : musicAlbum.getMusicTrackList()) {
-			// insert into Music Singer table
-			insertIntoMusicSinger(musicAlbum, music);
+	public static void insertMusicAlbum(MusicAlbum musicAlbum) {
+		try {
+			// disable auto commit
+			disableAutoCommit();
 			
-			// insert into People involved music table
-			insertIntoPeopleInvolvedMusic(musicAlbum, music);
+			// insert into Music table
+			insertIntoMusic(musicAlbum);
+			
+			for (Music music : musicAlbum.getMusicTrackList()) {
+				// insert into Music Singer table
+				insertIntoMusicSinger(musicAlbum, music);
+				
+				// insert into People involved music table
+				insertIntoPeopleInvolvedMusic(musicAlbum, music);
+			}
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 	}
 	
@@ -217,6 +239,9 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		String result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			// disable auto commit
+			disableAutoCommit();
+			
 			Statement stmt = null;
 			stmt = connection.createStatement();
 			System.out.println("SELECT * FROM " + MusicTable.TABLE_NAME + " WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
@@ -226,8 +251,24 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			}
 			
 			connection.close();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
 		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 		
 		return result;
@@ -243,11 +284,13 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @param musicAlbumName the name of the music album
 	 * @return a musicAlbum object containing all the info of the given
 	 * music album name
-	 * @throws SQLException 
 	 */
-	public static MusicAlbum getMusicAlbumInfo(String musicAlbumName) throws SQLException {
-		MusicAlbum musicAlbum;
+	public static MusicAlbum getMusicAlbumInfo(String musicAlbumName) {
+		MusicAlbum musicAlbum = null;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			// disable auto commit
+			disableAutoCommit();
+			
 			// Get all the music names
 			ArrayList<String> musicNames = getMusicNameList(musicAlbumName);
 			
@@ -305,8 +348,24 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			musicAlbum.setMusicTrackList(musicList);
 			
 			connection.close();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
 		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
 		}
 		
 		return musicAlbum;
@@ -467,14 +526,37 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @throws NumberFormatException 
 	 */
 	public static void compareAndUpdateMusicAlbum(MusicAlbum oldMusicAlbum, MusicAlbum newMusicAlbum) throws NumberFormatException, SQLException {
-		// update Music table
-		compareAndUpdateMusicTable(oldMusicAlbum, newMusicAlbum);
-	
-		// update Music singer table
-		compareAndUpdateMusicSingerTable(oldMusicAlbum, newMusicAlbum);
+		try {
+			// disable auto commit
+			disableAutoCommit();
+			
+			// update Music table
+			compareAndUpdateMusicTable(oldMusicAlbum, newMusicAlbum);
 		
-		// update People involved music table
-		compareAndUpdatePeopleInvolvedMusicTable(oldMusicAlbum, newMusicAlbum);
+			// update Music singer table
+			compareAndUpdateMusicSingerTable(oldMusicAlbum, newMusicAlbum);
+			
+			// update People involved music table
+			compareAndUpdatePeopleInvolvedMusicTable(oldMusicAlbum, newMusicAlbum);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (SQLException e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
 	}
 	
 	
