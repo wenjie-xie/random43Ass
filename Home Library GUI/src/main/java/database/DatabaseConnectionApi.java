@@ -45,16 +45,16 @@ public class DatabaseConnectionApi {
 	}
 	
 	/**
-	 * This is for rs.getInt
+	 * This is to format string to integer
 	 * @param num
 	 * @return
 	 */
-	protected static Integer formatInt(int num) {
+	protected static Integer formatStringToInt(String num) {
 		
-		Integer result = num;
+		Integer result = null;
 		
-		if (result == 0) {
-			result = null;
+		if (num != null) {
+			result = Integer.parseInt(num);
 		}
 		
 		return result;
@@ -83,12 +83,12 @@ public class DatabaseConnectionApi {
 				// check both middle name and gender
 				String actualMiddleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 				String expectedMiddleName = formatString(person.getMiddleName());
-				Integer actualGender = formatInt(rs.getInt(PeopleInvolvedTable.GENDER));
+				Integer actualGender = formatStringToInt(rs.getString(PeopleInvolvedTable.GENDER));
 				Integer expectedGender = person.getGenderInt();
 				
 				if (actualGender == expectedGender) {
 					if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
-						result = formatInt(rs.getInt(PeopleInvolvedTable.ID));
+						result = formatStringToInt(rs.getString(PeopleInvolvedTable.ID));
 					}
 				}
 			}
@@ -169,7 +169,7 @@ public class DatabaseConnectionApi {
 			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
 			String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 			String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
-			Integer gender = formatInt(rs.getInt(PeopleInvolvedTable.GENDER)); 
+			Integer gender = formatStringToInt(rs.getString(PeopleInvolvedTable.GENDER)); 
 			
 			person = new Person(familyName, firstName);
 			person.setMiddleName(middleName);

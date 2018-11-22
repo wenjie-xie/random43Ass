@@ -253,21 +253,23 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			System.out.println("SELECT " + MusicTable.ALBUM_NAME + ", " + MusicTable.YEAR + " "
+			System.out.println("SELECT * "
 					+ "FROM " + MusicTable.TABLE_NAME + " "
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
-			ResultSet rs = stmt.executeQuery("SELECT " + MusicTable.ALBUM_NAME + ", " + MusicTable.YEAR + " "
+			ResultSet rs = stmt.executeQuery("SELECT * "
 					+ "FROM " + MusicTable.TABLE_NAME + " "
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + musicAlbumName + "'");
 			
 			rs.next();
 			String albumName = rs.getString(MusicTable.ALBUM_NAME);
-			Integer year = formatInt(rs.getInt(MusicTable.YEAR));
-			Integer producerID = formatInt(rs.getInt(MusicTable.PRODUCER_ID));
+			Integer year = formatStringToInt(rs.getString(MusicTable.YEAR));
+			Integer producerID = formatStringToInt(rs.getString(MusicTable.PRODUCER_ID));
 			Person producer = getPersonFromPeopleInvolvedTable(producerID);
-			Integer diskType = formatInt(rs.getInt(MusicTable.DISK_TYPE));
+			Integer diskType = formatStringToInt(rs.getString(MusicTable.DISK_TYPE));
 			
 			musicAlbum = new MusicAlbum(albumName, year, null);
+			musicAlbum.setProducer(producer);
+			musicAlbum.setDiskType(diskType);
 			
 			ArrayList<Music> musicList = new ArrayList<>();
 			// Loop through all music
@@ -364,7 +366,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ " and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
-				Integer personID = formatInt(rs.getInt(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID));
+				Integer personID = formatStringToInt(rs.getString(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID));
 				String isSongWriter = rs.getString(PeopleInvolvedMusicTable.IS_SONG_WRITER);
 				String isComposer = rs.getString(PeopleInvolvedMusicTable.IS_COMPOSER);
 				String isArranger = rs.getString(PeopleInvolvedMusicTable.IS_ARRANGER);
@@ -419,7 +421,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
-				Integer personID = formatInt(rs.getInt(MusicSingerTable.PEOPLE_INVOLVED_ID));
+				Integer personID = formatStringToInt(rs.getString(MusicSingerTable.PEOPLE_INVOLVED_ID));
 				
 				singerList.add(personID);
 			}

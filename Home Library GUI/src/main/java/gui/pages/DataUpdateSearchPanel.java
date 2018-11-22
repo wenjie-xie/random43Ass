@@ -97,7 +97,8 @@ public class DataUpdateSearchPanel extends JPanel {
 			}
 			
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Unable to connect to the database.");
+			// JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Unable to connect to the database.");
+			e.printStackTrace();
 		}
 	}
 	

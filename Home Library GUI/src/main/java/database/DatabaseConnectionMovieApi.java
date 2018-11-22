@@ -304,7 +304,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
 			
 			rs.next();
-			Integer year = formatInt(rs.getInt(MovieTable.YEAR));
+			Integer year = formatStringToInt(rs.getString(MovieTable.YEAR));
 			
 			movie = new Movie(movieName, year);
 			
@@ -387,10 +387,10 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
 			
 			while (rs.next()) {
-				Integer roleID = formatInt(rs.getInt(CrewMemberTable.ROLE_ID));
+				Integer roleID = formatStringToInt(rs.getString(CrewMemberTable.ROLE_ID));
 				roleIDList.add(roleID);
 				
-				Integer personID = formatInt(rs.getInt(CrewMemberTable.PEOPLE_INVOLVED_ID));
+				Integer personID = formatStringToInt(rs.getString(CrewMemberTable.PEOPLE_INVOLVED_ID));
 				personIDList.add(personID);
 			}
 			
@@ -499,7 +499,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
 			
 			rs.next();
-			result = formatInt(rs.getInt(AwardTable.AWARD));
+			result = formatStringToInt(rs.getString(AwardTable.AWARD));
 			
 			connection.close();
 		} catch (SQLException e) {

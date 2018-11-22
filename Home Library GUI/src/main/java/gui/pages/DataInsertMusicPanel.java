@@ -347,7 +347,12 @@ public class DataInsertMusicPanel extends JPanel {
 				// Create a music object
 				Music targetMusic = new Music(targetMusicName);
 				targetMusic.setLanguage(targetLanguage);
-				targetMusic.setSingerList(new ArrayList<>(Arrays.asList(targetSinger1, targetSinger2)));
+				if ((this.formatString(targetSinger1.getFirstName()) != null) && (this.formatString(targetSinger1.getSurname()) != null)) {
+					targetMusic.getSingerList().add(targetSinger1);
+				}
+				if ((this.formatString(targetSinger2.getFirstName()) != null) && (this.formatString(targetSinger2.getSurname()) != null)) {
+					targetMusic.getSingerList().add(targetSinger2);
+				}
 				targetMusic.setSongWriter(targetSongWriter);
 				targetMusic.setComposer(targetComposer);
 				targetMusic.setArranger(targetArranger);
@@ -410,5 +415,19 @@ public class DataInsertMusicPanel extends JPanel {
 			target = null;
 		}
 		return target;
+	}
+	
+	private String formatString(String str) {
+		
+		String result = str.replaceAll("'", "");
+		
+		if (str.length() == 4) {
+			result = result.replaceAll("NULL", "").replaceAll("null", "");
+		}
+		
+		if (result.equals("")) {
+			result = null;
+		}
+		return result;
 	}
 }

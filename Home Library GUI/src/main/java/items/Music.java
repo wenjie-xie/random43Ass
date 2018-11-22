@@ -20,7 +20,7 @@ public class Music {
 	public Music(String musicName) {
 		this.musicName = musicName;
 		this.language = null;
-		this.singerList = null;
+		this.singerList = new ArrayList<>();
 		this.songWriter = null;
 		this.composer = null;
 		this.arranger = null;
