@@ -31,20 +31,15 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @throws SQLException 
 	 */
 	public static void insertMusicAlbum(MusicAlbum musicAlbum) throws SQLException {
-		try {
-			// insert into Music table
-			insertIntoMusic(musicAlbum);
+		// insert into Music table
+		insertIntoMusic(musicAlbum);
+		
+		for (Music music : musicAlbum.getMusicTrackList()) {
+			// insert into Music Singer table
+			insertIntoMusicSinger(musicAlbum, music);
 			
-			for (Music music : musicAlbum.getMusicTrackList()) {
-				// insert into Music Singer table
-				insertIntoMusicSinger(musicAlbum, music);
-				
-				// insert into People involved music table
-				insertIntoPeopleInvolvedMusic(musicAlbum, music);
-			}
-			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
+			// insert into People involved music table
+			insertIntoPeopleInvolvedMusic(musicAlbum, music);
 		}
 	}
 	
@@ -267,10 +262,10 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			
 			rs.next();
 			String albumName = rs.getString(MusicTable.ALBUM_NAME);
-			Integer year = rs.getInt(MusicTable.YEAR);
-			Integer producerID = rs.getInt(MusicTable.PRODUCER_ID);
+			Integer year = formatInt(rs.getInt(MusicTable.YEAR));
+			Integer producerID = formatInt(rs.getInt(MusicTable.PRODUCER_ID));
 			Person producer = getPersonFromPeopleInvolvedTable(producerID);
-			Integer diskType = rs.getInt(MusicTable.DISK_TYPE);
+			Integer diskType = formatInt(rs.getInt(MusicTable.DISK_TYPE));
 			
 			musicAlbum = new MusicAlbum(albumName, year, null);
 			
@@ -369,7 +364,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ " and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
-				Integer personID = rs.getInt(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID);
+				Integer personID = formatInt(rs.getInt(PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID));
 				String isSongWriter = rs.getString(PeopleInvolvedMusicTable.IS_SONG_WRITER);
 				String isComposer = rs.getString(PeopleInvolvedMusicTable.IS_COMPOSER);
 				String isArranger = rs.getString(PeopleInvolvedMusicTable.IS_ARRANGER);
@@ -424,7 +419,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 					+ " and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
 			
 			while(rs.next()) {
-				Integer personID = rs.getInt(MusicSingerTable.PEOPLE_INVOLVED_ID);
+				Integer personID = formatInt(rs.getInt(MusicSingerTable.PEOPLE_INVOLVED_ID));
 				
 				singerList.add(personID);
 			}

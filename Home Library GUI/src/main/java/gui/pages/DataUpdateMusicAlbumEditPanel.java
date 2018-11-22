@@ -84,7 +84,10 @@ public class DataUpdateMusicAlbumEditPanel extends DataInsertMusicPanel {
 	 */
 	private void fillMusicAlbumInfo(MusicAlbum musicAlbum) {
 		// nameOfDisk
-		this.nameOfDisk.setText(this.formatString(musicAlbum.getDiskType()));
+		this.nameOfDisk.setText(this.formatString(musicAlbum.getAlbumName()));
+		
+		// diskType
+		this.diskType.setText(this.formatString(musicAlbum.getDiskType()));
 		
 		// yearPublished
 		this.yearPublished.setText(this.formatString(musicAlbum.getYearPublished()));

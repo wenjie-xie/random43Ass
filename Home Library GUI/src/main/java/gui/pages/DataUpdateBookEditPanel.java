@@ -102,8 +102,9 @@ public class DataUpdateBookEditPanel extends DataInsertBookPanel {
 		// tagList
 		int tagIndex = 0;
 		for (JTextArea tagField : tagList) {
-			String currTag = book.getKeyWords().get(tagIndex).replaceAll("'", "");
+			String currTag = this.formatString(book.getKeyWords().get(tagIndex));
 			tagField.setText(this.formatString(currTag));
+			tagIndex = tagIndex + 1;
 		}
 		
 		// description

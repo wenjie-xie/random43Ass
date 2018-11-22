@@ -25,6 +25,7 @@ public class DataInsertMusicPanel extends JPanel {
 	private static final long serialVersionUID = 5011747774458485854L;
 
 	protected JTextArea nameOfDisk;
+	protected JTextArea diskType;
 	protected JTextArea yearPublished;
 	protected JTextArea producerSurname;
 	protected JTextArea producerFirstName;
@@ -62,19 +63,22 @@ public class DataInsertMusicPanel extends JPanel {
 		// Name of the Disk
 		nameOfDisk = this.createTextField("Name of the Disk:", 1, 0);
 		
+		// Disk Type
+		this.diskType = this.createTextField("Disk Type:", 2, 0);
+		
 		// Year Published
-		yearPublished = this.createTextField("Year Published:", 2, 0);
+		yearPublished = this.createTextField("Year Published:", 3, 0);
 		
 		// Producer (1)
-		producerSurname = this.createTextField("Producer Surname:", 3, 0);
-		producerFirstName = this.createTextField("Producer First Name:", 3, 2);
-		producerMiddleName = this.createTextField("Producer Middle Name:", 3, 4);
-		producerGender = this.createTextField("Producer Gender:", 3, 6);
+		producerSurname = this.createTextField("Producer Surname:", 4, 0);
+		producerFirstName = this.createTextField("Producer First Name:", 4, 2);
+		producerMiddleName = this.createTextField("Producer Middle Name:", 4, 4);
+		producerGender = this.createTextField("Producer Gender:", 4, 6);
 		
 		// Add music track to the album
-		ArrayList<ArrayList<JTextArea>> musicTrackTable = new ArrayList<ArrayList<JTextArea>>();
-		musicTrackTable.add(this.addOneMusicTrack(4, 1));
-		int nextRowNum = musicTrackTable.get(0).size() + 3;
+		musicTrackTable = new ArrayList<ArrayList<JTextArea>>();
+		musicTrackTable.add(this.addOneMusicTrack(5, 1));
+		int nextRowNum = musicTrackTable.get(0).size() + 5;
 		
 		this.addMusicTrackBtn = new JButton("Add Music Track");
 		addMusicTrackBtn.addActionListener(new ActionListener() {
@@ -214,7 +218,7 @@ public class DataInsertMusicPanel extends JPanel {
 		JTextArea arrangerSurname = this.createTextField("Arranger Surname:", targetRow, 0);
 		JTextArea arrangerFirstName = this.createTextField("Arranger First Name:", targetRow, 2);
 		JTextArea arrangerMiddleName = this.createTextField("Arranger Middle Name:", targetRow, 4);
-		JTextArea arrangerGender = this.createTextField("Arranger Middle Name:", targetRow, 6);
+		JTextArea arrangerGender = this.createTextField("Arranger Gender:", targetRow, 6);
 		textAreaList.addAll(Arrays.asList(arrangerSurname, arrangerFirstName, arrangerMiddleName, arrangerGender));
 		
 		return textAreaList;
@@ -232,6 +236,9 @@ public class DataInsertMusicPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Music Album object
 				MusicAlbum musicAlbum = getMusicAlbumInfo();
+				System.out.println("******************************");
+				System.out.println(musicAlbum.toString());
+				System.out.println("******************************");
 				
 				try {
 					DatabaseConnectionMusicAlbumApi.insertMusicAlbum(musicAlbum);
@@ -254,6 +261,9 @@ public class DataInsertMusicPanel extends JPanel {
 	protected MusicAlbum getMusicAlbumInfo() {
 		// name of disk
 		String targetAlbumName = textAreaToString(this.nameOfDisk);
+		
+		// disk type
+		Integer targetDiskType = textAreaToInt(this.diskType);
 		
 		// year published
 		Integer targetYearPublished = textAreaToInt(this.yearPublished);
@@ -348,6 +358,7 @@ public class DataInsertMusicPanel extends JPanel {
 		}
 		// Create a MusicAlbum object
 		MusicAlbum musicAlbum = new MusicAlbum(targetAlbumName, targetYearPublished, musicList);
+		musicAlbum.setDiskType(targetDiskType);
 		
 		// producer
 		String targetProducerSurname = textAreaToString(this.producerSurname);
@@ -393,6 +404,9 @@ public class DataInsertMusicPanel extends JPanel {
 		try {
 			target = textArea.getText();
 		} catch (NullPointerException e) {
+			target = null;
+		}
+		if (textArea.getText().equals("")) {
 			target = null;
 		}
 		return target;

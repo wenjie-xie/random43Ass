@@ -129,7 +129,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " "
 					+ "WHERE " + KeywordTable.TAG + " = '" + tag + "'");
 			if (rs.next()) {
-				result = rs.getInt(KeywordTable.ID);
+				result = formatInt(rs.getInt(KeywordTable.ID));
 			}
 			
 			connection.close();
@@ -245,9 +245,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			String bookISBN = rs.getString(BookTable.ISBN);
 			String bookTitle = rs.getString(BookTable.TITLE);
 			String bookPublisher = rs.getString(BookTable.PUBLISHER);
-			Integer bookNumberOfPages = rs.getInt(BookTable.NUMBER_OF_PAGES);
-			Integer bookYear = rs.getInt(BookTable.YEAR_OF_PUBLICATION);
-			Integer bookEdition = rs.getInt(BookTable.EDITION_NUMBER);
+			Integer bookNumberOfPages = formatInt(rs.getInt(BookTable.NUMBER_OF_PAGES));
+			Integer bookYear = formatInt(rs.getInt(BookTable.YEAR_OF_PUBLICATION));
+			Integer bookEdition = formatInt(rs.getInt(BookTable.EDITION_NUMBER));
 			String bookAbstract = rs.getString(BookTable.ABSTRACT);
 			
 			book = new Book(bookISBN, bookTitle, bookPublisher, bookNumberOfPages, bookYear);

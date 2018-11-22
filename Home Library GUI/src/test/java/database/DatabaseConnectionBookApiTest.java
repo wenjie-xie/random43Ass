@@ -16,6 +16,8 @@ import database.tables.BookTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedTable;
 import items.Book;
+import items.Music;
+import items.MusicAlbum;
 import items.Person;
 
 class DatabaseConnectionBookApiTest {
@@ -24,81 +26,44 @@ class DatabaseConnectionBookApiTest {
 	protected static final String sqlPassword = "a";
 
 	@Test
-	public void testInsertBook() throws SQLException {
+	public void testMusicAlbumInsert() throws SQLException {
 		
-		String isbn = "Test";
-		String title = "Test123";
-		String publisher = "jack";
-		int numOfPage = 123;
-		int publicationYear = 2000;
-		int editionNum = 1;
-		String description = "testing 123456";
-		Book testBook = new Book(isbn, title, publisher, numOfPage, publicationYear);
-		testBook.setEditionNumber(editionNum);
-		testBook.setBookDescription(description);
+		String nameOfDisk = "Name of Disk";
+		Integer diskType = 1;
+		Integer yearPublished = 2000;
+		Person producer = new Person("P S", "P FN");
+		producer.setMiddleName("P MN");
+		producer.setGender(1);
 		
-		String firstName = "myFirstName";
-		String lastName = "myLastName";
-		testBook.setAuthorList(new ArrayList<>(Arrays.asList(
-				new Person(lastName, firstName))));
+		Person singer1 = new Person("S1 S", "S1 FN");
+		singer1.setMiddleName("S1 MN");
 		
-		String tag = "testTag";
-		testBook.setKeyWords(new ArrayList<>(Arrays.asList(tag)));
-		DatabaseConnectionBookApi.insertBook(testBook);
+		Person singer2 = new Person("S2 S", "S2 FN");
 		
-		ArrayList<String> expectedBookTable = new ArrayList<>(Arrays.asList(
-				isbn, title, publisher, "" + numOfPage, "" + publicationYear, "" + editionNum, description));
-		ArrayList<String> expectedKeywordTable = new ArrayList<>(Arrays.asList(
-				tag));
-		ArrayList<String> expectedPeopleInvolvedTable = new ArrayList<>(Arrays.asList(
-				firstName, null, lastName, null));
+		Person songWriter = new Person("SW S", null);
 		
-		ArrayList<String> actualBookTable = new ArrayList<>();
-		ArrayList<String> actualKeywordTable = new ArrayList<>();
-		ArrayList<String> actualPeopleInvolvedTable = new ArrayList<>();
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			
-			// Book
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = 'TEST123'");
-			
-			if (rs.next()) {
-				actualBookTable.add(rs.getString(BookTable.ISBN));
-				actualBookTable.add(rs.getString(BookTable.TITLE));
-				actualBookTable.add(rs.getString(BookTable.PUBLISHER));
-				actualBookTable.add(rs.getString(BookTable.NUMBER_OF_PAGES));
-				actualBookTable.add(rs.getString(BookTable.YEAR_OF_PUBLICATION));
-				actualBookTable.add(rs.getString(BookTable.EDITION_NUMBER));
-				actualBookTable.add(rs.getString(BookTable.ABSTRACT));
-			}
-			
-			// Keyword
-			rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = 1");
-			if (rs.next()) {
-				// Tag
-				actualKeywordTable.add(rs.getString(KeywordTable.TAG));
-			}
-			
-			// PeopleInvolved
-			rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = 1");
-			if (rs.next()) {
-				// FirstName
-				actualPeopleInvolvedTable.add(rs.getString(PeopleInvolvedTable.FIRST_NAME));
-				// MiddleName
-				actualPeopleInvolvedTable.add(rs.getString(PeopleInvolvedTable.MIDDLE_NAME));
-				// FamilyName
-				actualPeopleInvolvedTable.add(rs.getString(PeopleInvolvedTable.FAMILY_NAME));
-				// Gender
-				actualPeopleInvolvedTable.add(rs.getString(PeopleInvolvedTable.GENDER));
-			}
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
+		Person composer = new Person("C S", null);
+		composer.setMiddleName("C MN");
+		composer.setGender(1);
 		
-		assertEquals(expectedBookTable, actualBookTable);
-		assertEquals(expectedKeywordTable, actualKeywordTable);
-		assertEquals(expectedPeopleInvolvedTable, actualPeopleInvolvedTable);
+		Person arranger = new Person(null, "A FN");
+		arranger.setMiddleName("A MN");
+		
+		Music music = new Music("Track1");
+		music.setLanguage("English");
+		music.setSingerList(new ArrayList<>(Arrays.asList(singer1, singer2)));
+		music.setSongWriter(songWriter);
+		music.setComposer(composer);
+		music.setArranger(arranger);
+		ArrayList<Music> musicTrackList = new ArrayList<>(Arrays.asList(music));
+		
+		MusicAlbum musicAlbum = new MusicAlbum("Name of Disk",
+				2000, musicTrackList);
+		musicAlbum.setDiskType(diskType);
+		musicAlbum.setYearPublished(yearPublished);
+		musicAlbum.setProducer(producer);
+		
+		DatabaseConnectionMusicAlbumApi.insertMusicAlbum(musicAlbum);
 	}
 
 }

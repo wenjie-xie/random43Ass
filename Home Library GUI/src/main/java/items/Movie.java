@@ -227,4 +227,17 @@ public class Movie {
 	public void setAward(Integer award) {
 		this.award = award;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Movie [movieName=" + movieName + ", directorList=" + directorList + ", scriptWriterList="
+				+ scriptWriterList + ", castList=" + castList + ", producerList=" + producerList + ", composerList="
+				+ composerList + ", editorList=" + editorList + ", costumeDesignerList=" + costumeDesignerList
+				+ ", releaseYear=" + releaseYear + ", award=" + award + "]";
+	}
+	
+	
 }

@@ -365,6 +365,9 @@ public class DataInsertMoviePanel extends JPanel {
 		} catch (NullPointerException e) {
 			target = null;
 		}
+		if (textArea.getText().equals("")) {
+			target = null;
+		}
 		return target;
 	}
 }

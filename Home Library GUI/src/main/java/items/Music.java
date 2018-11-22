@@ -117,6 +117,15 @@ public class Music {
 	public void setArranger(Person arranger) {
 		this.arranger = arranger;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Music [musicName=" + musicName + ", language=" + language + ", singerList=" + singerList
+				+ ", songWriter=" + songWriter + ", composer=" + composer + ", arranger=" + arranger + "]";
+	}
 	
 	
 }

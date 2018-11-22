@@ -120,5 +120,17 @@ public class MusicAlbum {
 	public void setMusicTrackList(ArrayList<Music> musicTrackList) {
 		this.musicTrackList = musicTrackList;
 	}
+
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "MusicAlbum [albumName=" + albumName + ", yearPublished=" + yearPublished + ", producer=" + producer
+				+ ", diskType=" + diskType + ", musicTrackList=" + musicTrackList + "]";
+	}
+	
 	
 }

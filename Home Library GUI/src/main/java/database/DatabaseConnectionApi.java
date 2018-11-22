@@ -45,6 +45,22 @@ public class DatabaseConnectionApi {
 	}
 	
 	/**
+	 * This is for rs.getInt
+	 * @param num
+	 * @return
+	 */
+	protected static Integer formatInt(int num) {
+		
+		Integer result = num;
+		
+		if (result == 0) {
+			result = null;
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Try to find the ID for the person given in the PeopleInvolvedTable
 	 * @param person
 	 * @return ID of the person iff the person already exists, else return null
@@ -62,17 +78,17 @@ public class DatabaseConnectionApi {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
 							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
-			if (rs.next()) {
+			while (rs.next()) {
 				// make sure the person exists
 				// check both middle name and gender
 				String actualMiddleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 				String expectedMiddleName = formatString(person.getMiddleName());
-				Integer actualGender = rs.getInt(PeopleInvolvedTable.GENDER);
+				Integer actualGender = formatInt(rs.getInt(PeopleInvolvedTable.GENDER));
 				Integer expectedGender = person.getGenderInt();
 				
 				if (actualGender == expectedGender) {
 					if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
-						result = rs.getInt(PeopleInvolvedTable.ID);
+						result = formatInt(rs.getInt(PeopleInvolvedTable.ID));
 					}
 				}
 			}
@@ -153,7 +169,7 @@ public class DatabaseConnectionApi {
 			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
 			String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 			String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
-			Integer gender = rs.getInt(PeopleInvolvedTable.GENDER); 
+			Integer gender = formatInt(rs.getInt(PeopleInvolvedTable.GENDER)); 
 			
 			person = new Person(familyName, firstName);
 			person.setMiddleName(middleName);
