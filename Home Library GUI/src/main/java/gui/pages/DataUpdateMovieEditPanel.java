@@ -143,7 +143,7 @@ public class DataUpdateMovieEditPanel extends DataInsertMoviePanel {
 			producerNameList.get(2).setText(formatString(producer.getMiddleName()));
 			
 			// gender
-			producerNameList.get(2).setText(formatString(producer.getGender()));
+			producerNameList.get(3).setText(formatString(producer.getGender()));
 		}
 		
 		// composerNameTable

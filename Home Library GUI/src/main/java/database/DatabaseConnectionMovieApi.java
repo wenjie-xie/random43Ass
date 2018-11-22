@@ -482,12 +482,13 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		
 		try {
 			
-			ArrayList<Integer> personIDList = new ArrayList<>();
-			ArrayList<Integer> roleIDList = new ArrayList<>();
+			HashMap<String, ArrayList<Integer>> personIDRoleIDMap = getPersonIDRoleIDLists(movie);
+			ArrayList<Integer> personIDList = personIDRoleIDMap.get("personID");
+			ArrayList<Integer> roleIDList = personIDRoleIDMap.get("roleID");
 			
 			for (int i = 0; i < personIDList.size(); i++) {
 				Integer roleID = roleIDList.get(i);
-				String role = getRoleDescription(roleID);
+				String role = "'" + getRoleDescription(roleID) + "'";
 				
 				Integer personID = personIDList.get(i);
 				Person person = getPersonFromPeopleInvolvedTable(personID);

@@ -226,7 +226,7 @@ public class DataInsertMoviePanel extends JPanel {
 	private ArrayList<JTextArea> createNameRow(String role, int rowNum, int personNum) {
 		ArrayList<JTextArea> nameList = new ArrayList<>();
 		int targetRowNum = rowNum;
-		this.createTextField("****** " + role + " #" + personNum + " ******", targetRowNum, 0);
+		this.createTextField("****** " + role + " #" + personNum + " ******", targetRowNum, 0, false);
 		
 		targetRowNum = targetRowNum + 1;
 		JTextArea surname = this.createTextField(role + " Surname:", targetRowNum, 0);

@@ -94,6 +94,9 @@ public class DataUpdateSearchPanel extends JPanel {
 			} else if (DatabaseConnectionMovieApi.tryToFindMovieName(targetName) != null) {
 				Movie targetMovie = DatabaseConnectionMovieApi.getMovieInfo(targetName);
 				// If it is a movie navigate to the DataUpdateMovieEditPanel
+				System.out.println(targetMovie.toString());
+				// if it is a music album navigate to the DataUpdateMusicAlbumEditPanel
+				HL_xiewen4.mainFrame.flipPageTo(new DataUpdateMovieEditPanel(targetMovie));
 			}
 			
 		} catch (SQLException e) {

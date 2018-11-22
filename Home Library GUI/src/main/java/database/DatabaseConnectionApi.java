@@ -39,6 +39,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SET AUTOCOMMIT = 0");
 			stmt.executeUpdate("SET AUTOCOMMIT = 0");
 			
 		} catch (SQLException e) {
@@ -55,6 +56,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("SET AUTOCOMMIT = 1");
 			stmt.executeUpdate("SET AUTOCOMMIT = 1");
 			
 		} catch (SQLException e) {
@@ -70,6 +72,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("COMMIT");
 			stmt.executeUpdate("COMMIT");
 			
 		} catch (SQLException e) {
@@ -85,6 +88,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
+			System.out.println("ROLLBACK");
 			stmt.executeUpdate("ROLLBACK");
 			
 		} catch (SQLException e) {
