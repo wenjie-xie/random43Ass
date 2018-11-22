@@ -26,6 +26,129 @@ class DatabaseConnectionApiTest {
 	protected static final String sqlUsername = "root";
 	protected static final String sqlPassword = "a";
 
+	
+	//@Test
+	public void testBookInsert() {
+		// Book name
+		String bookName = "TestBookName";
+		
+		// Book ISBN
+		String bookISBN = "TestBookISBN";
+		
+		// Publisher name
+		String publisherName = "TestPublisherName";
+		
+		// Edition Number
+		Integer editionNum = 1;
+		
+		// Author
+		Person author1 = new Person("TestAuthor1 S", "TestAuthor1 FN");
+		Person author2 = new Person("TestAuthor2 S", "TestAuthor2 FN");
+		ArrayList<Person> authorList = new ArrayList<>();
+		authorList.add(author1);
+		authorList.add(author2);
+		
+		// Number of page
+		Integer numOfPage = 66;
+		
+		// Publication Year
+		Integer publicationYear = 2000;
+		
+		// Keywords
+		ArrayList<String> tags = new ArrayList<>(Arrays.asList("TestTag1", "TestTag2"));
+		
+		// Book description
+		String description = "Test DEscription";
+		
+		Book book = new Book(bookISBN, bookName, publisherName, numOfPage, publicationYear);
+		book.setKeyWords(tags);
+		book.setAuthorList(authorList);
+		book.setBookDescription(description);
+		
+		DatabaseConnectionBookApi.insertBook(book);
+	}
+	
+	@Test
+	public void testBookUpdate() {
+		// Book name
+		String bookName = "TestBookName";
+		
+		// Book ISBN
+		String bookISBN = "TestBookISBN";
+		
+		// Publisher name
+		String publisherName = "TestPublisherName";
+		
+		// Edition Number
+		Integer editionNum = 1;
+		
+		// Author
+		Person author1 = new Person("TestAuthor1 S", "TestAuthor1 FN");
+		Person author2 = new Person("TestAuthor2 S", "TestAuthor2 FN");
+		ArrayList<Person> authorList = new ArrayList<>();
+		authorList.add(author1);
+		authorList.add(author2);
+		
+		// Number of page
+		Integer numOfPage = 66;
+		
+		// Publication Year
+		Integer publicationYear = 2000;
+		
+		// Keywords
+		ArrayList<String> tags = new ArrayList<>(Arrays.asList("TestTag1", "TestTag2"));
+		
+		// Book description
+		String description = "Test DEscription";
+		
+		Book book = new Book(bookISBN, bookName, publisherName, numOfPage, publicationYear);
+		book.setKeyWords(tags);
+		book.setAuthorList(authorList);
+		book.setBookDescription(description);
+		
+		
+		// NEW
+		
+		// Book name
+		String newbookName = "newTestBookName";
+		
+		// Book ISBN
+		String newbookISBN = "newBookISBN";
+		
+		// Publisher name
+		String newpublisherName = "newTestPublisherName";
+		
+		// Edition Number
+		Integer neweditionNum = 1;
+		
+		// Author
+		Person newauthor1 = new Person("newTestAuthor1 S", "newTestAuthor1 FN");
+		Person newauthor2 = new Person("newTestAuthor2 S", "newTestAuthor2 FN");
+		ArrayList<Person> newauthorList = new ArrayList<>();
+		authorList.add(newauthor1);
+		authorList.add(newauthor2);
+		
+		// Number of page
+		Integer newnumOfPage = 666;
+		
+		// Publication Year
+		Integer newpublicationYear = 20000;
+		
+		// Keywords
+		ArrayList<String> newtags = new ArrayList<>(Arrays.asList("newTestTag1", "newTestTag2"));
+		
+		// Book description
+		String newdescription = "newTest DEscription";
+		
+		Book newbook = new Book(newbookISBN, newbookName, newpublisherName, newnumOfPage, newpublicationYear);
+		book.setKeyWords(newtags);
+		book.setAuthorList(newauthorList);
+		book.setBookDescription(newdescription);
+		
+		DatabaseConnectionBookApi.compareAndUpdateBookInfo(book, newbook);
+	}
+	
+	
 	//@Test
 	public void testMusicAlbumInsert() {
 		
@@ -103,7 +226,7 @@ class DatabaseConnectionApiTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void testMovieInsert() {
 		
 		// name of the movie

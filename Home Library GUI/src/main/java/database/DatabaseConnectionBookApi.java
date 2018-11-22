@@ -460,22 +460,21 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * book with the new book by changing the database
 	 * @param oldBookInfo
 	 * @param newBookInfo
-	 * @throws SQLException 
 	 */
-	public static void compareAndUpdateBookInfo(Book oldBookInfo, Book newBookInfo) throws SQLException {
+	public static void compareAndUpdateBookInfo(Book oldBookInfo, Book newBookInfo) {
 	
 		try {
 			// disable auto commit
 			disableAutoCommit();
-		
-			// compare and update Book table
-			updateBookTable(oldBookInfo, newBookInfo);
 			
 			// compare and update Book Author Table
 			compareAndUpdateBookAuthorTable(oldBookInfo, newBookInfo);
 			
 			// compare and update Book Keyword Table
 			compareAndUpdateBookKeywordTable(oldBookInfo, newBookInfo);
+			
+			// compare and update Book table
+			updateBookTable(oldBookInfo, newBookInfo);
 			
 			// commit
 			sqlCommit();

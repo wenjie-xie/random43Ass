@@ -138,13 +138,10 @@ public class DataUpdateBookEditPanel extends DataInsertBookPanel {
 				// Add all the info into the Book object
 				Book newBook = getBookInfo();
 				
-				try {
-					DatabaseConnectionBookApi.compareAndUpdateBookInfo(oldBookInfo, newBook);
-					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-					
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
+
+				DatabaseConnectionBookApi.compareAndUpdateBookInfo(oldBookInfo, newBook);
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
+
 				
 			}
 		});
