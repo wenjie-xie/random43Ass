@@ -104,7 +104,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				flipPageTo(new DataInsertMusicPanel("Add New Music Album:"));
+				flipPageTo(new DataInsertMusicPanel());
 			}
 		});
 		dataInsert.add(music);
@@ -115,7 +115,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				flipPageTo(new DataInsertMoviePanel("Add New Movie:"));
+				flipPageTo(new DataInsertMoviePanel());
 			}
 		});
 		dataInsert.add(movie);

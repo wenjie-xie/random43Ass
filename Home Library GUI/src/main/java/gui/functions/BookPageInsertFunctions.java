@@ -18,7 +18,7 @@ import gui.pages.HomePagePanel;
 import items.Book;
 import items.Person;
 
-public class BookPageInsertFunctions extends JPanel {
+public class BookPageInsertFunctions extends GeneralFunctions {
 
 	private static final long serialVersionUID = 6503852278982043219L;
 	
@@ -317,39 +317,5 @@ public class BookPageInsertFunctions extends JPanel {
 		book.setBookDescription(targetDescription);
 		
 		return book;
-	}
-	
-	
-	/**
-	 * Get data from the text area as Integer
-	 * @param textArea
-	 * @return a Integer given, otherwise return null
-	 */
-	private Integer textAreaToInt(JTextArea textArea) {
-		Integer target;
-		try {
-			target = Integer.parseInt(textArea.getText());
-		} catch (Exception e) {
-			target = null;
-		}
-		return target;
-	}
-	
-	/**
-	 * Get data from the text area as String
-	 * @param textArea
-	 * @return a String given, otherwise return null
-	 */
-	private String textAreaToString(JTextArea textArea) {
-		String target;
-		try {
-			target = textArea.getText();
-		} catch (NullPointerException e) {
-			target = null;
-		}
-		if (textArea.getText().equals("")) {
-			target = null;
-		}
-		return target;
 	}
 }

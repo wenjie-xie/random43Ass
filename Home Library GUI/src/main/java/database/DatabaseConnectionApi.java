@@ -434,51 +434,6 @@ public class DatabaseConnectionApi {
 	
 	
 	/**
-	 * Alter Table Constrain
-	 * @param tableName
-	 * @param foreignKeyName
-	 * @param foreignKeyReferenceTable
-	 * @param onUpdateCascade
-	 * @param onDeleteCascade
-	 * @throws SQLException 
-	 */
-	protected static void alterTableConstrain(String tableName, String foreignKeyName, String fkReferenceTableName, String fkReferenceName, boolean onUpdateCascade, boolean onDeleteCascade) throws SQLException {
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			String onDeleteAction;
-			String onUpdateAction;
-			if (onUpdateCascade) {
-				onUpdateAction = "CASCADE";
-			} else {
-				onUpdateAction = "NO ACTION";
-			}
-			
-			if (onDeleteCascade) {
-				onDeleteAction = "CASCADE";
-			} else {
-				onDeleteAction = "NO ACTION";
-			}
-			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			
-			stmt.executeUpdate("ALTER TABLE " + tableName + " "
-					+ "DROP FOREIGN KEY " + foreignKeyName);
-
-			stmt.executeUpdate("ALTER TABLE " + tableName + " "
-					+ "ADD CONSTRAINT " + foreignKeyName + " "
-					+ "FOREIGN KEY (" + foreignKeyName + ")" + " "
-					+ "REFERENCES " + fkReferenceTableName + "(" + fkReferenceName + ")" + " "
-					+ "ON UPDATE " + onUpdateAction + " "
-					+ "ON DELETE " + onDeleteAction);
-			
-			connection.close();
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-	}
-	
-	/**
 	 * The purpose of this method is to update the person with the id given to
 	 * the newInfo in the PeopleInvolved Table
 	 * @param personID the id of the person you are trying to update
