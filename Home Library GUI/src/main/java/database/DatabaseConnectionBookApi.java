@@ -470,6 +470,12 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// compare and update Book table
 			updateBookTable(oldBookInfo, newBookInfo);
 			
+			// compare and update Book Author table
+			updateBookAuthorTable(oldBookInfo, newBookInfo);
+			
+			// compare and update Book keyword table
+			updateBookKeywordTable(oldBookInfo, newBookInfo);
+			
 			// commit
 			sqlCommit();
 			
@@ -531,19 +537,175 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	
 	
 	/**
-	 * Alter BookAuthor Table to cascade ISBN on update
-	 * @throws SQLException 
+	 * Update the Book author table
+	 * @param oldBookInfo
+	 * @param newBookInfo
+	 * @throws SQLException
 	 */
-	private static void alterBookAuthorTableToOnUpdateCascade() throws SQLException {
+	private static void updateBookAuthorTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
+		HashMap<String, ArrayList<Person>> removeUpdateAndNewMap = determineRemovedUpdateAndNewPerson(
+				oldBookInfo.getAuthorList(),
+				newBookInfo.getAuthorList());
+		ArrayList<Person> removedPeopleList = removeUpdateAndNewMap.get("removed");
+		ArrayList<Person> updatePeopleList = removeUpdateAndNewMap.get("update");
+		ArrayList<Person> newPeopleList = removeUpdateAndNewMap.get("new");
+		
+		// update
+		for (int updatePersonIndex = 0; updatePersonIndex < updatePeopleList.size(); updatePersonIndex++) {
+			Person person = updatePeopleList.get(updatePersonIndex);
+			Person newPersonInfo = newBookInfo.getAuthorList().get(updatePersonIndex);
+			int personID = tryToFindPerson(person);
+			
+			updatePersonWithID(personID, newPersonInfo);
+		}
+		
+		// remove
+		for (int removePersonIndex = 0; removePersonIndex < removedPeopleList.size(); removePersonIndex++) {
+			Person person = removedPeopleList.get(removePersonIndex);
+			int personID = tryToFindPerson(person);
+			String isbn = formatString(oldBookInfo.getBookISBN());
+			removeAuthorFromBookAuthor(isbn, personID);
+		}
+		
+		// add
+		Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
+				null, null, null, null);
+		dummy.setAuthorList(newPeopleList);
+		insertIntoBookAuthor(dummy);
+		
+		// update ISBN
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
+			
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			stmt.executeUpdate("ALTER TABLE " + BookAuthorTable.TABLE_NAME + " "
-					+ "ADD CONSTRAINT " + BookAuthorTable.ISBN + " "
-					+ "FOREIGN KEY (" + BookAuthorTable.ISBN + ")" + " "
-					+ "REFERENCES " + BookTable.TABLE_NAME + "(" + BookTable.ISBN + ")" + " "
-					+ "ON UPDATE CASCADE");
+			stmt.executeUpdate("UPDATE " + BookAuthorTable.TABLE_NAME + " "
+					+ "SET " + BookAuthorTable.ISBN + " = " + newBookInfo.getBookISBN() + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	
+	/**
+	 * The purpose of this method is to update the tag with the id given to
+	 * the newTagInfo in the Keyword Table
+	 * @param keywordID the id of the keyword you are trying to update, 
+	 * @param newTagInfo the info you are trying to update the tag into
+	 * @throws SQLException 
+	 */
+	private static void updateKeywordWithID(int keywordID, String newTag) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + KeywordTable.TABLE_NAME + " "
+					+ "SET " + KeywordTable.TAG + " = '" + newTag + "' "
+					+ "WHERE " + KeywordTable.ID + " = " + keywordID);
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	
+	/**
+	 * Determine the tags that needs to be removed, update or added from the two given tag list
+	 * @param oldTagList
+	 * @param newTagList
+	 * @return a map to each of the three list with keys "removed", "update", and "new"
+	 */
+	protected static HashMap<String, ArrayList<String>> determineRemovedUpdateAndNewTags(ArrayList<String> oldTagList, ArrayList<String> newTagList) {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		// old tags that needs to be removed
+		ArrayList<String> removedTagList = new ArrayList<>();
+		// new tags that needs to be added
+		ArrayList<String> addTagList = new ArrayList<>();
+		// old tags that needs to be updated
+		ArrayList<String> updateTagList = new ArrayList<>();
+		
+		
+		// if some tags are deleted
+		if (newTagList.size() <= oldTagList.size()) {
+			for (int i = 0; i < newTagList.size(); i++) {
+				String needUpdate = oldTagList.get(i);
+				updateTagList.add(needUpdate);
+			}
+			
+			for (int i = newTagList.size(); i < oldTagList.size(); i++) {
+				String needRemove = oldTagList.get(i);
+				removedTagList.add(needRemove);
+			}
+			
+		// if some tags are added
+		} else {
+			for (int i = 0; i < oldTagList.size(); i++) {
+				String needUpdate = oldTagList.get(i);
+				updateTagList.add(needUpdate);
+			}
+			
+			for (int i = oldTagList.size(); i < newTagList.size(); i++) {
+				String needAdd = newTagList.get(i);
+				addTagList.add(needAdd);
+			}
+		}
+		
+		
+		result.put("removed", removedTagList);
+		result.put("new", addTagList);
+		result.put("update", updateTagList);
+		
+		return result;
+	}
+	
+	/**
+	 * Update the Book keyword table
+	 * @param oldBookInfo
+	 * @param newBookInfo
+	 * @throws SQLException 
+	 */
+	private static void updateBookKeywordTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
+		HashMap<String, ArrayList<String>> removeUpdateAndNewMap = determineRemovedUpdateAndNewTags(
+				oldBookInfo.getKeyWords(),
+				newBookInfo.getKeyWords());
+		ArrayList<String> removedTagList = removeUpdateAndNewMap.get("removed");
+		ArrayList<String> updateTagList = removeUpdateAndNewMap.get("update");
+		ArrayList<String> newTagList = removeUpdateAndNewMap.get("new");
+		
+		// update
+		for (int updateTagIndex = 0; updateTagIndex < updateTagList.size(); updateTagIndex++) {
+			String tag = updateTagList.get(updateTagIndex);
+			String newTagInfo = newBookInfo.getKeyWords().get(updateTagIndex);
+			int tagID = tryToFindBookTag(tag);
+			
+			updateKeywordWithID(tagID, newTagInfo);
+		}
+		
+		// remove
+		for (int removeTagIndex = 0; removeTagIndex < removedTagList.size(); removeTagIndex++) {
+			String tag = removedTagList.get(removeTagIndex);
+			int tagID = tryToFindBookTag(tag);
+			String isbn = formatString(oldBookInfo.getBookISBN());
+			removeKeywordFromBookKeyword(isbn, tagID);
+		}
+		
+		// add
+		Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
+				null, null, null, null);
+		dummy.setKeyWords(newTagList);
+		insertIntoBookKeyword(dummy);
+		
+		// update ISBN
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + BookKeywordTable.TABLE_NAME + " "
+					+ "SET " + BookKeywordTable.ISBN + " = " + newBookInfo.getBookISBN() + " "
+					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -558,20 +720,20 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove the given row from book author
-	 * @param bookISBN
+	 * @param bookISBN with no ''
 	 * @param authorID
 	 * @throws SQLException 
 	 */
-	private static void removeAuthorFromBookAuthor(String bookISBN, Integer authorID) throws SQLException {
+	private static void removeAuthorFromBookAuthor(String bookISBN, int authorID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
 			Statement stmt = null;
 			stmt = connection.createStatement();
 			System.out.println("DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "' "
 					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
 			stmt.executeUpdate("DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = " + bookISBN + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "' "
 					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
 			
 			connection.close();

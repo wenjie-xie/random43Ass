@@ -384,37 +384,50 @@ public class DatabaseConnectionApi {
 	}
 	
 	/**
-	 * Determine removed, same and new people from the two given people list
+	 * Determine the people that needs to be removed, update or added from the two given people list
 	 * @param oldPeopleList
 	 * @param newPeopleList
-	 * @return a map to each of the three list with keys "removed", "same", and "new"
+	 * @return a map to each of the three list with keys "removed", "update", and "new"
 	 */
-	protected static HashMap<String, ArrayList<Person>> determineRemovedSameAndNewPerson(ArrayList<Person> oldPeopleList, ArrayList<Person> newPeopleList) {
+	protected static HashMap<String, ArrayList<Person>> determineRemovedUpdateAndNewPerson(ArrayList<Person> oldPeopleList, ArrayList<Person> newPeopleList) {
 		HashMap<String, ArrayList<Person>> result = new HashMap<>();
+		// old people that needs to be removed
 		ArrayList<Person> removedPersonList = new ArrayList<>();
+		// new people that needs to be added
 		ArrayList<Person> newPersonList = new ArrayList<>();
-		ArrayList<Person> samePersonList = new ArrayList<>();
+		// old people that needs to be updated
+		ArrayList<Person> updatePersonList = new ArrayList<>();
 		
 		
-		// Determine the person that should be removed
-		for (Person oldPerson : oldPeopleList) {
-			if (!newPeopleList.contains(oldPerson)) {
-				removedPersonList.add(oldPerson);
-			} else {
-				samePersonList.add(oldPerson);
+		// if some people are deleted
+		if (newPeopleList.size() <= oldPeopleList.size()) {
+			for (int i = 0; i < newPeopleList.size(); i++) {
+				Person needUpdate = oldPeopleList.get(i);
+				updatePersonList.add(needUpdate);
+			}
+			
+			for (int i = newPeopleList.size(); i < oldPeopleList.size(); i++) {
+				Person needRemove = oldPeopleList.get(i);
+				removedPersonList.add(needRemove);
+			}
+			
+		// if some people are added
+		} else {
+			for (int i = 0; i < oldPeopleList.size(); i++) {
+				Person needUpdate = oldPeopleList.get(i);
+				updatePersonList.add(needUpdate);
+			}
+			
+			for (int i = oldPeopleList.size(); i < newPeopleList.size(); i++) {
+				Person needAdd = newPeopleList.get(i);
+				newPersonList.add(needAdd);
 			}
 		}
 		
-		// Determine the person that is new
-		for (Person newPerson : newPeopleList) {
-			if (!oldPeopleList.contains(newPerson)) {
-				newPersonList.add(newPerson);
-			}
-		}
 		
 		result.put("removed", removedPersonList);
 		result.put("new", newPersonList);
-		result.put("same", samePersonList);
+		result.put("update", updatePersonList);
 		
 		return result;
 	}
@@ -458,6 +471,31 @@ public class DatabaseConnectionApi {
 					+ "REFERENCES " + fkReferenceTableName + "(" + fkReferenceName + ")" + " "
 					+ "ON UPDATE " + onUpdateAction + " "
 					+ "ON DELETE " + onDeleteAction);
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * The purpose of this method is to update the person with the id given to
+	 * the newInfo in the PeopleInvolved Table
+	 * @param personID the id of the person you are trying to update
+	 * @param newPersonInfo the info you are trying to update the person into
+	 * @throws SQLException 
+	 */
+	protected static void updatePersonWithID(int personID, Person newPersonInfo) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + PeopleInvolvedTable.FIRST_NAME + " = " + newPersonInfo.getFirstName() + ", "
+							+ PeopleInvolvedTable.MIDDLE_NAME + " = " + newPersonInfo.getMiddleName() + ", "
+							+ PeopleInvolvedTable.FAMILY_NAME + " = " + newPersonInfo.getSurname() + ", "
+							+ PeopleInvolvedTable.GENDER + " = " + newPersonInfo.getGender() + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
 			
 			connection.close();
 		} catch (SQLException e) {

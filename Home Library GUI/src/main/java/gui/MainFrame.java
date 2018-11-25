@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				flipPageTo(new DataInsertBookPanel("Add New Book:"));
+				flipPageTo(new DataInsertBookPanel());
 			}
 		});
 		dataInsert.add(book);
