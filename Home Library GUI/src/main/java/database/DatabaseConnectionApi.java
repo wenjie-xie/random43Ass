@@ -387,7 +387,7 @@ public class DatabaseConnectionApi {
 	 * Determine the people that needs to be removed, update or added from the two given people list
 	 * @param oldPeopleList
 	 * @param newPeopleList
-	 * @return a map to each of the three list with keys "removed", "update", and "new"
+	 * @return a map to each of the three list with keys "removed", "updated", and "new"
 	 */
 	protected static HashMap<String, ArrayList<Person>> determineRemovedUpdateAndNewPerson(ArrayList<Person> oldPeopleList, ArrayList<Person> newPeopleList) {
 		HashMap<String, ArrayList<Person>> result = new HashMap<>();
@@ -427,7 +427,7 @@ public class DatabaseConnectionApi {
 		
 		result.put("removed", removedPersonList);
 		result.put("new", newPersonList);
-		result.put("update", updatePersonList);
+		result.put("updated", updatePersonList);
 		
 		return result;
 	}

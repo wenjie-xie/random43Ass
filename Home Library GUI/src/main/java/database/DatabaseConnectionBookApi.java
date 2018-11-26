@@ -547,16 +547,18 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 				oldBookInfo.getAuthorList(),
 				newBookInfo.getAuthorList());
 		ArrayList<Person> removedPeopleList = removeUpdateAndNewMap.get("removed");
-		ArrayList<Person> updatePeopleList = removeUpdateAndNewMap.get("update");
+		ArrayList<Person> updatePeopleList = removeUpdateAndNewMap.get("updated");
 		ArrayList<Person> newPeopleList = removeUpdateAndNewMap.get("new");
 		
 		// update
 		for (int updatePersonIndex = 0; updatePersonIndex < updatePeopleList.size(); updatePersonIndex++) {
 			Person person = updatePeopleList.get(updatePersonIndex);
 			Person newPersonInfo = newBookInfo.getAuthorList().get(updatePersonIndex);
-			int personID = tryToFindPerson(person);
 			
-			updatePersonWithID(personID, newPersonInfo);
+			if (!person.equals(newPersonInfo)) {
+				int personID = tryToFindPerson(person);
+				updatePersonWithID(personID, newPersonInfo);
+			}
 		}
 		
 		// remove
@@ -679,9 +681,11 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		for (int updateTagIndex = 0; updateTagIndex < updateTagList.size(); updateTagIndex++) {
 			String tag = updateTagList.get(updateTagIndex);
 			String newTagInfo = newBookInfo.getKeyWords().get(updateTagIndex);
-			int tagID = tryToFindBookTag(tag);
 			
-			updateKeywordWithID(tagID, newTagInfo);
+			if (!tag.equals(newTagInfo)) {
+				int tagID = tryToFindBookTag(tag);
+				updateKeywordWithID(tagID, newTagInfo);
+			}
 		}
 		
 		// remove
