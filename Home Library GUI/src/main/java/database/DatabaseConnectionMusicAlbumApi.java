@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import database.tables.BookAuthorTable;
 import database.tables.MusicSingerTable;
@@ -791,49 +793,45 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		ArrayList<Music> newMusicList = sameRemovedNewMap.get("new");
 		
 		// Remove the song writer, composer and arranger in the removedMusicList
+		String albumName = formatString(oldMusicAlbum.getAlbumName());
+		Integer year = formatStringToInt(oldMusicAlbum.getYearPublished());
 		for (Music music : removedMusicList) {
-			String albumName = formatString(oldMusicAlbum.getAlbumName());
-			Integer year = formatStringToInt(oldMusicAlbum.getYearPublished());
 			String musicName = formatString(music.getMusicName());
 			removeAMusicFromPeopleInvolvedMusicTable(albumName, year, musicName);
 		}
 		
-		
-	}
-	
-	
-	/**
-	 * Update a person in the people involved music table
-	 * @param albumName name of the album, with no '', not null
-	 * @param year year the album is published, not null
-	 * @param musicName name of the music, with no '', not null
-	 * @param personID, not null
-	 * @param isSW is song writer, null is false, otherwise true
-	 * @param isC is composer, null is false, otherwise true
-	 * @param isA is arranger, null is false, otherwise true
-	 * @throws SQLException 
-	 */
-	private void updatePersonInPeopleInvolvedMusicTable(String albumName, Integer year, String musicName,
-			Integer personID, Integer isSW, Integer isC, Integer isA) throws SQLException {
-
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + PeopleInvolvedMusicTable.TABLE_NAME + " "
-					+ "SET " + PeopleInvolvedMusicTable.IS_ARRANGER + " = " + isA + ", "
-							+ PeopleInvolvedMusicTable.IS_COMPOSER + " = " + isC + ", "
-							+ PeopleInvolvedMusicTable.IS_SONG_WRITER + " = " + isSW + " "
-					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = '" + albumName + "' "
-							+ "and " + PeopleInvolvedMusicTable.YEAR + " = " + year + " "
-							+ "and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "' "
-							+ "and " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " = " + personID);
-			connection.close();
+		// Update each song writer, composer and arranger in the updatedMusicList
+		for (int i = 0; i < updatedMusicList.size(); i++) {
+			Music oldMusic = updatedMusicList.get(i);
+			Person oldComposer = oldMusic.getComposer();
+			Person oldArranger = oldMusic.getArranger();
+			Person oldSongWriter = oldMusic.getSongWriter();
 			
-		} catch (SQLException e) {
-		    throw new SQLException(e);
+			Music newMusic = newMusicAlbum.getMusicTrackList().get(i);
+			Person newComposer = newMusic.getComposer();
+			Person newArranger = newMusic.getArranger();
+			Person newSongWriter = newMusic.getSongWriter();
+			
+			// update composer
+			int oldComposerID = tryToFindPerson(oldComposer);
+			updatePersonWithID(oldComposerID, newComposer);
+			
+			// update arranger
+			int oldArrangerID = tryToFindPerson(oldArranger);
+			updatePersonWithID(oldArrangerID, newArranger);
+			
+			// update song writer
+			int oldSongWriterID = tryToFindPerson(oldSongWriter);
+			updatePersonWithID(oldSongWriterID, newSongWriter);
+		}
+		
+		// Add new composer, arranger, and song writer
+		for (Music music : newMusicList) {
+			insertIntoPeopleInvolvedMusic(oldMusicAlbum, music);
 		}
 	}
+	
+	
 	
 	/**********************************
 	 * REMOVE MUSIC ALBUM *
