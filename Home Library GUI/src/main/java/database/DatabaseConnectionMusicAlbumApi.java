@@ -804,7 +804,36 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Update a person in the people involved music table
+	 * @param albumName name of the album, with no '', not null
+	 * @param year year the album is published, not null
+	 * @param musicName name of the music, with no '', not null
+	 * @param personID, not null
+	 * @param isSW is song writer, null is false, otherwise true
+	 * @param isC is composer, null is false, otherwise true
+	 * @param isA is arranger, null is false, otherwise true
+	 * @throws SQLException 
 	 */
+	private void updatePersonInPeopleInvolvedMusicTable(String albumName, Integer year, String musicName,
+			Integer personID, Integer isSW, Integer isC, Integer isA) throws SQLException {
+
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("UPDATE " + PeopleInvolvedMusicTable.TABLE_NAME + " "
+					+ "SET " + PeopleInvolvedMusicTable.IS_ARRANGER + " = " + isA + ", "
+							+ PeopleInvolvedMusicTable.IS_COMPOSER + " = " + isC + ", "
+							+ PeopleInvolvedMusicTable.IS_SONG_WRITER + " = " + isSW + " "
+					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = '" + albumName + "' "
+							+ "and " + PeopleInvolvedMusicTable.YEAR + " = " + year + " "
+							+ "and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "' "
+							+ "and " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " = " + personID);
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
 	
 	/**********************************
 	 * REMOVE MUSIC ALBUM *
