@@ -2,6 +2,7 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -73,22 +74,32 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 */
 	private static void insertIntoBook(Book book) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("INSERT INTO " + BookTable.TABLE_NAME + " "
+			
+			String query = "INSERT INTO " + BookTable.TABLE_NAME + " "
 					+ "(" + BookTable.ISBN + ", " + BookTable.TITLE + ", " + BookTable.PUBLISHER + ", "
 					+ BookTable.NUMBER_OF_PAGES + ", " + BookTable.YEAR_OF_PUBLICATION + ", "
 					+ BookTable.EDITION_NUMBER + ", " + BookTable.ABSTRACT + ") "
-					+ "VALUES (" + book.getBookISBN() + ", " + book.getBookName() + ", " + book.getPublisherName() + ", "
-					+ book.getNumOfPage() + ", " + book.getPublicationYear() + ", "
-					+ book.getEditionNumber() + ", " + book.getBookDescription() + ")");
-			stmt.executeUpdate("INSERT INTO " + BookTable.TABLE_NAME + " "
-					+ "(" + BookTable.ISBN + ", " + BookTable.TITLE + ", " + BookTable.PUBLISHER + ", "
-					+ BookTable.NUMBER_OF_PAGES + ", " + BookTable.YEAR_OF_PUBLICATION + ", "
-					+ BookTable.EDITION_NUMBER + ", " + BookTable.ABSTRACT + ") "
-					+ "VALUES (" + book.getBookISBN() + ", " + book.getBookName() + ", " + book.getPublisherName() + ", "
-					+ book.getNumOfPage() + ", " + book.getPublicationYear() + ", "
-					+ book.getEditionNumber() + ", " + book.getBookDescription() + ")");
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, book.getBookISBN());
+			ps.setString(2, book.getBookName());
+			ps.setString(3, book.getPublisherName());
+			if (book.getNumOfPage() == null)
+				ps.setNull(4, java.sql.Types.INTEGER);
+			else
+				ps.setInt(4, book.getNumOfPage());
+			if (book.getPublicationYear() == null)
+				ps.setNull(5, java.sql.Types.INTEGER);
+			else
+				ps.setInt(5, book.getPublicationYear());
+			if (book.getEditionNumber() == null)
+				ps.setNull(6, java.sql.Types.INTEGER);
+			else
+				ps.setInt(6, book.getEditionNumber());
+			ps.setString(7, book.getBookDescription());
+			ps.executeUpdate();
+			
 			connection.close();
 		} catch (SQLException e) {
 		    throw new SQLException(e);
@@ -105,17 +116,18 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			
 			// Loop through each tag
 			for (String tag : book.getKeyWords()) {
-				Integer tagID = findOrCreateBookTag(tag);
+				int tagID = findOrCreateBookTag(tag);
 				
 				// SQL
-				Statement stmt = null;
-				stmt = connection.createStatement();
-				System.out.println("INSERT INTO " + BookKeywordTable.TABLE_NAME + " "
+				
+				String query = "INSERT INTO " + BookKeywordTable.TABLE_NAME + " "
 						+ "(" + BookKeywordTable.ISBN + ", " + BookKeywordTable.KEYWORD_ID + ") "
-						+ "VALUES (" + book.getBookISBN() + ", " + tagID + ")");
-				stmt.executeUpdate("INSERT INTO " + BookKeywordTable.TABLE_NAME + " "
-						+ "(" + BookKeywordTable.ISBN + ", " + BookKeywordTable.KEYWORD_ID + ") "
-						+ "VALUES (" + book.getBookISBN() + ", " + tagID + ")");
+						+ "VALUES (?, ?)";
+				
+				PreparedStatement ps = connection.prepareStatement(query);
+				ps.setString(1, book.getBookISBN());
+				ps.setInt(2, tagID);
+				ps.executeUpdate();
 			}
 			
 			connection.close();
@@ -146,12 +158,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		Integer result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + KeywordTable.TABLE_NAME + " "
-					+ "WHERE " + KeywordTable.TAG + " = '" + tag + "'");
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " "
-					+ "WHERE " + KeywordTable.TAG + " = '" + tag + "'");
+			
+			String query = "SELECT * FROM " + KeywordTable.TABLE_NAME + " "
+					+ "WHERE " + KeywordTable.TAG + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, tag);
+			ResultSet rs = ps.executeQuery();
+			
 			if (rs.next()) {
 				result = formatStringToInt(rs.getString(KeywordTable.ID));
 			}
@@ -171,14 +185,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 */
 	private static void insertIntoKeyword(String tag) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("INSERT INTO " + KeywordTable.TABLE_NAME + " "
+			
+			String query = "INSERT INTO " + KeywordTable.TABLE_NAME + " "
 					+ "(" + KeywordTable.TAG + ") "
-					+ "VALUES ('" + tag + "')");
-			stmt.executeUpdate("INSERT INTO " + KeywordTable.TABLE_NAME + " "
-					+ "(" + KeywordTable.TAG + ") "
-					+ "VALUES ('" + tag + "')");
+					+ "VALUES (?)";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, tag);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -197,16 +211,16 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			for (Person author : book.getAuthorList()) {
 				// try to grab the author ID from the database
 				// if the author is new insert the author to the database
-				Integer authorID = findOrCreatePerson(author);
+				int authorID = findOrCreatePerson(author);
 				
-				Statement stmt = null;
-				stmt = connection.createStatement();
-				System.out.println("INSERT INTO " + BookAuthorTable.TABLE_NAME + " "
+				String query = "INSERT INTO " + BookAuthorTable.TABLE_NAME + " "
 						+ "(" + BookAuthorTable.ISBN + ", " + BookAuthorTable.AUTHOR_ID + ") "
-						+ "VALUES (" + book.getBookISBN() + ", " + authorID + ")");
-				stmt.executeUpdate("INSERT INTO " + BookAuthorTable.TABLE_NAME + " "
-						+ "(" + BookAuthorTable.ISBN + ", " + BookAuthorTable.AUTHOR_ID + ") "
-						+ "VALUES (" + book.getBookISBN() + ", " + authorID + ")");
+						+ "VALUES (?, ?)";
+				
+				PreparedStatement ps = connection.prepareStatement(query);
+				ps.setString(1, book.getBookISBN());
+				ps.setInt(2, authorID);
+				ps.executeUpdate();
 			}
 			
 			connection.close();
@@ -233,10 +247,13 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// disable auto commit
 			disableAutoCommit();
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
+			String query = "SELECT * FROM " + BookTable.TABLE_NAME + " "
+					+ "WHERE " + BookTable.TITLE + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, bookName);
+			ResultSet rs = ps.executeQuery();
+			
 			if (rs.next()) {
 				result = rs.getString(BookTable.ISBN);
 			}
@@ -282,10 +299,12 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// disable auto commit
 			disableAutoCommit();
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + BookTable.TABLE_NAME + " WHERE " + BookTable.TITLE + " = '" + bookName + "'");
+			String query = "SELECT * FROM " + BookTable.TABLE_NAME + " "
+					+ "WHERE " + BookTable.TITLE + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, bookName);
+			ResultSet rs = ps.executeQuery();
 			
 			rs.next();
 			String bookISBN = rs.getString(BookTable.ISBN);
@@ -334,13 +353,16 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @return the tag name
 	 * @throws SQLException 
 	 */
-	private static String getTagFromKeywordTable(Integer id) throws SQLException {
+	private static String getTagFromKeywordTable(int id) throws SQLException {
 		String tag;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + KeywordTable.TABLE_NAME + " WHERE " + KeywordTable.ID + " = " + id);
+			String query = "SELECT * FROM " + KeywordTable.TABLE_NAME + " "
+					+ "WHERE " + KeywordTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			
 			rs.next();
 			tag = rs.getString(KeywordTable.TAG);
 			
@@ -378,14 +400,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	private static ArrayList<Integer> getTagIDList(String bookISBN) throws SQLException {
 		ArrayList<Integer> tagList = new ArrayList<>();
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT " + BookKeywordTable.KEYWORD_ID + " "
+			
+			String query = "SELECT " + BookKeywordTable.KEYWORD_ID + " "
 					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = '" + bookISBN + "'");
-			ResultSet rs = stmt.executeQuery("SELECT " + BookKeywordTable.KEYWORD_ID + " "
-					+ "FROM " + BookKeywordTable.TABLE_NAME + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = '" + bookISBN + "'");
+					+ "WHERE " + BookKeywordTable.ISBN + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, bookISBN);
+			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()) {
 				String tagID = rs.getString(BookKeywordTable.KEYWORD_ID);
@@ -428,14 +450,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	private static ArrayList<Integer> getAuthorIDList(String bookISBN) throws SQLException {
 		ArrayList<Integer> authorIDList = new ArrayList<>();
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT " + BookAuthorTable.AUTHOR_ID + " "
+			
+			String query = "SELECT " + BookAuthorTable.AUTHOR_ID + " "
 					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "'");
-			ResultSet rs = stmt.executeQuery("SELECT " + BookAuthorTable.AUTHOR_ID + " "
-					+ "FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "'");
+					+ "WHERE " + BookAuthorTable.ISBN + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, bookISBN);
+			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()) {
 				String authorID = rs.getString(BookAuthorTable.AUTHOR_ID);
@@ -506,28 +528,31 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	private static void updateBookTable(Book oldBookInfo, Book newBookInfo) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("UPDATE " + BookTable.TABLE_NAME + " "
-					+ "SET " + BookTable.ISBN + " = " + newBookInfo.getBookISBN() + ", "
-					+ BookTable.TITLE + " = " + newBookInfo.getBookName() + ", "
-					+ BookTable.PUBLISHER + " = " + newBookInfo.getPublisherName() + ", "
-					+ BookTable.NUMBER_OF_PAGES + " = " + newBookInfo.getNumOfPage() + ", "
-					+ BookTable.YEAR_OF_PUBLICATION + " = " + newBookInfo.getPublicationYear() + ", "
-					+ BookTable.EDITION_NUMBER + " = " + newBookInfo.getEditionNumber() + ", "
-					+ BookTable.ABSTRACT + " = " + newBookInfo.getBookDescription() + " "
-					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
-					+ "and " + BookTable.TITLE + " = " + oldBookInfo.getBookName());
-			stmt.executeUpdate("UPDATE " + BookTable.TABLE_NAME + " "
-					+ "SET " + BookTable.ISBN + " = " + newBookInfo.getBookISBN() + ", "
-					+ BookTable.TITLE + " = " + newBookInfo.getBookName() + ", "
-					+ BookTable.PUBLISHER + " = " + newBookInfo.getPublisherName() + ", "
-					+ BookTable.NUMBER_OF_PAGES + " = " + newBookInfo.getNumOfPage() + ", "
-					+ BookTable.YEAR_OF_PUBLICATION + " = " + newBookInfo.getPublicationYear() + ", "
-					+ BookTable.EDITION_NUMBER + " = " + newBookInfo.getEditionNumber() + ", "
-					+ BookTable.ABSTRACT + " = " + newBookInfo.getBookDescription() + " "
-					+ "WHERE " + BookTable.ISBN + " = " + oldBookInfo.getBookISBN() + " "
-					+ "and " + BookTable.TITLE + " = " + oldBookInfo.getBookName());
+			String query = "UPDATE " + BookTable.TABLE_NAME + " "
+					+ "SET " + BookTable.ISBN + " = ?, "
+					+ BookTable.TITLE + " = ?, "
+					+ BookTable.PUBLISHER + " = ?, "
+					+ BookTable.NUMBER_OF_PAGES + " = ?, "
+					+ BookTable.YEAR_OF_PUBLICATION + " = ?, "
+					+ BookTable.EDITION_NUMBER + " = ?, "
+					+ BookTable.ABSTRACT + " = ? "
+					+ "WHERE " + BookTable.ISBN + " = ? "
+					+ "and " + BookTable.TITLE + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newBookInfo.getBookISBN());
+			ps.setString(2, newBookInfo.getBookName());
+			ps.setString(3, newBookInfo.getPublisherName());
+			ps.setInt(4, newBookInfo.getNumOfPage());
+			ps.setInt(5, newBookInfo.getPublicationYear());
+			if (newBookInfo.getEditionNumber() == null)
+				ps.setNull(6, java.sql.Types.INTEGER);
+			else
+				ps.setInt(6, newBookInfo.getEditionNumber());
+			ps.setString(7, newBookInfo.getBookDescription());
+			ps.setString(8, oldBookInfo.getBookISBN());
+			ps.setString(9, oldBookInfo.getBookName());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -565,12 +590,12 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		for (int removePersonIndex = 0; removePersonIndex < removedPeopleList.size(); removePersonIndex++) {
 			Person person = removedPeopleList.get(removePersonIndex);
 			int personID = tryToFindPerson(person);
-			String isbn = formatString(oldBookInfo.getBookISBN());
+			String isbn = oldBookInfo.getBookISBN();
 			removeAuthorFromBookAuthor(isbn, personID);
 		}
 		
 		// add
-		Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
+		Book dummy = new Book(newBookInfo.getBookISBN(),
 				null, null, null, null);
 		dummy.setAuthorList(newPeopleList);
 		insertIntoBookAuthor(dummy);
@@ -578,11 +603,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		// update ISBN
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + BookAuthorTable.TABLE_NAME + " "
-					+ "SET " + BookAuthorTable.ISBN + " = " + newBookInfo.getBookISBN() + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = " + oldBookInfo.getBookISBN());
+			String query = "UPDATE " + BookAuthorTable.TABLE_NAME + " "
+					+ "SET " + BookAuthorTable.ISBN + " = ? "
+					+ "WHERE " + BookAuthorTable.ISBN + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newBookInfo.getBookISBN());
+			ps.setString(2, oldBookInfo.getBookISBN());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -601,11 +629,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	private static void updateKeywordWithID(int keywordID, String newTag) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + KeywordTable.TABLE_NAME + " "
-					+ "SET " + KeywordTable.TAG + " = '" + newTag + "' "
-					+ "WHERE " + KeywordTable.ID + " = " + keywordID);
+			String query = "UPDATE " + KeywordTable.TABLE_NAME + " "
+					+ "SET " + KeywordTable.TAG + " = ? "
+					+ "WHERE " + KeywordTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newTag);
+			ps.setInt(2, keywordID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -692,12 +723,12 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		for (int removeTagIndex = 0; removeTagIndex < removedTagList.size(); removeTagIndex++) {
 			String tag = removedTagList.get(removeTagIndex);
 			int tagID = tryToFindBookTag(tag);
-			String isbn = formatString(oldBookInfo.getBookISBN());
+			String isbn = oldBookInfo.getBookISBN();
 			removeKeywordFromBookKeyword(isbn, tagID);
 		}
 		
 		// add
-		Book dummy = new Book(formatString(newBookInfo.getBookISBN()),
+		Book dummy = new Book(newBookInfo.getBookISBN(),
 				null, null, null, null);
 		dummy.setKeyWords(newTagList);
 		insertIntoBookKeyword(dummy);
@@ -705,11 +736,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		// update ISBN
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + BookKeywordTable.TABLE_NAME + " "
-					+ "SET " + BookKeywordTable.ISBN + " = " + newBookInfo.getBookISBN() + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = " + oldBookInfo.getBookISBN());
+			String query = "UPDATE " + BookKeywordTable.TABLE_NAME + " "
+					+ "SET " + BookKeywordTable.ISBN + " = ? "
+					+ "WHERE " + BookKeywordTable.ISBN + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newBookInfo.getBookISBN());
+			ps.setString(2, oldBookInfo.getBookISBN());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -730,15 +764,15 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 */
 	private static void removeAuthorFromBookAuthor(String bookISBN, int authorID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "' "
-					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
-			stmt.executeUpdate("DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
-					+ "WHERE " + BookAuthorTable.ISBN + " = '" + bookISBN + "' "
-					+ "and " + BookAuthorTable.AUTHOR_ID + " = " + authorID);
+			
+			String query = "DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
+					+ "WHERE " + BookAuthorTable.ISBN + " = ? "
+					+ "and " + BookAuthorTable.AUTHOR_ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, bookISBN);
+			ps.setInt(2, authorID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -754,15 +788,15 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 */
 	private static void removeKeywordFromBookKeyword(String bookISBN, Integer keywordID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("DELETE FROM " + BookKeywordTable.TABLE_NAME + " "
+			
+			String query = "DELETE FROM " + BookKeywordTable.TABLE_NAME + " "
 					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN + " "
-					+ "and " + BookKeywordTable.KEYWORD_ID + " = " + keywordID);
-			stmt.executeUpdate("DELETE FROM " + BookKeywordTable.TABLE_NAME + " "
-					+ "WHERE " + BookKeywordTable.ISBN + " = " + bookISBN + " "
-					+ "and " + BookKeywordTable.KEYWORD_ID + " = " + keywordID);
+					+ "and " + BookKeywordTable.KEYWORD_ID + " = " + keywordID;
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, bookISBN);
+			ps.setInt(2, keywordID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
