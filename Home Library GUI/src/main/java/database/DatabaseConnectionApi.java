@@ -12,6 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.sun.jndi.cosnaming.CNNameParser;
+
 import database.tables.BookAuthorTable;
 import database.tables.BookTable;
 import database.tables.KeywordTable;
@@ -99,7 +101,7 @@ public class DatabaseConnectionApi {
 	}
 	
 	
-	protected static String formatString(String str) {
+	/*protected static String formatString(String str) {
 		
 		String result = str.replaceAll("'", "");
 		
@@ -111,7 +113,7 @@ public class DatabaseConnectionApi {
 			result = null;
 		}
 		return result;
-	}
+	}*/
 	
 	/**
 	 * This is to format string to integer
@@ -154,9 +156,9 @@ public class DatabaseConnectionApi {
 				// make sure the person exists
 				// check both middle name and gender
 				String actualMiddleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
-				String expectedMiddleName = formatString(person.getMiddleName());
+				String expectedMiddleName = person.getMiddleName();
 				Integer actualGender = formatStringToInt(rs.getString(PeopleInvolvedTable.GENDER));
-				Integer expectedGender = person.getGenderInt();
+				Integer expectedGender = person.getGender();
 				
 				if (actualGender == expectedGender) {
 					if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
@@ -180,18 +182,22 @@ public class DatabaseConnectionApi {
 	 */
 	protected static void insertIntoPeopleInvolved(Person person) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
+
+			String query = "INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "(" + PeopleInvolvedTable.FIRST_NAME + ", " + PeopleInvolvedTable.MIDDLE_NAME + ", "
-						+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
-					+ "VALUES (" + person.getFirstName() + ", " + person.getMiddleName() + ", "
-							+ person.getSurname() + ", " + person.getGender() + ")");
-			stmt.executeUpdate("INSERT INTO " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "(" + PeopleInvolvedTable.FIRST_NAME + ", " + PeopleInvolvedTable.MIDDLE_NAME + ", "
-						+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
-					+ "VALUES (" + person.getFirstName() + ", " + person.getMiddleName() + ", "
-							+ person.getSurname() + ", " + person.getGender() + ")");
+					+ PeopleInvolvedTable.FAMILY_NAME + ", " + PeopleInvolvedTable.GENDER + ") "
+				+ "VALUES (?, ?, ?, ?)";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, person.getFirstName());
+			ps.setString(2, person.getMiddleName());
+			ps.setString(3, person.getSurname());
+			if (person.getGender() == null) {
+				ps.setNull(4, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(4, person.getGender());
+			}
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -229,13 +235,16 @@ public class DatabaseConnectionApi {
 	 * @return a Person representing the person with the given id
 	 * @throws SQLException 
 	 */
-	protected static Person getPersonFromPeopleInvolvedTable(Integer id) throws SQLException {
+	protected static Person getPersonFromPeopleInvolvedTable(int id) throws SQLException {
 		Person person;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " WHERE " + PeopleInvolvedTable.ID + " = " + id);
+			String query = "SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, id);
+			
+			ResultSet rs = ps.executeQuery();
 			
 			rs.next();
 			String firstName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
@@ -261,17 +270,17 @@ public class DatabaseConnectionApi {
 	 * @param newData the new data with ''
 	 * @throws SQLException 
 	 */
-	private static void updatePeopleInvolvedTableWithNewData(Integer oldID, String columnName, String newData) throws SQLException {
+	private static void updatePeopleInvolvedTableWithNewData(int oldID, String columnName, String newData) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
-			stmt.executeUpdate("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
+			String query = "UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = ? "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newData);
+			ps.setInt(2, oldID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -286,17 +295,21 @@ public class DatabaseConnectionApi {
 	 * @param newData the new data as a int
 	 * @throws SQLException 
 	 */
-	private static void updatePeopleInvolvedTableWithNewData(Integer oldID, String columnName, Integer newData) throws SQLException {
+	private static void updatePeopleInvolvedTableWithNewData(int oldID, String columnName, Integer newData) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
-			stmt.executeUpdate("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "SET " + columnName + " = " + newData + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + oldID);
+			String query = "UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + columnName + " = ? "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			if (newData == null) {
+				ps.setNull(1, java.sql.Types.INTEGER);
+			} else {
+				ps.setInt(1, newData);
+			}
+			ps.setInt(2, oldID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -350,15 +363,15 @@ public class DatabaseConnectionApi {
 	 */
 	protected static void removePersonFromPeopleInvolvedTable(Person person) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
-					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
-			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
-					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
+			
+			String query = "DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = ? "
+					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, person.getSurname());
+			ps.setString(2, person.getFirstName());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -371,15 +384,15 @@ public class DatabaseConnectionApi {
 	 * @param personID
 	 * @throws SQLException
 	 */
-	protected static void removePersonFromPeopleInvolvedTable(Integer personID) throws SQLException {
+	protected static void removePersonFromPeopleInvolvedTable(int personID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
-			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
+			String query = "DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, personID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -447,14 +460,24 @@ public class DatabaseConnectionApi {
 	protected static void updatePersonWithID(int personID, Person newPersonInfo) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "SET " + PeopleInvolvedTable.FIRST_NAME + " = " + newPersonInfo.getFirstName() + ", "
-							+ PeopleInvolvedTable.MIDDLE_NAME + " = " + newPersonInfo.getMiddleName() + ", "
-							+ PeopleInvolvedTable.FAMILY_NAME + " = " + newPersonInfo.getSurname() + ", "
-							+ PeopleInvolvedTable.GENDER + " = " + newPersonInfo.getGender() + " "
-					+ "WHERE " + PeopleInvolvedTable.ID + " = " + personID);
+			String query = "UPDATE " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "SET " + PeopleInvolvedTable.FIRST_NAME + " = ?, "
+					+ PeopleInvolvedTable.MIDDLE_NAME + " = ?, "
+					+ PeopleInvolvedTable.FAMILY_NAME + " = ?, "
+					+ PeopleInvolvedTable.GENDER + " = ? "
+					+ "WHERE " + PeopleInvolvedTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newPersonInfo.getFirstName());
+			ps.setString(2, newPersonInfo.getMiddleName());
+			ps.setString(3, newPersonInfo.getSurname());
+			if (newPersonInfo.getGender() == null)
+				ps.setNull(4, java.sql.Types.INTEGER);
+			else
+				ps.setInt(4, newPersonInfo.getGender());
+			ps.setInt(5, personID);
+			
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {

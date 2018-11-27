@@ -26,11 +26,7 @@ public class Person {
 	 * @return the surname
 	 */
 	public String getSurname() {
-		String result = "NULL";
-		if (this.surname != null) {
-			result = "'" + this.surname + "'";
-		}
-		return result;
+		return surname;
 	}
 
 	/**
@@ -44,11 +40,7 @@ public class Person {
 	 * @return the firstName
 	 */
 	public String getFirstName() {
-		String result = "NULL";
-		if (this.firstName != null) {
-			result = "'" + this.firstName + "'";
-		}
-		return result;
+		return firstName;
 	}
 
 	/**
@@ -62,11 +54,7 @@ public class Person {
 	 * @return the middleName
 	 */
 	public String getMiddleName() {
-		String result = "NULL";
-		if (this.middleName != null) {
-			result = "'" + this.middleName + "'";
-		}
-		return result;
+		return middleName;
 	}
 
 	/**
@@ -79,29 +67,16 @@ public class Person {
 	/**
 	 * @return the gender
 	 */
-	public String getGender() {
-		String result = "NULL";
-		if (this.gender != null) {
-			result = "" + this.gender;
-		}
-		return result;
-	}
-	
-	/**
-	 * @return the gender
-	 */
-	public Integer getGenderInt() {
-		return this.gender;
+	public Integer getGender() {
+		return gender;
 	}
 
 	/**
-	 * @param isMale the isMale to set
+	 * @param gender the gender to set
 	 */
 	public void setGender(Integer gender) {
 		this.gender = gender;
 	}
-	
-	
 
 	/**
 	 * @return the award
@@ -118,12 +93,22 @@ public class Person {
 	}
 
 	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Person [surname=" + surname + ", firstName=" + firstName + ", middleName=" + middleName + ", gender="
+				+ gender + ", award=" + award + "]";
+	}
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((award == null) ? 0 : award.hashCode());
 		result = prime * result + ((firstName == null) ? 0 : firstName.hashCode());
 		result = prime * result + ((gender == null) ? 0 : gender.hashCode());
 		result = prime * result + ((middleName == null) ? 0 : middleName.hashCode());
@@ -143,6 +128,11 @@ public class Person {
 		if (getClass() != obj.getClass())
 			return false;
 		Person other = (Person) obj;
+		if (award == null) {
+			if (other.award != null)
+				return false;
+		} else if (!award.equals(other.award))
+			return false;
 		if (firstName == null) {
 			if (other.firstName != null)
 				return false;
@@ -164,15 +154,6 @@ public class Person {
 		} else if (!surname.equals(other.surname))
 			return false;
 		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Person [surname=" + surname + ", firstName=" + firstName + ", middleName=" + middleName + ", gender="
-				+ gender + "]";
 	}
 
 	

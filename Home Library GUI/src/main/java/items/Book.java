@@ -32,11 +32,7 @@ public class Book {
 	 * @return the bookName
 	 */
 	public String getBookName() {
-		String result = "NULL";
-		if (bookName != null) {
-			result = "'" + this.bookName + "'";
-		}
-		return result;
+		return bookName;
 	}
 
 	/**
@@ -50,11 +46,7 @@ public class Book {
 	 * @return the bookISBN
 	 */
 	public String getBookISBN() {
-		String result = "NULL";
-		if (this.bookISBN != null) {
-			result = "'" + this.bookISBN + "'";
-		}
-		return result;
+		return bookISBN;
 	}
 
 	/**
@@ -68,11 +60,7 @@ public class Book {
 	 * @return the publisherName
 	 */
 	public String getPublisherName() {
-		String result = "NULL";
-		if (this.publisherName != null) {
-			result = "'" + this.publisherName + "'";
-		}
-		return result;
+		return publisherName;
 	}
 
 	/**
@@ -85,19 +73,8 @@ public class Book {
 	/**
 	 * @return the editionNumber
 	 */
-	public String getEditionNumber() {
-		String result = "NULL";
-		if (this.editionNumber != null) {
-			result = "" + this.editionNumber;
-		}
-		return result;
-	}
-	
-	/**
-	 * @return the editionNumber
-	 */
-	public Integer getEditionNumberInt() {
-		return this.editionNumber;
+	public Integer getEditionNumber() {
+		return editionNumber;
 	}
 
 	/**
@@ -120,26 +97,12 @@ public class Book {
 	public void setAuthorList(ArrayList<Person> authorList) {
 		this.authorList = authorList;
 	}
-	
-	public void addAuthor(Person newAuthor) {
-		this.authorList.add(newAuthor);
-	}
 
 	/**
 	 * @return the numOfPage
 	 */
-	public String getNumOfPage() {
-		String result = "NULL";
-		if (this.numOfPage != null)
-			result = "" + this.numOfPage;
-		return result;
-	}
-	
-	/**
-	 * @return the numOfPage
-	 */
-	public Integer getNumOfPageInt() {
-		return this.numOfPage;
+	public Integer getNumOfPage() {
+		return numOfPage;
 	}
 
 	/**
@@ -152,18 +115,8 @@ public class Book {
 	/**
 	 * @return the publicationYear
 	 */
-	public String getPublicationYear() {
-		String result = "NULL";
-		if (this.numOfPage != null)
-			result = "" + this.publicationYear;
-		return result;
-	}
-	
-	/**
-	 * @return the publicationYear
-	 */
-	public Integer getPublicationYearInt() {
-		return this.publicationYear;
+	public Integer getPublicationYear() {
+		return publicationYear;
 	}
 
 	/**
@@ -186,20 +139,12 @@ public class Book {
 	public void setKeyWords(ArrayList<String> keyWords) {
 		this.keyWords = keyWords;
 	}
-	
-	public void addKeyWord(String keyWord) {
-		this.keyWords.add(keyWord);
-	}
 
 	/**
 	 * @return the bookDescription
 	 */
 	public String getBookDescription() {
-		String result = "NULL";
-		if (this.bookDescription != null) {
-			result = "'" + this.bookDescription + "'";
-		}
-		return result;
+		return bookDescription;
 	}
 
 	/**
@@ -219,6 +164,85 @@ public class Book {
 				+ ", publicationYear=" + publicationYear + ", keyWords=" + keyWords + ", bookDescription="
 				+ bookDescription + "]";
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((authorList == null) ? 0 : authorList.hashCode());
+		result = prime * result + ((bookDescription == null) ? 0 : bookDescription.hashCode());
+		result = prime * result + ((bookISBN == null) ? 0 : bookISBN.hashCode());
+		result = prime * result + ((bookName == null) ? 0 : bookName.hashCode());
+		result = prime * result + ((editionNumber == null) ? 0 : editionNumber.hashCode());
+		result = prime * result + ((keyWords == null) ? 0 : keyWords.hashCode());
+		result = prime * result + ((numOfPage == null) ? 0 : numOfPage.hashCode());
+		result = prime * result + ((publicationYear == null) ? 0 : publicationYear.hashCode());
+		result = prime * result + ((publisherName == null) ? 0 : publisherName.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Book other = (Book) obj;
+		if (authorList == null) {
+			if (other.authorList != null)
+				return false;
+		} else if (!authorList.equals(other.authorList))
+			return false;
+		if (bookDescription == null) {
+			if (other.bookDescription != null)
+				return false;
+		} else if (!bookDescription.equals(other.bookDescription))
+			return false;
+		if (bookISBN == null) {
+			if (other.bookISBN != null)
+				return false;
+		} else if (!bookISBN.equals(other.bookISBN))
+			return false;
+		if (bookName == null) {
+			if (other.bookName != null)
+				return false;
+		} else if (!bookName.equals(other.bookName))
+			return false;
+		if (editionNumber == null) {
+			if (other.editionNumber != null)
+				return false;
+		} else if (!editionNumber.equals(other.editionNumber))
+			return false;
+		if (keyWords == null) {
+			if (other.keyWords != null)
+				return false;
+		} else if (!keyWords.equals(other.keyWords))
+			return false;
+		if (numOfPage == null) {
+			if (other.numOfPage != null)
+				return false;
+		} else if (!numOfPage.equals(other.numOfPage))
+			return false;
+		if (publicationYear == null) {
+			if (other.publicationYear != null)
+				return false;
+		} else if (!publicationYear.equals(other.publicationYear))
+			return false;
+		if (publisherName == null) {
+			if (other.publisherName != null)
+				return false;
+		} else if (!publisherName.equals(other.publisherName))
+			return false;
+		return true;
+	}
+
 	
 }

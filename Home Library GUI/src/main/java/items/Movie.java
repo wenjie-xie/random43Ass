@@ -38,11 +38,7 @@ public class Movie {
 	 * @return the movieName
 	 */
 	public String getMovieName() {
-		String result = "NULL";
-		if (this.movieName != null) {
-			result = "'" + this.movieName + "'";
-		}
-		return result;
+		return movieName;
 	}
 
 	/**
@@ -65,27 +61,19 @@ public class Movie {
 	public void setDirectorList(ArrayList<Person> directorList) {
 		this.directorList = directorList;
 	}
-	
-	public void addDirector(Person newDirector) {
-		this.directorList.add(newDirector);
-	}
 
 	/**
-	 * @return the scriptWriter
+	 * @return the scriptWriterList
 	 */
 	public ArrayList<Person> getScriptWriterList() {
 		return scriptWriterList;
 	}
 
 	/**
-	 * @param scriptWriter the scriptWriter to set
+	 * @param scriptWriterList the scriptWriterList to set
 	 */
-	public void setScriptWriterList(ArrayList<Person> scriptWriter) {
-		this.scriptWriterList = scriptWriter;
-	}
-	
-	public void addScriptWriter(Person newScriptWriter) {
-		this.scriptWriterList.add(newScriptWriter);
+	public void setScriptWriterList(ArrayList<Person> scriptWriterList) {
+		this.scriptWriterList = scriptWriterList;
 	}
 
 	/**
@@ -101,10 +89,6 @@ public class Movie {
 	public void setCastList(ArrayList<Person> castList) {
 		this.castList = castList;
 	}
-	
-	public void addCast(Person newCast) {
-		this.castList.add(newCast);
-	}
 
 	/**
 	 * @return the producerList
@@ -118,10 +102,6 @@ public class Movie {
 	 */
 	public void setProducerList(ArrayList<Person> producerList) {
 		this.producerList = producerList;
-	}
-	
-	public void addProducer(Person producer) {
-		this.producerList.add(producer);
 	}
 
 	/**
@@ -137,10 +117,6 @@ public class Movie {
 	public void setComposerList(ArrayList<Person> composerList) {
 		this.composerList = composerList;
 	}
-	
-	public void addComposer(Person newComposer) {
-		this.composerList.add(newComposer);
-	}
 
 	/**
 	 * @return the editorList
@@ -155,45 +131,26 @@ public class Movie {
 	public void setEditorList(ArrayList<Person> editorList) {
 		this.editorList = editorList;
 	}
-	
-	public void addEditor(Person editor) {
-		this.editorList.add(editor);
-	}
 
 	/**
-	 * @return the costumeDesigner
+	 * @return the costumeDesignerList
 	 */
 	public ArrayList<Person> getCostumeDesignerList() {
 		return costumeDesignerList;
 	}
 
 	/**
-	 * @param costumeDesigner the costumeDesigner to set
+	 * @param costumeDesignerList the costumeDesignerList to set
 	 */
-	public void setCostumeDesignerList(ArrayList<Person> costumeDesigner) {
-		this.costumeDesignerList = costumeDesigner;
-	}
-	
-	public void addCostumeDesigner(Person newCostumeDesigner) {
-		this.costumeDesignerList.add(newCostumeDesigner);
+	public void setCostumeDesignerList(ArrayList<Person> costumeDesignerList) {
+		this.costumeDesignerList = costumeDesignerList;
 	}
 
 	/**
 	 * @return the releaseYear
 	 */
-	public String getReleaseYear() {
-		String result = "NULL";
-		if (this.releaseYear != null) {
-			result = "" + this.releaseYear;
-		}
-		return result;
-	}
-	
-	/**
-	 * @return the releaseYear
-	 */
-	public Integer getReleaseYearInt() {
-		return this.releaseYear;
+	public Integer getReleaseYear() {
+		return releaseYear;
 	}
 
 	/**
@@ -206,19 +163,8 @@ public class Movie {
 	/**
 	 * @return the award
 	 */
-	public String getAward() {
-		String result = "NULL";
-		if (this.award != null) {
-			result = "" + this.award;
-		}
-		return result;
-	}
-	
-	/**
-	 * @return the award
-	 */
-	public Integer getAwardInt() {
-		return this.award;
+	public Integer getAward() {
+		return award;
 	}
 
 	/**
@@ -238,6 +184,92 @@ public class Movie {
 				+ composerList + ", editorList=" + editorList + ", costumeDesignerList=" + costumeDesignerList
 				+ ", releaseYear=" + releaseYear + ", award=" + award + "]";
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((award == null) ? 0 : award.hashCode());
+		result = prime * result + ((castList == null) ? 0 : castList.hashCode());
+		result = prime * result + ((composerList == null) ? 0 : composerList.hashCode());
+		result = prime * result + ((costumeDesignerList == null) ? 0 : costumeDesignerList.hashCode());
+		result = prime * result + ((directorList == null) ? 0 : directorList.hashCode());
+		result = prime * result + ((editorList == null) ? 0 : editorList.hashCode());
+		result = prime * result + ((movieName == null) ? 0 : movieName.hashCode());
+		result = prime * result + ((producerList == null) ? 0 : producerList.hashCode());
+		result = prime * result + ((releaseYear == null) ? 0 : releaseYear.hashCode());
+		result = prime * result + ((scriptWriterList == null) ? 0 : scriptWriterList.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Movie other = (Movie) obj;
+		if (award == null) {
+			if (other.award != null)
+				return false;
+		} else if (!award.equals(other.award))
+			return false;
+		if (castList == null) {
+			if (other.castList != null)
+				return false;
+		} else if (!castList.equals(other.castList))
+			return false;
+		if (composerList == null) {
+			if (other.composerList != null)
+				return false;
+		} else if (!composerList.equals(other.composerList))
+			return false;
+		if (costumeDesignerList == null) {
+			if (other.costumeDesignerList != null)
+				return false;
+		} else if (!costumeDesignerList.equals(other.costumeDesignerList))
+			return false;
+		if (directorList == null) {
+			if (other.directorList != null)
+				return false;
+		} else if (!directorList.equals(other.directorList))
+			return false;
+		if (editorList == null) {
+			if (other.editorList != null)
+				return false;
+		} else if (!editorList.equals(other.editorList))
+			return false;
+		if (movieName == null) {
+			if (other.movieName != null)
+				return false;
+		} else if (!movieName.equals(other.movieName))
+			return false;
+		if (producerList == null) {
+			if (other.producerList != null)
+				return false;
+		} else if (!producerList.equals(other.producerList))
+			return false;
+		if (releaseYear == null) {
+			if (other.releaseYear != null)
+				return false;
+		} else if (!releaseYear.equals(other.releaseYear))
+			return false;
+		if (scriptWriterList == null) {
+			if (other.scriptWriterList != null)
+				return false;
+		} else if (!scriptWriterList.equals(other.scriptWriterList))
+			return false;
+		return true;
+	}
+
 	
 	
 }
