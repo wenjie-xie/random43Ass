@@ -5,6 +5,7 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -138,14 +139,17 @@ public class DatabaseConnectionApi {
 		Integer result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
-							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = " + person.getSurname() + " "
-							+ "and " + PeopleInvolvedTable.FIRST_NAME + " = " + person.getFirstName());
+			
+			String query = "SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedTable.FAMILY_NAME + " = ? "
+					+ "and " + PeopleInvolvedTable.FIRST_NAME + " = ?";
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setString (1, person.getSurname());
+		    preparedStatement.setString (2, person.getFirstName());
+		    
+		    ResultSet rs = preparedStatement.executeQuery();
+			
 			while (rs.next()) {
 				// make sure the person exists
 				// check both middle name and gender
