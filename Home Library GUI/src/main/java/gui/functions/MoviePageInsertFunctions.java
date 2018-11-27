@@ -76,7 +76,10 @@ public class MoviePageInsertFunctions extends GeneralFunctions {
 		
 		// Cast (1-10)
 		castNameTable = new ArrayList<>();
-		castNameTable.add(this.createNameRow("Cast", 14, 1));
+		ArrayList<JTextArea> castRowFieldList = createNameRow("Cast", 14, 1);
+		JTextArea award = createTextField("Cast Award:", 15, 8);
+		castRowFieldList.add(award);
+		castNameTable.add(castRowFieldList);
 		
 		// Add more cast button
 		this.addCastBtn = new JButton("Add More Cast");
@@ -88,7 +91,10 @@ public class MoviePageInsertFunctions extends GeneralFunctions {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				numOfCast = numOfCast + 1;
-				castNameTable.add(createNameRow("Cast", nextRowNum, numOfCast));
+				ArrayList<JTextArea> castRowFieldList = createNameRow("Cast", nextRowNum, numOfCast);
+				JTextArea award = createTextField("Cast Award:", nextRowNum + 1, 8);
+				castRowFieldList.add(award);
+				castNameTable.add(castRowFieldList);
 				nextRowNum = nextRowNum + 2;
 				
 				// disable this button if the number of author is reached
@@ -223,28 +229,7 @@ public class MoviePageInsertFunctions extends GeneralFunctions {
 		
 		return nameList;
 	}
-	
-	/**
-	 * Create a submit button for this panel
-	 * @return a submit JButton
-	 */
-	private JButton createSubmitButton() {
-		JButton submitBtn = new JButton("Submit");
-		submitBtn.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// Add all the info into the Music Album object
-				Movie movie = getMovieInfo();
-				
-				DatabaseConnectionMovieApi.insertMovie(movie);
-				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-				
-			}
-		});
-		
-		return submitBtn;
-	}
+
 	
 	/**
 	 * Put all info provided by the user into a Movie object
@@ -310,6 +295,12 @@ public class MoviePageInsertFunctions extends GeneralFunctions {
 				// Gender
 				Integer targetGender = textAreaToInt(person.get(3));
 				targetPerson.setGender(targetGender);
+				
+				// Award
+				if (person.size() == 5) {
+					Integer targetAward = textAreaToInt(person.get(4));
+					targetPerson.setAward(targetAward);
+				}
 				
 				// Add person
 				targetPersonList.add(targetPerson);

@@ -82,6 +82,9 @@ public class MoviePageViewFunctions extends MoviePageInsertFunctions {
 			
 			// gender
 			castNameList.get(3).setText(formatString(cast.getGender()));
+			
+			// award
+			castNameList.get(4).setText(formatString(String.valueOf(cast.getAward())));
 		}
 		
 		// producerNameTable

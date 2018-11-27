@@ -12,12 +12,14 @@ public class Person {
 	private String firstName;
 	private String middleName;
 	private Integer gender;
+	private Integer award;
 	
 	public Person(String surname, String firstName) {
 		this.firstName = firstName;
 		this.surname = surname;
 		this.gender = null;
 		this.middleName = null;
+		this.award = null;
 	}
 
 	/**
@@ -97,6 +99,22 @@ public class Person {
 	 */
 	public void setGender(Integer gender) {
 		this.gender = gender;
+	}
+	
+	
+
+	/**
+	 * @return the award
+	 */
+	public Integer getAward() {
+		return award;
+	}
+
+	/**
+	 * @param award the award to set
+	 */
+	public void setAward(Integer award) {
+		this.award = award;
 	}
 
 	/* (non-Javadoc)

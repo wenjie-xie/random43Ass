@@ -11,6 +11,7 @@ import java.util.HashMap;
 import database.tables.AwardTable;
 import database.tables.CrewMemberTable;
 import database.tables.MovieTable;
+import database.tables.MusicSingerTable;
 import database.tables.MusicTable;
 import database.tables.Role;
 import database.tables.RoleTable;
@@ -635,9 +636,165 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	}
 	
 	
+	/**
+	 * Compare and update crew member table
+	 * @param oldMovieInfo
+	 * @param newMovieInfo
+	 * @throws SQLException 
+	 */
+	private static void compareAndUpdateCrewMemberTable(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
+
+		String movieName = formatString(oldMovieInfo.getMovieName());
+		Integer releaseYear = formatStringToInt(oldMovieInfo.getReleaseYear());
+		
+		// Director
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getDirectorList(), newMovieInfo.getDirectorList(), Role.DIRECTOR);
+		// Script Writer
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getScriptWriterList(), newMovieInfo.getScriptWriterList(), Role.SCRIPT_WRITER);
+		// Cast
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getCastList(), newMovieInfo.getCastList(), Role.CAST);
+		// Producer
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getProducerList(), newMovieInfo.getProducerList(), Role.PRODUCER);
+		// Composer
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getComposerList(), newMovieInfo.getComposerList(), Role.COMPOSER);
+		// Editor
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getEditorList(), newMovieInfo.getEditorList(), Role.EDITOR);
+		// Costume Designer
+		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getCostumeDesignerList(), newMovieInfo.getCostumeDesignerList(), Role.COSTUME_DESIGNER);
+	}
+	
+	
+	/**
+	 * Remove, update or add each type of user to crew member table
+	 * @param movieName with out ''
+	 * @param releaseYear
+	 * @param oldPeopleList
+	 * @param newPeopleList
+	 * @param role
+	 * @throws SQLException 
+	 */
+	private static void updateEachCrewMember(
+			String movieName, Integer releaseYear, ArrayList<Person> oldPeopleList, ArrayList<Person> newPeopleList, String role) throws SQLException {
+		HashMap<String, ArrayList<Person>> removedUpdatedAndNewMap = determineRemovedUpdateAndNewPerson(oldPeopleList, newPeopleList);
+		ArrayList<Person> removedPeopleList = removedUpdatedAndNewMap.get("removed");
+		ArrayList<Person> updatedPeopleList = removedUpdatedAndNewMap.get("updated");
+		ArrayList<Person> addedPeopleList = removedUpdatedAndNewMap.get("new");
+		
+		// remove people in removed people list
+		for (Person person : removedPeopleList) {
+			int peopleInvolvedID = tryToFindPerson(person);
+			int roleID = formatStringToInt(tryToFindRole(role));
+			removeARowFromCrewMemberTable(peopleInvolvedID, movieName, releaseYear, roleID);
+		}
+		
+		// update people in the updatedPeopleList
+		for (int i = 0; i < updatedPeopleList.size(); i++) {
+			Person oldPersonInfo = updatedPeopleList.get(i);
+			Person newPersonInfo = newPeopleList.get(i);
+			int peopleInvolvedID = tryToFindPerson(oldPersonInfo);
+			updatePersonWithID(peopleInvolvedID, newPersonInfo);
+			
+		}
+		
+		// add new people to the crew
+		for (Person person : addedPeopleList) {
+			Movie dummyMovie = new Movie(movieName, releaseYear);
+			insertIntoCrewMemberHelper(dummyMovie, person, role);
+		}
+	}
+	
+	
+	/**
+	 * Update the award receive by each cast
+	 * @param oldMovieInfo
+	 * @param newMovieInfo
+	 */
+	private static void compareAndUpdateAwardTable(Movie oldMovieInfo, Movie newMovieInfo) {
+		HashMap<String, ArrayList<Person>> removedUpdatedAndNewMap = determineRemovedUpdateAndNewPerson(oldMovieInfo.getCastList(), newMovieInfo.getCastList());
+		ArrayList<Person> removedPeopleList = removedUpdatedAndNewMap.get("removed");
+		ArrayList<Person> updatedPeopleList = removedUpdatedAndNewMap.get("updated");
+		ArrayList<Person> addedPeopleList = removedUpdatedAndNewMap.get("new");
+		
+		String movieName = formatString(oldMovieInfo.getMovieName());
+		Integer releaseYear = oldMovieInfo.getAwardInt();
+		
+		// remove people in removed people list
+		for (Person person : removedPeopleList) {
+			int peopleInvolvedID = tryToFindPerson(person);
+			removeARowFromAwardTable(peopleInvolvedID, movieName, releaseYear, award);
+			
+		}
+		
+		// update people in the updatedPeopleList
+		for (int i = 0; i < updatedPeopleList.size(); i++) {
+			Person oldPersonInfo = updatedPeopleList.get(i);
+			Person newPersonInfo = newPeopleList.get(i);
+			int peopleInvolvedID = tryToFindPerson(oldPersonInfo);
+			updatePersonWithID(peopleInvolvedID, newPersonInfo);
+			
+		}
+		
+		// add new people to the crew
+		for (Person person : addedPeopleList) {
+			Movie dummyMovie = new Movie(movieName, releaseYear);
+			insertIntoCrewMemberHelper(dummyMovie, person, role);
+		}
+	}
+	
 	/*****************************
 	 * REMOVE MOVIE *
 	 *****************************/
+	
+	/**
+	 * Remove a row from the crew member table
+	 * @param peopleInvolvedID
+	 * @param movieName with no ''
+	 * @param releaseYear
+	 * @param roleID should be a Role constant
+	 * @throws SQLException
+	 */
+	private static void removeARowFromCrewMemberTable(int peopleInvolvedID, String movieName, Integer releaseYear, int roleID) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.PEOPLE_INVOLVED_ID + " = " + peopleInvolvedID + " "
+							+ "and " + CrewMemberTable.MOVIE_NAME + " = " + movieName + " "
+							+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + releaseYear + " "
+							+ "and " + CrewMemberTable.ROLE_ID + " = " + roleID);
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**
+	 * Remove a row from the award table
+	 * @param peopleInvolvedID
+	 * @param movieName with no ''
+	 * @param releaseYear
+	 * @param award with no ''
+	 * @throws SQLException
+	 */
+	private static void removeARowFromAwardTable(int peopleInvolvedID, String movieName, Integer releaseYear, String award) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM " + AwardTable.TABLE_NAME + " "
+					+ "WHERE " + AwardTable.PEOPLE_INVOLVED_ID + " = " + peopleInvolvedID + " "
+							+ "and " + AwardTable.MOVIE_NAME + " = " + movieName + " "
+							+ "and " + AwardTable.YEAR + " = " + releaseYear + " "
+							+ "and " + AwardTable.AWARD + " = " + award);
+			connection.close();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
 	
 	/**
 	 * Remove the movie given completely from the database
