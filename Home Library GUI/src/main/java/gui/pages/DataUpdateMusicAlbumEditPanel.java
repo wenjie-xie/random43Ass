@@ -55,7 +55,7 @@ public class DataUpdateMusicAlbumEditPanel extends MusicAlbumPageViewFunctions {
 				MusicAlbum newMusicAlbum = getMusicAlbumInfo();
 				
 				try {
-					DatabaseConnectionMusicAlbumApi.compareAndUpdateMusicAlbum(newMusicAlbum, oldMusicAlbum);
+					DatabaseConnectionMusicAlbumApi.compareAndUpdateMusicAlbum(oldMusicAlbum, newMusicAlbum);
 					
 					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				} catch (NumberFormatException | SQLException e1) {

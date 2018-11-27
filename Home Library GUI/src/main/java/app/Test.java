@@ -20,7 +20,7 @@ public class Test {
 		@Override
 		public void run() {
 			JFrame frame = new JFrame();
-			JScrollPane scrollPane = new JScrollPane(new DataInsertMoviePanel("TESTING"));
+			JScrollPane scrollPane = new JScrollPane(new DataInsertMoviePanel());
 			frame.getContentPane().add(scrollPane);
 			 
 			frame.setSize(1000, 800);

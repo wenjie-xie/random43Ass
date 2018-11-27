@@ -648,7 +648,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				
 				Statement stmt = null;
 				stmt = connection.createStatement();
-				stmt.executeUpdate("UPDATE " + MusicTable.MUSIC_NAME + " "
+				stmt.executeUpdate("UPDATE " + MusicTable.TABLE_NAME + " "
 						+ "SET " + MusicTable.ALBUM_NAME + " = " + newMusicAlbum.getAlbumName() + ", "
 							+ MusicTable.YEAR + " = " + newMusicAlbum.getYearPublished() + ", "
 							+ MusicTable.MUSIC_NAME + " = " + updateTo.getMusicName() + ", "
