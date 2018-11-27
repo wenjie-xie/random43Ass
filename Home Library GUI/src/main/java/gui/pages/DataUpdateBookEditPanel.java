@@ -53,7 +53,6 @@ public class DataUpdateBookEditPanel extends BookPageViewFunctions {
 				// Add all the info into the Book object
 				Book newBook = getBookInfo();
 				
-
 				DatabaseConnectionBookApi.compareAndUpdateBookInfo(oldBookInfo, newBook);
 				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 

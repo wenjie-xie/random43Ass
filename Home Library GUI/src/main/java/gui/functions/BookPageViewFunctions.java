@@ -33,16 +33,16 @@ public class BookPageViewFunctions extends BookPageInsertFunctions {
 	 */
 	protected void fillBookInfo(Book book) {
 		// bookName
-		bookName.setText(this.formatString(book.getBookName()));
+		bookName.setText(book.getBookName());
 		
 		// bookISBN
-		bookISBN.setText(this.formatString(book.getBookISBN()));
+		bookISBN.setText(book.getBookISBN());
 		
 		// publisherName
-		publisherName.setText(this.formatString(book.getPublisherName()));
+		publisherName.setText(book.getPublisherName());
 		
 		// editionNumber
-		editionNumber.setText(this.formatString(book.getEditionNumber()));
+		editionNumber.setText(formatIntToStr(book.getEditionNumber()));
 		
 		// authorNameTable
 		int authorIndex = 0;
@@ -50,49 +50,44 @@ public class BookPageViewFunctions extends BookPageInsertFunctions {
 			Person currAuthor = book.getAuthorList().get(authorIndex);
 			
 			// Surname
-			authorFields.get(0).setText(this.formatString(currAuthor.getSurname()));
+			authorFields.get(0).setText(currAuthor.getSurname());
 			
 			// FirstName
-			authorFields.get(1).setText(this.formatString(currAuthor.getFirstName()));
+			authorFields.get(1).setText(currAuthor.getFirstName());
 			
 			// MiddleName
-			authorFields.get(2).setText(this.formatString(currAuthor.getMiddleName()));
+			authorFields.get(2).setText(currAuthor.getMiddleName());
 			
 			// Gender
-			authorFields.get(3).setText(this.formatString(currAuthor.getGender()));
+			authorFields.get(3).setText(formatIntToStr(currAuthor.getGender()));
 			
 			authorIndex = authorIndex + 1;
 		}
 		
 		// numberOfPage
-		numberOfPage.setText(this.formatString(book.getNumOfPage()));
+		numberOfPage.setText(formatIntToStr(book.getNumOfPage()));
 		
 		// publicationYear
-		publicationYear.setText(this.formatString(book.getPublicationYear()));
+		publicationYear.setText(formatIntToStr(book.getPublicationYear()));
 		
 		// tagList
 		int tagIndex = 0;
-		for (JTextArea tagField : tagList) {
-			String currTag = this.formatString(book.getKeyWords().get(tagIndex));
-			tagField.setText(this.formatString(currTag));
-			tagIndex = tagIndex + 1;
+		if (!book.getKeyWords().isEmpty()) {
+			for (JTextArea tagField : tagList) {
+				String currTag = book.getKeyWords().get(tagIndex);
+				tagField.setText(currTag);
+				tagIndex = tagIndex + 1;
+			}
 		}
 		
 		// description
-		description.setText(this.formatString(book.getBookDescription()));
+		description.setText(book.getBookDescription());
 	}
 	
-	private static String formatString(String str) {
-		
-		String result = str.replaceAll("'", "");
-		
-		if (str.length() == 4) {
-			result = result.replaceAll("NULL", "").replaceAll("null", "");
-		}
-		
-		if (result.equals("")) {
-			result = null;
-		}
+	private static String formatIntToStr(Integer num) {
+		String result = null;
+		if (num != null)
+			result = String.valueOf(num);
 		return result;
 	}
 

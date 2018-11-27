@@ -97,6 +97,8 @@ public class DataUpdateSearchPanel extends JPanel {
 				System.out.println(targetMovie.toString());
 				// if it is a music album navigate to the DataUpdateMusicAlbumEditPanel
 				HL_xiewen4.mainFrame.flipPageTo(new DataUpdateMovieEditPanel(targetMovie));
+			} else {
+				JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Item Not Found.");
 			}
 			
 		} catch (SQLException e) {
