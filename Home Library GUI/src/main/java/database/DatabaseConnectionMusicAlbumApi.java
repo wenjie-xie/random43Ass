@@ -12,12 +12,15 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import database.tables.BookAuthorTable;
+import database.tables.BookTable;
+import database.tables.MovieTable;
 import database.tables.MusicSingerTable;
 import database.tables.MusicTable;
 import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
 import database.tables.Role;
 import items.Book;
+import items.Movie;
 import items.Music;
 import items.MusicAlbum;
 import items.Person;
@@ -1096,5 +1099,125 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			
 			e.printStackTrace();
 		}
+	}
+	
+	
+	/*******************************
+	 * VIEW Music Album *
+	 *******************************/
+	
+	/**
+	 * Return a map containing array of singers, where each key is the music album title containing the
+	 * target sub string
+	 * 	"music album title" : [all singers of the music album]
+	 * @param target the sub string of the name
+	 * @param releaseYear year of publication
+	 * @return 
+	 */
+	public HashMap<String, ArrayList<String>> getMovieTitleToDirectorMap(String target, int releaseYear) {
+		HashMap<String, ArrayList<String>> titleToSingers = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			titleToSingers = getMusicAlbumTitleToSingerMapHelper(target, releaseYear);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		return titleToSingers;
+	}
+	
+	private HashMap<String, ArrayList<String>> getMusicAlbumTitleToSingerMapHelper(String target, int year) throws SQLException {
+		HashMap<String, ArrayList<String>> titleToSingers = new HashMap<>();
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String query = "SELECT FROM " + MusicTable.TABLE_NAME + " "
+					+ "WHERE " + MusicTable.YEAR + " = ? "
+							+ "and " + MusicTable.ALBUM_NAME + " LIKE ? "
+					+ "ORDER BY " + MusicTable.ALBUM_NAME;
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, year);
+			ps.setString(2, target);
+			ResultSet rs = ps.executeQuery();
+			
+			// Go through each matching music album and music name to get music singers
+			String preAlbumName = null;
+			ArrayList<String> singerNameList = null;
+			String albumName = null;
+			while (rs.next()) {
+				albumName = rs.getString(MusicTable.ALBUM_NAME);
+				String musicName = rs.getString(MusicTable.MUSIC_NAME);
+				
+				// If the search just started with a new music
+				if (preAlbumName == null) {
+					preAlbumName = albumName;
+					singerNameList = new ArrayList<>();
+					
+				// When all singer for the album are added to the singerNameList
+				} else if (!preAlbumName.equals(albumName)) {
+					titleToSingers.put(preAlbumName, singerNameList);
+					preAlbumName = albumName;
+					singerNameList = new ArrayList<>();
+				}
+				
+				singerNameList.addAll(getSingerNameList(albumName, year, musicName));
+			}
+			
+			// add the last album and singers
+			if (albumName != null) {
+				titleToSingers.put(albumName, singerNameList);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return titleToSingers;
+	}
+	
+	/**
+	 * The purpose of this function is to get a list of singers names
+	 * @param albumName the full name of the album name must exist
+	 * @param albumReleaseYear the year the music album was released
+	 * @param musicName the name of the music in the album
+	 * @throws SQLException 
+	 */
+	private ArrayList<String> getSingerNameList(String albumName, int albumReleasedYear, String musicName) throws SQLException{
+		ArrayList<String> singerNameList = new ArrayList<>();
+		
+		MusicAlbum musicAlbum = new MusicAlbum(albumName, albumReleasedYear, null);
+		ArrayList<Person> singerList = getSingerList(musicAlbum, musicName);
+		
+		for (Person singer : singerList) {
+			String singerName = singer.getFirstName();
+			
+			if (singer.getMiddleName() != null)
+				singerName = singerName + " " + singer.getMiddleName();
+			
+			singerName = singerName + " " + singer.getSurname();
+			
+			singerNameList.add(singerName);
+		}
+		
+		return singerNameList;
 	}
 }
