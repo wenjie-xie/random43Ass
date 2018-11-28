@@ -54,12 +54,12 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -219,9 +219,15 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			ps.setInt(2, musicAlbum.getYearPublished());
 			ps.setString(3, music.getMusicName());
 			ps.setInt(4, peopleInvolvedID);
-			ps.setInt(5, sw);
-			ps.setInt(6, com);
-			ps.setInt(7, arr);
+			if (sw == null) ps.setNull(5, java.sql.Types.INTEGER);
+			else ps.setInt(5, sw);
+			
+			if (com == null) ps.setNull(6, java.sql.Types.INTEGER);
+			else ps.setInt(6, com);
+			
+			if (arr == null) ps.setNull(7, java.sql.Types.INTEGER);
+			else ps.setInt(7, arr);
+			
 			ps.executeUpdate();
 			
 			connection.close();
@@ -267,12 +273,12 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -366,12 +372,12 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -560,12 +566,12 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}

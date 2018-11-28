@@ -50,12 +50,12 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -378,12 +378,12 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -607,12 +607,12 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
@@ -849,12 +849,12 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// enable auto commit
 			enableAutoCommit();
 		
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// roll back
 			try {
 				sqlRollBack();
 				enableAutoCommit();
-			} catch (SQLException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
