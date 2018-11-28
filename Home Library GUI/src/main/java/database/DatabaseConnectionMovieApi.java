@@ -2,6 +2,7 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -73,12 +74,14 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		String result = null;
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + RoleTable.TABLE_NAME + " "
-					+ "WHERE " + RoleTable.DESCRIPTION + " = " + role);
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + RoleTable.TABLE_NAME + " "
-					+ "WHERE " + RoleTable.DESCRIPTION + " = " + role);
+			
+			String query = "SELECT * FROM " + RoleTable.TABLE_NAME + " "
+					+ "WHERE " + RoleTable.DESCRIPTION + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, role);
+			ResultSet rs = ps.executeQuery();
+			
 			if (rs.next()) {
 				result = rs.getString(RoleTable.ID);
 			}
@@ -98,14 +101,14 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void insertIntoRole(String role) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("INSERT INTO " + RoleTable.TABLE_NAME + " "
+			
+			String query = "INSERT INTO " + RoleTable.TABLE_NAME + " "
 					+ "(" + RoleTable.DESCRIPTION + ") "
-					+ "VALUES (" + role + ")");
-			stmt.executeUpdate("INSERT INTO " + RoleTable.TABLE_NAME + " "
-					+ "(" + RoleTable.DESCRIPTION + ") "
-					+ "VALUES (" + role + ")");
+					+ "VALUES (?)";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, role);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -120,7 +123,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @return the ID of the person
 	 * @throws SQLException 
 	 */
-	private static String findOrCreateRole(String role) throws SQLException {
+	private static Integer findOrCreateRole(String role) throws SQLException {
 		String roleID = null;
 		try {
 			roleID = tryToFindRole(role);
@@ -134,7 +137,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		    throw new SQLException(e);
 		}
 		
-		return roleID;
+		return Integer.valueOf(roleID);
 	}
 	
 	/**
@@ -144,14 +147,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void insertIntoMovie(Movie movie) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("INSERT INTO " + MovieTable.TABLE_NAME + " "
+			
+			String query = "INSERT INTO " + MovieTable.TABLE_NAME + " "
 					+ "(" + MovieTable.MOVIE_NAME + ", " + MovieTable.YEAR + ") "
-					+ "VALUES (" + movie.getMovieName() + ", " + movie.getReleaseYear() + ")");
-			stmt.executeUpdate("INSERT INTO " + MovieTable.TABLE_NAME + " "
-					+ "(" + MovieTable.MOVIE_NAME + ", " + MovieTable.YEAR + ") "
-					+ "VALUES (" + movie.getMovieName() + ", " + movie.getReleaseYear() + ")");
+					+ "VALUES (?, ?)";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movie.getMovieName());
+			ps.setInt(2, movie.getReleaseYear());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -169,22 +173,21 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	private static void insertIntoCrewMemberHelper(Movie movie, Person person, String role) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			// Get the id of the person involved
-			Integer personID = findOrCreatePerson(person);
+			int personID = findOrCreatePerson(person);
 			// Get the id of the person's role
-			String roleID = findOrCreateRole(role);
+			int roleID = findOrCreateRole(role);
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("INSERT INTO " + CrewMemberTable.TABLE_NAME + " "
+			String query = "INSERT INTO " + CrewMemberTable.TABLE_NAME + " "
 					+ "(" + CrewMemberTable.PEOPLE_INVOLVED_ID + ", " + CrewMemberTable.MOVIE_NAME + ", "
 					+ CrewMemberTable.RELEASE_YEAR + ", " + CrewMemberTable.ROLE_ID + ") "
-					+ "VALUES (" + personID + ", " + movie.getMovieName() + ", "
-					+ movie.getReleaseYear() + ", " + roleID + ")");
-			stmt.executeUpdate("INSERT INTO " + CrewMemberTable.TABLE_NAME + " "
-					+ "(" + CrewMemberTable.PEOPLE_INVOLVED_ID + ", " + CrewMemberTable.MOVIE_NAME + ", "
-					+ CrewMemberTable.RELEASE_YEAR + ", " + CrewMemberTable.ROLE_ID + ") "
-					+ "VALUES (" + personID + ", " + movie.getMovieName() + ", "
-					+ movie.getReleaseYear() + ", " + roleID + ")");
+					+ "VALUES (?, ?, ?, ?)";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, personID);
+			ps.setString(2, movie.getMovieName());
+			ps.setInt(3, movie.getReleaseYear());
+			ps.setInt(4, roleID);
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -252,18 +255,17 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 				// Find the cast ID
 				Integer castID = findOrCreatePerson(cast);
 				
-				Statement stmt = null;
-				stmt = connection.createStatement();
-				System.out.println("INSERT INTO " + AwardTable.TABLE_NAME + " "
+				String query = "INSERT INTO " + AwardTable.TABLE_NAME + " "
 						+ "(" + AwardTable.PEOPLE_INVOLVED_ID + ", " + AwardTable.MOVIE_NAME + ", "
 						+ AwardTable.YEAR + ", " + AwardTable.AWARD + ") "
-						+ "VALUES (" + castID + ", " + movie.getMovieName() + ", "
-						+ movie.getReleaseYear() + ", " + movie.getAward() + ")");
-				stmt.executeUpdate("INSERT INTO " + AwardTable.TABLE_NAME + " "
-						+ "(" + AwardTable.PEOPLE_INVOLVED_ID + ", " + AwardTable.MOVIE_NAME + ", "
-						+ AwardTable.YEAR + ", " + AwardTable.AWARD + ") "
-						+ "VALUES (" + castID + ", " + movie.getMovieName() + ", "
-						+ movie.getReleaseYear() + ", " + movie.getAward() + ")");
+						+ "VALUES (?, ?, ?, ?)";
+				
+				PreparedStatement ps = connection.prepareStatement(query);
+				ps.setInt(1, castID);
+				ps.setString(2, movie.getMovieName());
+				ps.setInt(3, movie.getReleaseYear());
+				ps.setInt(4, cast.getAward());
+				ps.executeUpdate();
 			}
 			
 			connection.close();
@@ -289,12 +291,13 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// disable auto commit
 			disableAutoCommit();
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + MovieTable.TABLE_NAME + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MovieTable.TABLE_NAME + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
+			String query = "SELECT * FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movieName);
+			ResultSet rs = ps.executeQuery();
+			
 			if (rs.next()) {
 				result = rs.getString(MovieTable.MOVIE_NAME);
 			}
@@ -338,12 +341,12 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// disable auto commit
 			disableAutoCommit();
 			
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + MovieTable.TABLE_NAME + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + MovieTable.TABLE_NAME + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = '" + movieName + "'");
+			String query = "SELECT * FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movieName);
+			ResultSet rs = ps.executeQuery();
 			
 			rs.next();
 			Integer year = formatStringToInt(rs.getString(MovieTable.YEAR));
@@ -366,9 +369,6 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			movie.setEditorList(crewMemberMap.get(Role.EDITOR));
 			// Costume Designer
 			movie.setCostumeDesignerList(crewMemberMap.get(Role.COSTUME_DESIGNER));
-			
-			// Award
-			movie.setAward(getAward(movie));
 			
 			connection.close();
 			
@@ -401,15 +401,16 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @return a description of the role (Role class)
 	 * @throws SQLException 
 	 */
-	private static String getRoleDescription(Integer id) throws SQLException {
+	private static String getRoleDescription(int id) throws SQLException {
 		String result;
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + " "
-					+ "WHERE " + RoleTable.ID + " = " + id);
-			ResultSet rs = stmt.executeQuery("SELECT " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + " "
-					+ "WHERE " + RoleTable.ID + " = " + id);
+			
+			String query = "SELECT " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + " "
+					+ "WHERE " + RoleTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
 			
 			rs.next();
 			result = rs.getString(RoleTable.DESCRIPTION);
@@ -435,14 +436,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		ArrayList<Integer> roleIDList = new ArrayList<>();
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
-			ResultSet rs = stmt.executeQuery("SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+			
+			String query = "SELECT * FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = ? "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movie.getMovieName());
+			ps.setInt(2, movie.getReleaseYear());
+			ResultSet rs = ps.executeQuery();
 			
 			while (rs.next()) {
 				Integer roleID = formatStringToInt(rs.getString(CrewMemberTable.ROLE_ID));
@@ -538,36 +540,6 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		return crewMemberMap;
 	}
 	
-	/**
-	 * Get award of the movie
-	 * @param movie
-	 * @return the award
-	 * @throws SQLException 
-	 */
-	private static Integer getAward(Movie movie) throws SQLException {
-		Integer result;
-		
-		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			System.out.println("SELECT " + AwardTable.AWARD + " FROM " + AwardTable.TABLE_NAME + " "
-					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
-			ResultSet rs = stmt.executeQuery("SELECT " + AwardTable.AWARD + " FROM " + AwardTable.TABLE_NAME + " "
-					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
-			
-			rs.next();
-			result = formatStringToInt(rs.getString(AwardTable.AWARD));
-			
-			connection.close();
-		} catch (SQLException e) {
-		    throw new SQLException(e);
-		}
-		
-		return result;
-	}
-	
 	/*********************
 	 * UPDATE MOVIE *
 	 *********************/
@@ -586,12 +558,10 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			compareAndUpdateMovieTable(oldMovieInfo, newMovieInfo);
 			
 			// compare and update Crew member table
-			removeMovieFromCrewMemberTable(oldMovieInfo);
-			insertIntoCrewMember(newMovieInfo);
+			compareAndUpdateCrewMemberTable(oldMovieInfo, newMovieInfo);
 			
 			// compare and update Award table
-			removeMovieFromAwardTable(oldMovieInfo);
-			insertIntoAward(newMovieInfo);
+			compareAndUpdateAwardTable(oldMovieInfo, newMovieInfo);
 		
 			// commit
 			sqlCommit();
@@ -622,12 +592,17 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void compareAndUpdateMovieTable(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("UPDATE " + MovieTable.TABLE_NAME + " "
-					+ "SET " + MovieTable.MOVIE_NAME + " = " + newMovieInfo.getMovieName() + ", "
-							+ MovieTable.YEAR + " = " + newMovieInfo.getReleaseYear() + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = " + oldMovieInfo.getMovieName());
+			
+			String query = "UPDATE " + MovieTable.TABLE_NAME + " "
+					+ "SET " + MovieTable.MOVIE_NAME + " = ?, "
+					+ MovieTable.YEAR + " = ? "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, newMovieInfo.getMovieName());
+			ps.setInt(2, newMovieInfo.getReleaseYear());
+			ps.setString(3, oldMovieInfo.getMovieName());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -644,8 +619,8 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void compareAndUpdateCrewMemberTable(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
 
-		String movieName = formatString(oldMovieInfo.getMovieName());
-		Integer releaseYear = formatStringToInt(oldMovieInfo.getReleaseYear());
+		String movieName =oldMovieInfo.getMovieName();
+		Integer releaseYear = oldMovieInfo.getReleaseYear();
 		
 		// Director
 		updateEachCrewMember(movieName, releaseYear, oldMovieInfo.getDirectorList(), newMovieInfo.getDirectorList(), Role.DIRECTOR);
@@ -708,19 +683,21 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * Update the award receive by each cast
 	 * @param oldMovieInfo
 	 * @param newMovieInfo
+	 * @throws SQLException 
 	 */
-	private static void compareAndUpdateAwardTable(Movie oldMovieInfo, Movie newMovieInfo) {
+	private static void compareAndUpdateAwardTable(Movie oldMovieInfo, Movie newMovieInfo) throws SQLException {
 		HashMap<String, ArrayList<Person>> removedUpdatedAndNewMap = determineRemovedUpdateAndNewPerson(oldMovieInfo.getCastList(), newMovieInfo.getCastList());
 		ArrayList<Person> removedPeopleList = removedUpdatedAndNewMap.get("removed");
 		ArrayList<Person> updatedPeopleList = removedUpdatedAndNewMap.get("updated");
 		ArrayList<Person> addedPeopleList = removedUpdatedAndNewMap.get("new");
 		
-		String movieName = formatString(oldMovieInfo.getMovieName());
-		Integer releaseYear = oldMovieInfo.getAwardInt();
+		String movieName = oldMovieInfo.getMovieName();
+		Integer releaseYear = oldMovieInfo.getReleaseYear();
 		
 		// remove people in removed people list
 		for (Person person : removedPeopleList) {
 			int peopleInvolvedID = tryToFindPerson(person);
+			Integer award = person.getAward();
 			removeARowFromAwardTable(peopleInvolvedID, movieName, releaseYear, award);
 			
 		}
@@ -728,17 +705,16 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		// update people in the updatedPeopleList
 		for (int i = 0; i < updatedPeopleList.size(); i++) {
 			Person oldPersonInfo = updatedPeopleList.get(i);
-			Person newPersonInfo = newPeopleList.get(i);
+			Person newPersonInfo = newMovieInfo.getCastList().get(i);
 			int peopleInvolvedID = tryToFindPerson(oldPersonInfo);
 			updatePersonWithID(peopleInvolvedID, newPersonInfo);
 			
 		}
 		
-		// add new people to the crew
-		for (Person person : addedPeopleList) {
-			Movie dummyMovie = new Movie(movieName, releaseYear);
-			insertIntoCrewMemberHelper(dummyMovie, person, role);
-		}
+		// add new people to the award table
+		Movie dummyMovie = new Movie(movieName, releaseYear);
+		dummyMovie.setCastList(addedPeopleList);
+		insertIntoAward(dummyMovie);
 	}
 	
 	/*****************************
@@ -748,21 +724,27 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	/**
 	 * Remove a row from the crew member table
 	 * @param peopleInvolvedID
-	 * @param movieName with no ''
+	 * @param movieName
 	 * @param releaseYear
 	 * @param roleID should be a Role constant
 	 * @throws SQLException
 	 */
 	private static void removeARowFromCrewMemberTable(int peopleInvolvedID, String movieName, Integer releaseYear, int roleID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.PEOPLE_INVOLVED_ID + " = " + peopleInvolvedID + " "
-							+ "and " + CrewMemberTable.MOVIE_NAME + " = " + movieName + " "
-							+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + releaseYear + " "
-							+ "and " + CrewMemberTable.ROLE_ID + " = " + roleID);
+			
+			String query = "DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
+					+ "WHERE " + CrewMemberTable.PEOPLE_INVOLVED_ID + " = ? "
+					+ "and " + CrewMemberTable.MOVIE_NAME + " = ? "
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = ? "
+					+ "and " + CrewMemberTable.ROLE_ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, peopleInvolvedID);
+			ps.setString(2, movieName);
+			ps.setInt(3, releaseYear);
+			ps.setInt(4, roleID);
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -773,21 +755,30 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	/**
 	 * Remove a row from the award table
 	 * @param peopleInvolvedID
-	 * @param movieName with no ''
+	 * @param movieName 
 	 * @param releaseYear
-	 * @param award with no ''
+	 * @param award 
 	 * @throws SQLException
 	 */
-	private static void removeARowFromAwardTable(int peopleInvolvedID, String movieName, Integer releaseYear, String award) throws SQLException {
+	private static void removeARowFromAwardTable(int peopleInvolvedID, String movieName, int releaseYear, Integer award) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + AwardTable.TABLE_NAME + " "
-					+ "WHERE " + AwardTable.PEOPLE_INVOLVED_ID + " = " + peopleInvolvedID + " "
-							+ "and " + AwardTable.MOVIE_NAME + " = " + movieName + " "
-							+ "and " + AwardTable.YEAR + " = " + releaseYear + " "
-							+ "and " + AwardTable.AWARD + " = " + award);
+			
+			String query = "DELETE FROM " + AwardTable.TABLE_NAME + " "
+					+ "WHERE " + AwardTable.PEOPLE_INVOLVED_ID + " = ? "
+					+ "and " + AwardTable.MOVIE_NAME + " = ? "
+					+ "and " + AwardTable.YEAR + " = ? "
+					+ "and " + AwardTable.AWARD + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, peopleInvolvedID);
+			ps.setString(2, movieName);
+			ps.setInt(3, releaseYear);
+			if (award == null)
+				ps.setNull(4, java.sql.Types.INTEGER);
+			else
+				ps.setInt(4, award);
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -841,11 +832,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void removeMovieFromMovieTable(Movie movie) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeQuery("DELETE FROM " + MovieTable.TABLE_NAME + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + MovieTable.YEAR + " = " + movie.getReleaseYear());
+			
+			String query = "DELETE FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = ? "
+					+ "and " + MovieTable.YEAR + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movie.getMovieName());
+			ps.setInt(2, movie.getReleaseYear());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -859,11 +854,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void removeMovieFromCrewMemberTable(Movie movie) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeQuery("DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
+			
+			String query = "DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
 					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear());
+					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear();
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movie.getMovieName());
+			ps.setInt(2, movie.getReleaseYear());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {
@@ -877,11 +876,15 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 */
 	private static void removeMovieFromAwardTable(Movie movie) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeQuery("DELETE FROM " + AwardTable.TABLE_NAME + " "
+			
+			String query = "DELETE FROM " + AwardTable.TABLE_NAME + " "
 					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear());
+					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear();
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, movie.getMovieName());
+			ps.setInt(2, movie.getReleaseYear());
+			ps.executeUpdate();
 			
 			connection.close();
 		} catch (SQLException e) {

@@ -19,7 +19,6 @@ public class Movie {
 	private ArrayList<Person> editorList;
 	private ArrayList<Person> costumeDesignerList;
 	private Integer releaseYear;
-	private Integer award;
 	
 	public Movie(String movieName, Integer releaseYear) {
 		this.movieName = movieName;
@@ -31,7 +30,6 @@ public class Movie {
 		this.composerList = new ArrayList<>();
 		this.editorList = new ArrayList<>();
 		this.costumeDesignerList = new ArrayList<>();
-		this.award = null;
 	}
 
 	/**
@@ -160,20 +158,6 @@ public class Movie {
 		this.releaseYear = releaseYear;
 	}
 
-	/**
-	 * @return the award
-	 */
-	public Integer getAward() {
-		return award;
-	}
-
-	/**
-	 * @param award the award to set
-	 */
-	public void setAward(Integer award) {
-		this.award = award;
-	}
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -182,7 +166,7 @@ public class Movie {
 		return "Movie [movieName=" + movieName + ", directorList=" + directorList + ", scriptWriterList="
 				+ scriptWriterList + ", castList=" + castList + ", producerList=" + producerList + ", composerList="
 				+ composerList + ", editorList=" + editorList + ", costumeDesignerList=" + costumeDesignerList
-				+ ", releaseYear=" + releaseYear + ", award=" + award + "]";
+				+ ", releaseYear=" + releaseYear + "]";
 	}
 
 	/* (non-Javadoc)
@@ -192,7 +176,6 @@ public class Movie {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((award == null) ? 0 : award.hashCode());
 		result = prime * result + ((castList == null) ? 0 : castList.hashCode());
 		result = prime * result + ((composerList == null) ? 0 : composerList.hashCode());
 		result = prime * result + ((costumeDesignerList == null) ? 0 : costumeDesignerList.hashCode());
@@ -217,11 +200,6 @@ public class Movie {
 		if (getClass() != obj.getClass())
 			return false;
 		Movie other = (Movie) obj;
-		if (award == null) {
-			if (other.award != null)
-				return false;
-		} else if (!award.equals(other.award))
-			return false;
 		if (castList == null) {
 			if (other.castList != null)
 				return false;
