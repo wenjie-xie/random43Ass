@@ -638,14 +638,14 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			for (Music music : removedMusicList) {
 				String musicName = music.getMusicName();
 				String albumName = oldMusicAlbum.getAlbumName();
-				Integer publishedYear = oldMusicAlbum.getYearPublishedInt();
+				Integer publishedYear = oldMusicAlbum.getYearPublished();
 				removeARowFromMusicTable(albumName, publishedYear, musicName);
 			}
 			
 			// insert the new music to the table
-			String albumName = formatString(newMusicAlbum.getAlbumName());
-			Integer publishedYear = newMusicAlbum.getYearPublishedInt();
-			Integer diskType = newMusicAlbum.getDiskTypeInt();
+			String albumName = newMusicAlbum.getAlbumName();
+			Integer publishedYear = newMusicAlbum.getYearPublished();
+			Integer diskType = newMusicAlbum.getDiskType();
 			Person producer = newMusicAlbum.getProducer();
 			MusicAlbum dummyAlbum = new MusicAlbum(albumName, publishedYear, newMusicList);
 			dummyAlbum.setDiskType(diskType);
@@ -659,18 +659,32 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				Music updateFrom = updatedMusicList.get(i);
 				Music updateTo = newMusicAlbum.getMusicTrackList().get(i);
 				
-				Statement stmt = null;
-				stmt = connection.createStatement();
-				stmt.executeUpdate("UPDATE " + MusicTable.TABLE_NAME + " "
-						+ "SET " + MusicTable.ALBUM_NAME + " = " + newMusicAlbum.getAlbumName() + ", "
-							+ MusicTable.YEAR + " = " + newMusicAlbum.getYearPublished() + ", "
-							+ MusicTable.MUSIC_NAME + " = " + updateTo.getMusicName() + ", "
-							+ MusicTable.LANGUAGE + " = " + updateTo.getLanguage() + ", "
-							+ MusicTable.DISK_TYPE + " = " + newMusicAlbum.getDiskType() + ", "
-							+ MusicTable.PRODUCER_ID + " = " + producerID + " "
-						+ "WHERE " + MusicTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName() + " "
-								+ "and " + MusicTable.YEAR + " = " + oldMusicAlbum.getYearPublished() + " "
-								+ "and " + MusicTable.MUSIC_NAME + " = " + updateFrom.getMusicName());
+				String query = "UPDATE " + MusicTable.TABLE_NAME + " "
+						+ "SET " + MusicTable.ALBUM_NAME + " = ?, "
+						+ MusicTable.YEAR + " = ?, "
+						+ MusicTable.MUSIC_NAME + " = ?, "
+						+ MusicTable.LANGUAGE + " = ?, "
+						+ MusicTable.DISK_TYPE + " = ?, "
+						+ MusicTable.PRODUCER_ID + " = ? "
+					+ "WHERE " + MusicTable.ALBUM_NAME + " = ? "
+							+ "and " + MusicTable.YEAR + " = ? "
+							+ "and " + MusicTable.MUSIC_NAME + " = ?";
+				
+				PreparedStatement ps = connection.prepareStatement(query);
+				ps.setString(1, newMusicAlbum.getAlbumName());
+				ps.setInt(2, newMusicAlbum.getYearPublished());
+				ps.setString(3, updateTo.getMusicName());
+				ps.setString(4, updateTo.getLanguage());
+				if (newMusicAlbum.getDiskType() == null)
+					ps.setNull(5, java.sql.Types.INTEGER);
+				else
+					ps.setInt(5, newMusicAlbum.getDiskType());
+				ps.setInt(6, producerID);
+				ps.setString(7, oldMusicAlbum.getAlbumName());
+				ps.setInt(8, oldMusicAlbum.getYearPublished());
+				ps.setString(9, updateFrom.getMusicName());
+				
+				ps.executeUpdate();
 			}
 			
 			connection.close();
@@ -689,7 +703,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	private static Music getMusicWithName(ArrayList<Music> musicList, String musicName) {
 		Music result = null;
 		for (Music music : musicList) {
-			if (formatString(music.getMusicName()).equals(musicName)) {
+			if (music.getMusicName().equals(musicName)) {
 				result = music;
 			}
 		}
@@ -711,10 +725,10 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		
 		try {
 			// Remove the music that no longer exists
-			String albumName = formatString(oldMusicAlbum.getAlbumName());
-			Integer year = oldMusicAlbum.getYearPublishedInt();
+			String albumName = oldMusicAlbum.getAlbumName();
+			Integer year = oldMusicAlbum.getYearPublished();
 			for (Music music : removedMusicList) {
-				String musicName = formatString(music.getMusicName());
+				String musicName = music.getMusicName();
 				removeMusicFromMusicSingerTable(albumName, year, musicName);
 			}
 			
@@ -728,15 +742,24 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 				// for the columns such as album name music name and year
 				// Ant of these change won't do anything but will return a exception and that is the point!
 				Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword);
-				Statement stmt = null;
-				stmt = connection.createStatement();
-				stmt.executeUpdate("UPDATE " + MusicSingerTable.TABLE_NAME + " "
-						+ "SET " + MusicSingerTable.ALBUM_NAME + " = " + newMusicAlbum.getAlbumName() + ", "
-								+ MusicSingerTable.YEAR + " = " + newMusicAlbum.getYearPublished() + ", "
-								+ MusicSingerTable.MUSIC_NAME + " = " + newMusic.getMusicName() + " "
-						+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName() + " "
-								+ "and " + MusicSingerTable.YEAR + " = " + oldMusicAlbum.getYearPublished() + " "
-								+ "and " + MusicSingerTable.MUSIC_NAME + " = " + oldMusic.getMusicName());
+				
+				String query = "UPDATE " + MusicSingerTable.TABLE_NAME + " "
+						+ "SET " + MusicSingerTable.ALBUM_NAME + " = ?, "
+						+ MusicSingerTable.YEAR + " = ?, "
+						+ MusicSingerTable.MUSIC_NAME + " = ? "
+						+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = ? "
+						+ "and " + MusicSingerTable.YEAR + " = ? "
+						+ "and " + MusicSingerTable.MUSIC_NAME + " = ?";
+				
+				PreparedStatement ps = connection.prepareStatement(query);
+				ps.setString(1, newMusicAlbum.getAlbumName());
+				ps.setInt(2, newMusicAlbum.getYearPublished());
+				ps.setString(3, newMusic.getMusicName());
+				ps.setString(4, oldMusicAlbum.getAlbumName());
+				ps.setInt(5, oldMusicAlbum.getYearPublished());
+				ps.setString(6, oldMusic.getMusicName());
+				ps.executeUpdate();
+				
 				connection.close();
 			}
 			
@@ -777,7 +800,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		}
 		
 		// insert new singers
-		String musicName = formatString(newMusic.getMusicName());
+		String musicName = newMusic.getMusicName();
 		Music dummMusic = new Music(musicName);
 		dummMusic.setSingerList(newSingerList);
 		MusicAlbum dummyMusicAlbum = new MusicAlbum(albumName, year, null);
@@ -806,10 +829,10 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		ArrayList<Music> newMusicList = sameRemovedNewMap.get("new");
 		
 		// Remove the song writer, composer and arranger in the removedMusicList
-		String albumName = formatString(oldMusicAlbum.getAlbumName());
-		Integer year = formatStringToInt(oldMusicAlbum.getYearPublished());
+		String albumName = oldMusicAlbum.getAlbumName();
+		Integer year = oldMusicAlbum.getYearPublished();
 		for (Music music : removedMusicList) {
-			String musicName = formatString(music.getMusicName());
+			String musicName = music.getMusicName();
 			removeAMusicFromPeopleInvolvedMusicTable(albumName, year, musicName);
 		}
 		
@@ -859,13 +882,18 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void removeARowFromMusicTable(String albumName, Integer year, String musicName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + MusicTable.TABLE_NAME + " "
-					+ "WHERE " + MusicTable.ALBUM_NAME + " = '" + albumName + "' "
-					+ "and " + MusicTable.YEAR + " = " + year + " "
-					+ "and " + MusicTable.MUSIC_NAME + " = '" + musicName + "'");
+			
+			String query = "DELETE FROM " + MusicTable.TABLE_NAME + " "
+					+ "WHERE " + MusicTable.ALBUM_NAME + " = ? "
+					+ "and " + MusicTable.YEAR + " = ? "
+					+ "and " + MusicTable.MUSIC_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, albumName);
+			ps.setInt(2, year);
+			ps.setString(3, musicName);
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -882,13 +910,18 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void removeMusicFromMusicSingerTable(String albumName, Integer year, String musicName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
-					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = '" + albumName + "' "
-					+ "and " + MusicSingerTable.YEAR + " = " + year + " "
-					+ "and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "'");
+			
+			String query = "DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = ? "
+					+ "and " + MusicSingerTable.YEAR + " = ? "
+					+ "and " + MusicSingerTable.MUSIC_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, albumName);
+			ps.setInt(2, year);
+			ps.setString(3, musicName);
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -905,13 +938,18 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void removeAMusicFromPeopleInvolvedMusicTable(String albumName, Integer year, String musicName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedMusicTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = '" + albumName + "' "
-							+ "and " + PeopleInvolvedMusicTable.YEAR + " = " + year + " "
-							+ "and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = '" + musicName + "'");
+			
+			String query = "DELETE FROM " + PeopleInvolvedMusicTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = ? "
+					+ "and " + PeopleInvolvedMusicTable.YEAR + " = ? "
+					+ "and " + PeopleInvolvedMusicTable.MUSIC_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, albumName);
+			ps.setInt(2, year);
+			ps.setString(3, musicName);
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -929,14 +967,20 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void removeARowFromMusicSingerTable(String albumName, Integer year, String musicName, Integer singerID) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
-					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = '" + albumName + "' "
-					+ "and " + MusicSingerTable.YEAR + " = " + year + " "
-					+ "and " + MusicSingerTable.MUSIC_NAME + " = '" + musicName + "' "
-					+ "and " + MusicSingerTable.PEOPLE_INVOLVED_ID + " = " + singerID);
+			
+			String query = "DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = ? "
+					+ "and " + MusicSingerTable.YEAR + " = ? "
+					+ "and " + MusicSingerTable.MUSIC_NAME + " = ? "
+					+ "and " + MusicSingerTable.PEOPLE_INVOLVED_ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, albumName);
+			ps.setInt(2, year);
+			ps.setString(3, musicName);
+			ps.setInt(4, singerID);
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -956,6 +1000,14 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			stmt = connection.createStatement();
 			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
 					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
+			
+			String query = "DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, oldMusicAlbum.getAlbumName());
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -970,11 +1022,14 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void removeMusicAlbumFromMusicTable(MusicAlbum oldMusicAlbum) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + MusicTable.TABLE_NAME + " "
-					+ "WHERE " + MusicTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
+			
+			String query = "DELETE FROM " + MusicTable.TABLE_NAME + " "
+					+ "WHERE " + MusicTable.ALBUM_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, oldMusicAlbum.getAlbumName());
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
@@ -989,11 +1044,14 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 */
 	private static void removeMusicAlbumFromPeopleInvolvedMusicTable(MusicAlbum oldMusicAlbum) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
-					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
+			
+			String query = "DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, oldMusicAlbum.getAlbumName());
+			ps.executeUpdate();
+			
 			connection.close();
 			
 		} catch (SQLException e) {
