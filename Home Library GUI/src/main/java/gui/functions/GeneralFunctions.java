@@ -39,4 +39,16 @@ public class GeneralFunctions extends JPanel {
 		}
 		return target;
 	}
+	
+	/**
+	 * change a integer to a string
+	 * @param num
+	 * @return
+	 */
+	protected static String formatIntToStr(Integer num) {
+		String result = null;
+		if (num != null)
+			result = String.valueOf(num);
+		return result;
+	}
 }

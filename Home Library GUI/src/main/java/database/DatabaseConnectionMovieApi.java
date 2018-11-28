@@ -491,7 +491,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			
 			for (int i = 0; i < personIDList.size(); i++) {
 				Integer roleID = roleIDList.get(i);
-				String role = "'" + getRoleDescription(roleID) + "'";
+				String role = getRoleDescription(roleID);
 				
 				Integer personID = personIDList.get(i);
 				Person person = getPersonFromPeopleInvolvedTable(personID);
@@ -505,6 +505,8 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 					scriptWriterList.add(person);
 				// Cast
 				} else if (role.equals(Role.CAST)) {
+					Integer award = getAwardFromAwardTable(personID, movie.getMovieName(), movie.getReleaseYear());
+					person.setAward(award);
 					castList.add(person);
 				// Producer
 				} else if (role.equals(Role.PRODUCER)) {
@@ -538,6 +540,42 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		crewMemberMap.put(Role.COSTUME_DESIGNER, costumeDesignerList);
 		
 		return crewMemberMap;
+	}
+	
+	
+	/**
+	 * Get the award of the given person
+	 * @param peopleInvolvedID
+	 * @param movieName
+	 * @param year
+	 * @return award of the person, can be null
+	 * @throws SQLException 
+	 */
+	private static Integer getAwardFromAwardTable(int peopleInvolvedID, String movieName, int year) throws SQLException {
+		Integer award = null;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String query = "SELECT " + AwardTable.AWARD + " "
+					+ "FROM " + AwardTable.TABLE_NAME + " "
+					+ "WHERE " + AwardTable.PEOPLE_INVOLVED_ID + " = ? "
+							+ "and " + AwardTable.MOVIE_NAME + " = ? "
+							+ "and " + AwardTable.YEAR + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, peopleInvolvedID);
+			ps.setString(2, movieName);
+			ps.setInt(3, year);
+			ResultSet rs = ps.executeQuery();
+			
+			if (rs.next())
+				award = rs.getInt(AwardTable.AWARD);
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return award;
 	}
 	
 	/*********************

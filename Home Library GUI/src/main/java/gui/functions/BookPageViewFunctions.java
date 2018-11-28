@@ -83,12 +83,5 @@ public class BookPageViewFunctions extends BookPageInsertFunctions {
 		// description
 		description.setText(book.getBookDescription());
 	}
-	
-	private static String formatIntToStr(Integer num) {
-		String result = null;
-		if (num != null)
-			result = String.valueOf(num);
-		return result;
-	}
 
 }
