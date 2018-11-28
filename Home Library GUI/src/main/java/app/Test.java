@@ -5,6 +5,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import gui.pages.DataInsertMoviePanel;
+import gui.pages.ViewFilterPanel;
 
 /**
  * This is how you create the JFrame execution
@@ -20,7 +21,7 @@ public class Test {
 		@Override
 		public void run() {
 			JFrame frame = new JFrame();
-			JScrollPane scrollPane = new JScrollPane(new DataInsertMoviePanel());
+			JScrollPane scrollPane = new JScrollPane(new ViewFilterPanel());
 			frame.getContentPane().add(scrollPane);
 			 
 			frame.setSize(1000, 800);
