@@ -532,7 +532,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		
 		// Add to map
 		crewMemberMap.put(Role.DIRECTOR, directorList);
-		crewMemberMap.put(Role.SCRIPT_WRITER, directorList);
+		crewMemberMap.put(Role.SCRIPT_WRITER, scriptWriterList);
 		crewMemberMap.put(Role.CAST, castList);
 		crewMemberMap.put(Role.PRODUCER, producerList);
 		crewMemberMap.put(Role.COMPOSER, composerList);

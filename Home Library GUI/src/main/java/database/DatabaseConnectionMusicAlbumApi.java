@@ -1064,4 +1064,42 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 		    throw new SQLException(e);
 		}
 	}
+	
+	/**
+	 * Remove a music album from the database
+	 * @param book
+	 */
+	public static void removeMusicAlbum(MusicAlbum musicAlbum) {
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			// remove music album from Music singer table
+			removeMusicAlbumFromMusicSingerTable(musicAlbum);
+			
+			// remove music album from people involved music table
+			removeMusicAlbumFromPeopleInvolvedMusicTable(musicAlbum);
+			
+			// remove music album from music table
+			removeMusicAlbumFromMusicTable(musicAlbum);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+	}
 }
