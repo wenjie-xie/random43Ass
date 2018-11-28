@@ -72,17 +72,17 @@ public class ViewFilterPanel extends JPanel {
 		c.gridx = 1;
 		this.add(yearSearchLabel, c);
 		
-		nameSearchBar = new JTextArea();
+		yearSearchBar = new JTextArea();
 		c.gridx = 2;
-		this.add(nameSearchBar, c);
+		this.add(yearSearchBar, c);
 		
 		// Buttons
-		JButton searchBtn = createSearchBtn();
+		JButton submitBtn = createSubmitBtn();
 		c.gridy = 5;
 		c.gridx = 1;
-		this.add(searchBtn, c);
+		this.add(submitBtn, c);
 		
-		JButton cancelBtn = createSearchBtn();
+		JButton cancelBtn = createCancelBtn();
 		c.gridx = 2;
 		this.add(cancelBtn, c);
 	}
@@ -91,8 +91,8 @@ public class ViewFilterPanel extends JPanel {
 	 * Create a search button
 	 * @return a search button
 	 */
-	private JButton createSearchBtn() {
-		JButton searchBtn = new JButton("Search");
+	private JButton createSubmitBtn() {
+		JButton searchBtn = new JButton("Submit");
 		searchBtn.addActionListener(new ActionListener() {
 			
 			@Override

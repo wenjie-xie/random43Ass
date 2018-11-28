@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import database.tables.AwardTable;
+import database.tables.BookTable;
 import database.tables.CrewMemberTable;
 import database.tables.MovieTable;
 import database.tables.MusicSingerTable;
@@ -925,5 +926,104 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
+	}
+	
+	/*************************
+	 * VIEW MOVIE *
+	 *************************/
+	
+	/**
+	 * Return a map containing array of directors, where each key is the movie title containing the
+	 * target sub string
+	 * 	"movie title" : [all director of the movie]
+	 * @param target the sub string of the name
+	 * @param year year of publication
+	 * @return 
+	 */
+	public HashMap<String, ArrayList<String>> getMovieTitleToDirectorMap(String target, int year) {
+		HashMap<String, ArrayList<String>> titleToDirectors = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			titleToDirectors = getMovieTitleToDirectorMapHelper(target, year);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		return titleToDirectors;
+	}
+	
+	private HashMap<String, ArrayList<String>> getMovieTitleToDirectorMapHelper(String target, int year) throws SQLException {
+		HashMap<String, ArrayList<String>> titleToDirector = new HashMap<>();
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String query = "SELECT FROM " + MovieTable.TABLE_NAME + " "
+					+ "WHERE " + MovieTable.YEAR + " = ? "
+							+ "and " + MovieTable.MOVIE_NAME + " LIKE ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, year);
+			ps.setString(2, target);
+			ResultSet rs = ps.executeQuery();
+			
+			// Go through each matching book name to get book authors
+			while (rs.next()) {
+				String movieTitle = rs.getString(BookTable.TITLE);
+				
+				ArrayList<String> directorNameList = getDirectorNameList(movieTitle, year);
+				
+				titleToDirector.put(movieTitle, directorNameList);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return titleToDirector;
+	}
+	
+	/**
+	 * The purpose of this function is to get a list of director names
+	 * @param movieTitle the full name of the movie must exist
+	 * @param movieYear the year the movie was released
+	 * @throws SQLException 
+	 */
+	private ArrayList<String> getDirectorNameList(String movieTitle, int releasedYear) throws SQLException{
+		ArrayList<String> directorNameList = new ArrayList<>();
+		
+		Movie movie = new Movie(movieTitle, releasedYear);
+		HashMap<String, ArrayList<Person>> crewMemberMap = getCrewMemberMap(movie);
+		ArrayList<Person> directorList = crewMemberMap.get(Role.DIRECTOR);
+		
+		for (Person director : directorList) {
+			String directorName = director.getFirstName();
+			
+			if (director.getMiddleName() != null)
+				directorName = directorName + " " + director.getMiddleName();
+			
+			directorName = directorName + " " + director.getSurname();
+			
+			directorNameList.add(directorName);
+		}
+		
+		return directorNameList;
 	}
 }

@@ -889,4 +889,102 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		    throw new SQLException(e);
 		}
 	}
+	
+	
+	/**********************
+	 * View Book *
+	 **********************/
+	
+	/**
+	 * Return a map containing array of authors, where each key is the book title containing the
+	 * target sub string
+	 * 	"book title" : [all author of the book]
+	 * @param target the sub string of the name
+	 * @param year year of publication
+	 * @return 
+	 */
+	public HashMap<String, ArrayList<String>> getBookTitleToAuthorMap(String target, int year) {
+		HashMap<String, ArrayList<String>> titleToAuthors = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			titleToAuthors = getBookTitleToAuthorMapHelper(target, year);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		return titleToAuthors;
+	}
+	
+	private HashMap<String, ArrayList<String>> getBookTitleToAuthorMapHelper(String target, int year) throws SQLException {
+		HashMap<String, ArrayList<String>> titleToAuthor = new HashMap<>();
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String query = "SELECT FROM " + BookTable.TABLE_NAME + " "
+					+ "WHERE " + BookTable.YEAR_OF_PUBLICATION + " = ? "
+							+ "and " + BookTable.TITLE + " LIKE ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, year);
+			ps.setString(2, target);
+			ResultSet rs = ps.executeQuery();
+			
+			// Go through each matching book name to get book authors
+			while (rs.next()) {
+				String bookISBN = rs.getString(BookTable.ISBN);
+				String bookTitle = rs.getString(BookTable.TITLE);
+				
+				ArrayList<String> authorNameList = getAuthorNameList(bookISBN);
+				
+				titleToAuthor.put(bookTitle, authorNameList);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return titleToAuthor;
+	}
+	
+	/**
+	 * The purpose of this function is to get a list of author names
+	 * @param bookISBN the isbn of the book must exist
+	 * @throws SQLException 
+	 */
+	private ArrayList<String> getAuthorNameList(String bookISBN) throws SQLException{
+		ArrayList<String> authorNameList = new ArrayList<>();
+		ArrayList<Integer> authorIDList = getAuthorIDList(bookISBN);
+		
+		for (Integer authorID : authorIDList) {
+			Person author = getPersonFromPeopleInvolvedTable(authorID);
+			String authorName = author.getFirstName();
+			
+			if (author.getMiddleName() != null)
+				authorName = authorName + " " + author.getMiddleName();
+			
+			authorName = authorName + " " + author.getSurname();
+			
+			authorNameList.add(authorName);
+		}
+		
+		return authorNameList;
+	}
 }
