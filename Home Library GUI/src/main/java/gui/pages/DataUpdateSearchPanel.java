@@ -41,7 +41,7 @@ public class DataUpdateSearchPanel extends JPanel {
 		c.insets.right = 2;
 		
 		// Add Book message
-		JLabel message = new JLabel("Search Product Name:");
+		JLabel message = new JLabel("Search Product Name (Update):");
 		message.setFont(new Font(message.getName(), Font.PLAIN, 30));
 		c.weightx = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -50,7 +50,7 @@ public class DataUpdateSearchPanel extends JPanel {
 		this.add(message, c);
 		
 		// A description
-		JLabel description = new JLabel("(Product Name => Name of the Book, Music Album or Movie)");
+		JLabel description = new JLabel("Search to Update (Product Name => Name of the Book, Music Album or Movie)");
 		c.gridy = 1;
 		this.add(description, c);
 		

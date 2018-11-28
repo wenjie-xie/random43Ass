@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import gui.pages.DataInsertBookPanel;
 import gui.pages.DataInsertMoviePanel;
 import gui.pages.DataInsertMusicPanel;
+import gui.pages.DataRemoveSearchPanel;
 import gui.pages.DataUpdateSearchPanel;
 import gui.pages.HomePagePanel;
 
@@ -75,6 +76,10 @@ public class MainFrame extends JFrame {
 		// Data > Update
 		JMenuItem dataUpdateMenu = this.createDataUpdateMenu();
 		dataMenuBar.add(dataUpdateMenu);
+		
+		// Data > Remove
+		JMenuItem dataRemoveMenu = this.createDataRemoveMenu();
+		dataMenuBar.add(dataRemoveMenu);
 		
 		return dataMenuBar;
 	}
@@ -136,6 +141,24 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				flipPageTo(new DataUpdateSearchPanel());
+			}
+		});
+		
+		return dataUpdate;
+	}
+	
+	/**
+	 * Create Remove Menu
+	 * @return update menu
+	 */
+	private JMenuItem createDataRemoveMenu() {
+		// Data > Update
+		JMenuItem dataUpdate = new JMenuItem("Remove");
+		dataUpdate.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flipPageTo(new DataRemoveSearchPanel());
 			}
 		});
 		

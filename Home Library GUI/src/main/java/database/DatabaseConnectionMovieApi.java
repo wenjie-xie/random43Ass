@@ -834,14 +834,14 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// disable auto commit
 			disableAutoCommit();
 			
-			// remove movie from Movie table
-			removeMovieFromMovieTable(movieName);
-			
 			// remove movie from crew member table
 			removeMovieFromCrewMemberTable(movieName);
 			
 			// remove movie from award table
 			removeMovieFromAwardTable(movieName);
+			
+			// remove movie from Movie table
+			removeMovieFromMovieTable(movieName);
 			
 			// commit
 			sqlCommit();

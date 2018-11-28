@@ -37,7 +37,7 @@ public class DataRemoveSearchPanel extends JPanel {
 		c.insets.right = 2;
 		
 		// Add Book message
-		JLabel message = new JLabel("Search Product Name:");
+		JLabel message = new JLabel("Search Product Name (Remove):");
 		message.setFont(new Font(message.getName(), Font.PLAIN, 30));
 		c.weightx = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -46,7 +46,7 @@ public class DataRemoveSearchPanel extends JPanel {
 		this.add(message, c);
 		
 		// A description
-		JLabel description = new JLabel("(Product Name => Name of the Book, Music Album or Movie)");
+		JLabel description = new JLabel("Search to Remove (Product Name => Name of the Book, Music Album or Movie)");
 		c.gridy = 1;
 		this.add(description, c);
 		
@@ -78,7 +78,6 @@ public class DataRemoveSearchPanel extends JPanel {
 			String id = null;
 			// Check if the target is a book, music album, movie or neither
 			if ((id = DatabaseConnectionBookApi.tryToFindBookName(targetName)) != null) {
-				Book targetBook = DatabaseConnectionBookApi.getBookInfo(targetName);
 				
 				int targetOption = JOptionPane.showConfirmDialog(HL_xiewen4.mainFrame,
 						"Are you sure you want to remove the Book <" + targetName + "> from library?");
@@ -87,12 +86,9 @@ public class DataRemoveSearchPanel extends JPanel {
 					DatabaseConnectionBookApi.removeBook(id);
 				}
 				
-				// if it is a book navigate to the DataUpdateBookEditPanel
-				HL_xiewen4.mainFrame.flipPageTo(new DataUpdateBookEditPanel(targetBook));
 				this.searchField.setText("");
 				
 			} else if ((id = DatabaseConnectionMusicAlbumApi.tryToFindMusicAlbumName(targetName)) != null) {
-				MusicAlbum targetMusicAlbum = DatabaseConnectionMusicAlbumApi.getMusicAlbumInfo(targetName);
 				
 				int targetOption = JOptionPane.showConfirmDialog(HL_xiewen4.mainFrame,
 						"Are you sure you want to remove the Music Album <" + targetName + "> from library?");
@@ -101,13 +97,9 @@ public class DataRemoveSearchPanel extends JPanel {
 					DatabaseConnectionMusicAlbumApi.removeMusicAlbum(id);
 				}
 				
-				// if it is a music album navigate to the DataUpdateMusicAlbumEditPanel
-				HL_xiewen4.mainFrame.flipPageTo(new DataUpdateMusicAlbumEditPanel(targetMusicAlbum));
 				this.searchField.setText("");
 				
 			} else if ((id = DatabaseConnectionMovieApi.tryToFindMovieName(targetName)) != null) {
-				Movie targetMovie = DatabaseConnectionMovieApi.getMovieInfo(targetName);
-				// If it is a movie
 				
 				int targetOption = JOptionPane.showConfirmDialog(HL_xiewen4.mainFrame,
 						"Are you sure you want to remove the Movie <" + targetName + "> from library?");

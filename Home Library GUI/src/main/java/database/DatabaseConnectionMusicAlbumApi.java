@@ -1046,7 +1046,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	private static void removeMusicAlbumFromPeopleInvolvedMusicTable(String musicAlbumName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			String query = "DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
+			String query = "DELETE FROM " + PeopleInvolvedMusicTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
