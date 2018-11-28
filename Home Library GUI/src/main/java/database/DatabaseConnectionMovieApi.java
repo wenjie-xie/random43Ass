@@ -827,21 +827,21 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove the movie given completely from the database
-	 * @param movie
+	 * @param movieName
 	 */
-	public static void removeMovie(Movie movie) {
+	public static void removeMovie(String movieName) {
 		try {
 			// disable auto commit
 			disableAutoCommit();
 			
 			// remove movie from Movie table
-			removeMovieFromMovieTable(movie);
+			removeMovieFromMovieTable(movieName);
 			
 			// remove movie from crew member table
-			removeMovieFromCrewMemberTable(movie);
+			removeMovieFromCrewMemberTable(movieName);
 			
 			// remove movie from award table
-			removeMovieFromAwardTable(movie);
+			removeMovieFromAwardTable(movieName);
 			
 			// commit
 			sqlCommit();
@@ -866,18 +866,17 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove movie from Movie Table
+	 * @param movieName
 	 * @throws SQLException 
 	 */
-	private static void removeMovieFromMovieTable(Movie movie) throws SQLException {
+	private static void removeMovieFromMovieTable(String movieName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + MovieTable.TABLE_NAME + " "
-					+ "WHERE " + MovieTable.MOVIE_NAME + " = ? "
-					+ "and " + MovieTable.YEAR + " = ?";
+					+ "WHERE " + MovieTable.MOVIE_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, movie.getMovieName());
-			ps.setInt(2, movie.getReleaseYear());
+			ps.setString(1, movieName);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -888,18 +887,17 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove movie from Crew Member Table
+	 * @param movieName
 	 * @throws SQLException 
 	 */
-	private static void removeMovieFromCrewMemberTable(Movie movie) throws SQLException {
+	private static void removeMovieFromCrewMemberTable(String movieName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + CrewMemberTable.RELEASE_YEAR + " = " + movie.getReleaseYear();
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, movie.getMovieName());
-			ps.setInt(2, movie.getReleaseYear());
+			ps.setString(1, movieName);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -910,18 +908,17 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove movie from Award Table
+	 * @param movieName
 	 * @throws SQLException 
 	 */
-	private static void removeMovieFromAwardTable(Movie movie) throws SQLException {
+	private static void removeMovieFromAwardTable(String movieName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + AwardTable.TABLE_NAME + " "
-					+ "WHERE " + AwardTable.MOVIE_NAME + " = " + movie.getMovieName() + " "
-					+ "and " + AwardTable.YEAR + " = " + movie.getReleaseYear();
+					+ "WHERE " + AwardTable.MOVIE_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, movie.getMovieName());
-			ps.setInt(2, movie.getReleaseYear());
+			ps.setString(1, movieName);
 			ps.executeUpdate();
 			
 			connection.close();

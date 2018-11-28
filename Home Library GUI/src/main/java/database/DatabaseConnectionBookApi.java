@@ -806,21 +806,21 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove a book from database
-	 * @param book
+	 * @param bookISBN
 	 */
-	public static void removeBook(Book book) {
+	public static void removeBook(String bookISBN) {
 		try {
 			// Disable auto commit
 			disableAutoCommit();
 			
 			// remove book from book author table
-			removeBookFromBookAuthorTable(book);
+			removeBookFromBookAuthorTable(bookISBN);
 			
 			// remove book from book keyword table
-			removeBookFromBookKeywordTable(book);
+			removeBookFromBookKeywordTable(bookISBN);
 			
 			// remove book from book table
-			removeBookFromBookTable(book);
+			removeBookFromBookTable(bookISBN);
 			
 			// commit
 			sqlCommit();
@@ -842,14 +842,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	private static void removeBookFromBookKeywordTable(Book book) throws SQLException {
+	private static void removeBookFromBookKeywordTable(String bookISBN) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + BookKeywordTable.TABLE_NAME + " "
 					+ "WHERE " + BookKeywordTable.ISBN + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, book.getBookISBN());
+			ps.setString(1, bookISBN);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -858,14 +858,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	private static void removeBookFromBookAuthorTable(Book book) throws SQLException {
+	private static void removeBookFromBookAuthorTable(String bookISBN) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + BookAuthorTable.TABLE_NAME + " "
 					+ "WHERE " + BookAuthorTable.ISBN + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, book.getBookISBN());
+			ps.setString(1, bookISBN);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -874,16 +874,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 	}
 	
-	private static void removeBookFromBookTable(Book book) throws SQLException {
+	private static void removeBookFromBookTable(String bookISBN) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + BookTable.TABLE_NAME + " "
-					+ "WHERE " + BookTable.ISBN + " = ? "
-							+ "and " + BookTable.TITLE + " = ?";
+					+ "WHERE " + BookTable.ISBN + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, book.getBookISBN());
-			ps.setString(2, book.getBookName());
+			ps.setString(1, bookISBN);
 			ps.executeUpdate();
 			
 			connection.close();

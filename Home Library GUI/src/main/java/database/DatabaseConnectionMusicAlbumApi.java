@@ -996,22 +996,17 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove a album from the Music singer table
-	 * @param oldMusicAlbum
+	 * @param musicAlbumName
 	 * @throws SQLException 
 	 */
-	private static void removeMusicAlbumFromMusicSingerTable(MusicAlbum oldMusicAlbum) throws SQLException {
+	private static void removeMusicAlbumFromMusicSingerTable(String musicAlbumName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
-
-			Statement stmt = null;
-			stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
-					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = " + oldMusicAlbum.getAlbumName());
 			
 			String query = "DELETE FROM " + MusicSingerTable.TABLE_NAME + " "
 					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, oldMusicAlbum.getAlbumName());
+			ps.setString(1, musicAlbumName);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -1023,17 +1018,17 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove a album from the Music table
-	 * @param oldMusicAlbum
+	 * @param musicAlbumName
 	 * @throws SQLException 
 	 */
-	private static void removeMusicAlbumFromMusicTable(MusicAlbum oldMusicAlbum) throws SQLException {
+	private static void removeMusicAlbumFromMusicTable(String musicAlbumName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + MusicTable.TABLE_NAME + " "
 					+ "WHERE " + MusicTable.ALBUM_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, oldMusicAlbum.getAlbumName());
+			ps.setString(1, musicAlbumName);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -1045,17 +1040,17 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove a album from the People Involved music table
-	 * @param oldMusicAlbum
+	 * @param musicAlbumName
 	 * @throws SQLException 
 	 */
-	private static void removeMusicAlbumFromPeopleInvolvedMusicTable(MusicAlbum oldMusicAlbum) throws SQLException {
+	private static void removeMusicAlbumFromPeopleInvolvedMusicTable(String musicAlbumName) throws SQLException {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "DELETE FROM " + PeopleInvolvedTable.TABLE_NAME + " "
 					+ "WHERE " + PeopleInvolvedMusicTable.ALBUM_NAME + " = ?";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
-			ps.setString(1, oldMusicAlbum.getAlbumName());
+			ps.setString(1, musicAlbumName);
 			ps.executeUpdate();
 			
 			connection.close();
@@ -1067,21 +1062,21 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	
 	/**
 	 * Remove a music album from the database
-	 * @param book
+	 * @param musicAlbumName
 	 */
-	public static void removeMusicAlbum(MusicAlbum musicAlbum) {
+	public static void removeMusicAlbum(String musicAlbumName) {
 		try {
 			// Disable auto commit
 			disableAutoCommit();
 			
 			// remove music album from Music singer table
-			removeMusicAlbumFromMusicSingerTable(musicAlbum);
+			removeMusicAlbumFromMusicSingerTable(musicAlbumName);
 			
 			// remove music album from people involved music table
-			removeMusicAlbumFromPeopleInvolvedMusicTable(musicAlbum);
+			removeMusicAlbumFromPeopleInvolvedMusicTable(musicAlbumName);
 			
 			// remove music album from music table
-			removeMusicAlbumFromMusicTable(musicAlbum);
+			removeMusicAlbumFromMusicTable(musicAlbumName);
 			
 			// commit
 			sqlCommit();
