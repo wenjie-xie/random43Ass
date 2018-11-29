@@ -55,7 +55,8 @@ public class MainFrame extends JFrame {
 		menuBar.add(viewMenu);
 		
 		// Report Menu
-		JMenu reportMenu = new JMenu("Report");
+		JMenu reportMenu = createReportMenu();
+		menuBar.add(reportMenu);
 		
 		// Add menu bar
 		this.setJMenuBar(menuBar);
@@ -183,6 +184,127 @@ public class MainFrame extends JFrame {
 		});
 		
 		return view;
+	}
+	
+	
+	/**
+	 * Create the report menu
+	 * @return the report menu
+	 */
+	private JMenu createReportMenu() {
+		JMenu report = new JMenu("Report");
+		
+		JMenuItem r1 = new JMenuItem("Authors’ Publications");
+		r1.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r1);
+		
+		JMenuItem r2 = new JMenuItem("Publications in one Year");
+		r2.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r2);
+		
+		JMenuItem r3 = new JMenuItem("Books Similar Topic");
+		r3.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r3);
+		
+		JMenuItem r4 = new JMenuItem("Frequent Publishers");
+		r4.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r4);
+		
+		JMenuItem r5 = new JMenuItem("Most Popular Subjects");
+		r5.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r5);
+		
+		JMenuItem r6 = new JMenuItem("Multi Skill Movie Crew");
+		r6.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r6);
+		
+		JMenuItem r7 = new JMenuItem("Award Winning Movies");
+		r7.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r7);
+		
+		JMenuItem r8 = new JMenuItem("Music With Similar Name");
+		r8.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r8);
+		
+		JMenuItem r9 = new JMenuItem("Multi Skills Music Crew");
+		r9.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r9);
+		
+		JMenuItem r10 = new JMenuItem("Similar Names");
+		r10.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		report.add(r10);
+		
+		return report;
 	}
 	
 	
