@@ -3,20 +3,35 @@ package gui.pages;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 public class ViewFilterResultPanel extends JPanel {
 	
 	private static final long serialVersionUID = 7444477024611266751L;
 
 	public ViewFilterResultPanel(HashMap<String, ArrayList<String>> table) {
+		ArrayList<String> col = new ArrayList<>(table.keySet());
+		String[] colNames = {col.get(0), col.get(1), col.get(2), col.get(3)};
+		String[][] data = to2DArray(table, colNames);
 		
-		String[] colNames = {"Product's Name", "Release Year", "Type", "Director/Singer/Author"};
-		String[][] data = to2DArray(table);
- 		JTable myTable = new JTable(data, colNames);
+		@SuppressWarnings("serial")
+		DefaultTableModel model = new DefaultTableModel(data, colNames) {
+			@Override
+		    public boolean isCellEditable(int row, int column) {
+		       return false;
+		    }
+			
+		};
+ 		JTable myTable = new JTable();
+ 		myTable.setModel(model);
  		
  		JScrollPane scrollPane = new JScrollPane(myTable);
  		
@@ -24,19 +39,14 @@ public class ViewFilterResultPanel extends JPanel {
  		this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
-	private String[][] to2DArray(HashMap<String, ArrayList<String>> table) {
-		String[][] myArray = new String[table.get("product name").size()][4];
+	private String[][] to2DArray(HashMap<String, ArrayList<String>> table, String[] colNames) {
+		String[][] myArray = new String[table.get(colNames[0]).size()][colNames.length];
 		
-		ArrayList<String> productNameList = table.get("product name");
-		ArrayList<String> productTypeList = table.get("product type");
-		ArrayList<String> releaseYearList = table.get("release year");
-		ArrayList<String> personNameList = table.get("person name");
-		
-		for (int i = 0; i < productNameList.size(); i++) {
-			myArray[i][0] = productNameList.get(i);
-			myArray[i][1] = releaseYearList.get(i);
-			myArray[i][2] = productTypeList.get(i);
-			myArray[i][3] = personNameList.get(i);
+		for (int i = 0; i < table.get(colNames[0]).size(); i++) {
+			for (int j = 0; j < colNames.length; j++) {
+				String key = colNames[j];
+				myArray[i][j] = table.get(key).get(i);
+			}
 		}
 		
 		return myArray;

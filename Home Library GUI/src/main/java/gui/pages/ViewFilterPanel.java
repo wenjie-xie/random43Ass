@@ -180,10 +180,10 @@ public class ViewFilterPanel extends GeneralFunctions {
 		}
 		
 		HashMap<String, ArrayList<String>> table = new HashMap<>();
-		table.put("product name", productNameList);
-		table.put("product type", productTypeList);
-		table.put("person name", personNameList);
-		table.put("release year", productReleaseYear);
+		table.put("Product's Name", productNameList);
+		table.put("Type", productTypeList);
+		table.put("Director/Singer/Author", personNameList);
+		table.put("Release Year", productReleaseYear);
 		
 		HL_xiewen4.mainFrame.flipPageTo(new ViewFilterResultPanel(table));
 	}
