@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import database.tables.BookAuthorTable;
 import database.tables.BookKeywordTable;
@@ -896,20 +897,18 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 **********************/
 	
 	/**
-	 * Return a map containing array of authors, where each key is the book title containing the
-	 * target sub string
-	 * 	"book title" : [all author of the book]
+	 * Return a map (BookTitle : AuthorName)
 	 * @param target the sub string of the name
 	 * @param year year of publication
 	 * @return 
 	 */
-	public static HashMap<String, ArrayList<String>> getBookTitleToAuthorMap(String target, int year) {
-		HashMap<String, ArrayList<String>> titleToAuthors = null;
+	public static HashMap<String, String> getBookTitleToAuthorSet(String target, int year) {
+		HashMap<String, String> titleToAuthor = null;
 		try {
 			// Disable auto commit
 			disableAutoCommit();
 			
-			titleToAuthors = getBookTitleToAuthorMapHelper(target, year);
+			titleToAuthor = getBookTitleToAuthorMapHelper(target, year);
 			
 			// commit
 			sqlCommit();
@@ -929,31 +928,67 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			
 			e.printStackTrace();
 		}
-		return titleToAuthors;
+		return titleToAuthor;
 	}
 	
-	private static HashMap<String, ArrayList<String>> getBookTitleToAuthorMapHelper(String target, int year) throws SQLException {
-		HashMap<String, ArrayList<String>> titleToAuthor = new HashMap<>();
+	private static HashMap<String, String> getBookTitleToAuthorMapHelper(String target, int year) throws SQLException {
+		HashMap<String, String> titleToAuthor = new HashMap<>();
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			String query = "SELECT FROM " + BookTable.TABLE_NAME + " "
-					+ "WHERE " + BookTable.YEAR_OF_PUBLICATION + " = ? "
-							+ "and " + BookTable.TITLE + " LIKE %?%";
+			String bookAuthorQuery =
+					"(SELECT * FROM " + BookAuthorTable.TABLE_NAME + ")";
+			String peopleInvolvedQuery =
+					"(SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + ")";
+			String bookQuery =
+					"(SELECT " 
+							+ BookTable.ISBN + ", "
+							+ BookTable.TITLE + " "
+					+ "FROM " 
+							+ BookTable.TABLE_NAME + " "
+					+ "WHERE " 
+							+ BookTable.YEAR_OF_PUBLICATION + " = ? "
+							+ "and " + BookTable.TITLE + " LIKE ?)";
+			String query = 
+					"SELECT " 
+						+ BookTable.TITLE + ", " 
+						+ PeopleInvolvedTable.FIRST_NAME + ", " 
+						+ PeopleInvolvedTable.MIDDLE_NAME + ", " 
+						+ PeopleInvolvedTable.FAMILY_NAME + " "
+					+ "FROM "
+						+ "(" 
+						+ bookAuthorQuery + " AS a "
+						+ "LEFT OUTER JOIN "
+						+ peopleInvolvedQuery + " AS b "
+						+ "ON a." + BookAuthorTable.AUTHOR_ID + " = " + PeopleInvolvedTable.ID + ") AS ab "
+								+ "NATURAL JOIN "
+								+ bookQuery + " AS c"
+					+ "ORDER BY " 
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ PeopleInvolvedTable.FIRST_NAME;
+			
+							
 			
 			PreparedStatement ps = connection.prepareStatement(query);
 			ps.setInt(1, year);
-			ps.setString(2, target);
+			ps.setString(2, "%" + target + "%");
 			ResultSet rs = ps.executeQuery();
 			
-			// Go through each matching book name to get book authors
 			while (rs.next()) {
-				String bookISBN = rs.getString(BookTable.ISBN);
 				String bookTitle = rs.getString(BookTable.TITLE);
-				
-				ArrayList<String> authorNameList = getAuthorNameList(bookISBN);
-				
-				titleToAuthor.put(bookTitle, authorNameList);
+				if (!titleToAuthor.containsKey(bookTitle)) {
+					String authorName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
+					String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
+					String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+					
+					if (middleName != null) {
+						authorName = authorName + " " + middleName;
+					}
+					
+					authorName = authorName + " " + familyName;
+					
+					titleToAuthor.put(bookTitle, authorName);
+				}
 			}
 			
 			connection.close();
@@ -962,29 +997,5 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		}
 		
 		return titleToAuthor;
-	}
-	
-	/**
-	 * The purpose of this function is to get a list of author names
-	 * @param bookISBN the isbn of the book must exist
-	 * @throws SQLException 
-	 */
-	private static ArrayList<String> getAuthorNameList(String bookISBN) throws SQLException{
-		ArrayList<String> authorNameList = new ArrayList<>();
-		ArrayList<Integer> authorIDList = getAuthorIDList(bookISBN);
-		
-		for (Integer authorID : authorIDList) {
-			Person author = getPersonFromPeopleInvolvedTable(authorID);
-			String authorName = author.getFirstName();
-			
-			if (author.getMiddleName() != null)
-				authorName = authorName + " " + author.getMiddleName();
-			
-			authorName = authorName + " " + author.getSurname();
-			
-			authorNameList.add(authorName);
-		}
-		
-		return authorNameList;
 	}
 }

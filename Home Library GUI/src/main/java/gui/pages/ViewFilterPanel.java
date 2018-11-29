@@ -156,6 +156,7 @@ public class ViewFilterPanel extends GeneralFunctions {
 		for (int i = 0; i < nameList.size(); i++) {
 			String name = nameList.get(i);
 			ArrayList<String> personName = nameToPersonMap.get(name);
+			
 		}
 	}
 	
