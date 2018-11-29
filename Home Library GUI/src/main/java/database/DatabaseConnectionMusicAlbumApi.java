@@ -1113,7 +1113,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 	 * @param releaseYear year of publication
 	 * @return 
 	 */
-	public static HashMap<String, String> getMovieTitleToDirectorMap(String target, int releaseYear) {
+	public static HashMap<String, String> getMusicAlbumTitleToSingerMap(String target, int releaseYear) {
 		HashMap<String, String> titleToSingers = null;
 		try {
 			// Disable auto commit

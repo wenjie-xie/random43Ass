@@ -19,6 +19,7 @@ import javax.swing.JTextArea;
 
 import app.HL_xiewen4;
 import database.DatabaseConnectionBookApi;
+import database.DatabaseConnectionMovieApi;
 import database.DatabaseConnectionMusicAlbumApi;
 import gui.functions.GeneralFunctions;
 
@@ -118,7 +119,7 @@ public class ViewFilterPanel extends GeneralFunctions {
 					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Release year must be a integer.");
 					
 				} else {
-					
+					performFilter();
 				}
 			}
 		});
@@ -153,7 +154,7 @@ public class ViewFilterPanel extends GeneralFunctions {
 		}
 		
 		if (musicAlbumCheckBox.isSelected()) {
-			HashMap<String, String> musicAlbumNameToSingerMap = DatabaseConnectionMusicAlbumApi.getMovieTitleToDirectorMap(target, year);
+			HashMap<String, String> musicAlbumNameToSingerMap = DatabaseConnectionMusicAlbumApi.getMusicAlbumTitleToSingerMap(target, year);
 			
 			for (String albumTitle : musicAlbumNameToSingerMap.keySet()) {
 				String singerName = musicAlbumNameToSingerMap.get(albumTitle);
@@ -164,6 +165,27 @@ public class ViewFilterPanel extends GeneralFunctions {
 				productReleaseYear.add(String.valueOf(year));
 			}
 		}
+		
+		if (movieCheckBox.isSelected()) {
+			HashMap<String, String> movieNameToSingerMap = DatabaseConnectionMovieApi.getMovieTitleToDirectorMap(target, year);
+			
+			for (String movieTitle : movieNameToSingerMap.keySet()) {
+				String directorName = movieNameToSingerMap.get(movieTitle);
+				
+				productNameList.add(movieTitle);
+				productTypeList.add("<M>");
+				personNameList.add(directorName);
+				productReleaseYear.add(String.valueOf(year));
+			}
+		}
+		
+		HashMap<String, ArrayList<String>> table = new HashMap<>();
+		table.put("product name", productNameList);
+		table.put("product type", productTypeList);
+		table.put("person name", personNameList);
+		table.put("release year", productReleaseYear);
+		
+		HL_xiewen4.mainFrame.flipPageTo(new ViewFilterResultPanel(table));
 	}
 	
 	/**
