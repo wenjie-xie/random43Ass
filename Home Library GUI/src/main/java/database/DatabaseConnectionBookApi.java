@@ -936,10 +936,6 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
-			String bookAuthorQuery =
-					"(SELECT * FROM " + BookAuthorTable.TABLE_NAME + ")";
-			String peopleInvolvedQuery =
-					"(SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + ")";
 			String bookQuery =
 					"(SELECT " 
 							+ BookTable.ISBN + ", "
@@ -948,7 +944,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 							+ BookTable.TABLE_NAME + " "
 					+ "WHERE " 
 							+ BookTable.YEAR_OF_PUBLICATION + " = ? "
-							+ "and " + BookTable.TITLE + " LIKE ?)";
+							+ "and " + BookTable.TITLE + " LIKE ?) AS b";
 			String query = 
 					"SELECT " 
 						+ BookTable.TITLE + ", " 
@@ -956,13 +952,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 						+ PeopleInvolvedTable.MIDDLE_NAME + ", " 
 						+ PeopleInvolvedTable.FAMILY_NAME + " "
 					+ "FROM "
-						+ "(" 
-						+ bookAuthorQuery + " AS a "
-						+ "LEFT OUTER JOIN "
-						+ peopleInvolvedQuery + " AS b "
-						+ "ON a." + BookAuthorTable.AUTHOR_ID + " = " + PeopleInvolvedTable.ID + ") AS ab "
-								+ "NATURAL JOIN "
-								+ bookQuery + " AS c"
+						+ BookAuthorTable.TABLE_NAME + " "
+						+ "INNER JOIN " + PeopleInvolvedTable.TABLE_NAME + " ON " + BookAuthorTable.AUTHOR_ID + " = " + PeopleInvolvedTable.ID + " "
+						+ "NATURAL JOIN " + bookQuery + " "
 					+ "ORDER BY " 
 						+ PeopleInvolvedTable.FAMILY_NAME + ", "
 						+ PeopleInvolvedTable.FIRST_NAME;

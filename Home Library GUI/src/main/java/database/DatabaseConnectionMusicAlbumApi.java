@@ -1150,12 +1150,8 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			String musicSingerQuery = 
 					"(SELECT * "
 					+ "FROM " + MusicSingerTable.TABLE_NAME + " "
-					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " = ? "
+					+ "WHERE " + MusicSingerTable.ALBUM_NAME + " LIKE ? "
 							+ "and " + MusicSingerTable.YEAR + " = ?) AS ms";
-			
-			String peopleInvolvedQuery =
-					"(SELECT * "
-					+ "FROM " + PeopleInvolvedTable.TABLE_NAME + ") AS pi";
 					
 			String query = 
 					"SELECT " + MusicSingerTable.ALBUM_NAME + ", "
@@ -1164,9 +1160,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 							+ PeopleInvolvedTable.FAMILY_NAME + " "
 					+ "FROM "
 						+ musicSingerQuery + " "
-						+ "LEFT OUTER JOIN "
-						+ peopleInvolvedQuery + " "
-						+ "ON ms." + MusicSingerTable.PEOPLE_INVOLVED_ID + " = pi." + PeopleInvolvedTable.ID + " "
+						+ "INNER JOIN " + PeopleInvolvedTable.TABLE_NAME + " ON ms." + MusicSingerTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.ID + " "
 					+ "ORDER BY " 
 						+ PeopleInvolvedTable.FAMILY_NAME + ", "
 						+ PeopleInvolvedTable.FIRST_NAME;

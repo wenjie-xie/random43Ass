@@ -977,23 +977,12 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			String crewMemberQuery = 
 					"(SELECT * "
 					+ "FROM " + CrewMemberTable.TABLE_NAME + " "
-					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " = ? "
+					+ "WHERE " + CrewMemberTable.MOVIE_NAME + " LIKE ? "
 							+ "and " + CrewMemberTable.RELEASE_YEAR  + " = ?) AS cm";
 			
 			String roleQuery = 
 					"(SELECT * FROM " + RoleTable.TABLE_NAME + " "
 					+ "WHERE " + RoleTable.DESCRIPTION + " = ?) AS r";
-			
-			String directorQuery = 
-					"(SELECT * "
-					+ "FROM "
-						+ crewMemberQuery + " "
-						+ "LEFT OUTER JOIN "
-						+ roleQuery + " "
-						+ "ON cm." + CrewMemberTable.ROLE_ID + " = r." + RoleTable.ID + ") AS cmr";
-			
-			String peopleInvolvedQuery = 
-					"(SELECT * FROM " + PeopleInvolvedTable.TABLE_NAME + ") AS pi";
 			
 			String query = 
 					"SELECT "
@@ -1002,10 +991,9 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 							+ PeopleInvolvedTable.MIDDLE_NAME + ", "
 							+ PeopleInvolvedTable.FAMILY_NAME + " "
 					+ "FROM "
-						+ directorQuery + " "
-						+ "LEFT OUTER JOIN "
-						+ peopleInvolvedQuery + " "
-						+ "ON cmr." + CrewMemberTable.PEOPLE_INVOLVED_ID + " = pi." + PeopleInvolvedTable.ID + " "
+						+ crewMemberQuery + " "
+						+ "INNER JOIN " + roleQuery + " ON cm." + CrewMemberTable.ROLE_ID + " = r." + RoleTable.ID + " "
+						+ "INNER JOIN " + PeopleInvolvedTable.TABLE_NAME + " ON cm." + CrewMemberTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.TABLE_NAME + "." + PeopleInvolvedTable.ID + " "
 					+ "ORDER BY "
 						+ PeopleInvolvedTable.FAMILY_NAME + ", "
 						+ PeopleInvolvedTable.FIRST_NAME;
@@ -1020,7 +1008,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			while (rs.next()) {
 				String movieTitle = rs.getString(CrewMemberTable.MOVIE_NAME);
 				
-				if (titleToDirector.containsKey(movieTitle)) {
+				if (!titleToDirector.containsKey(movieTitle)) {
 					String directorName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
 					String middleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 					String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);

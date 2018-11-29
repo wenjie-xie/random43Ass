@@ -19,6 +19,7 @@ import gui.pages.DataInsertMusicPanel;
 import gui.pages.DataRemoveSearchPanel;
 import gui.pages.DataUpdateSearchPanel;
 import gui.pages.HomePagePanel;
+import gui.pages.ViewFilterPanel;
 
 /**
  * @author xiewen4
@@ -50,8 +51,8 @@ public class MainFrame extends JFrame {
 		
 		
 		// View Menu
-		JMenu viewMenu = new JMenu("View");
-		
+		JMenuItem viewMenu = createViewMenu();
+		menuBar.add(viewMenu);
 		
 		// Report Menu
 		JMenu reportMenu = new JMenu("Report");
@@ -163,6 +164,25 @@ public class MainFrame extends JFrame {
 		});
 		
 		return dataUpdate;
+	}
+	
+	
+	/**
+	 * Create View Menu
+	 * @return update menu
+	 */
+	private JMenuItem createViewMenu() {
+		// Data > Update
+		JMenuItem view = new JMenuItem("View");
+		view.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flipPageTo(new ViewFilterPanel());
+			}
+		});
+		
+		return view;
 	}
 	
 	
