@@ -1150,7 +1150,7 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			
 			String query = "SELECT FROM " + MusicTable.TABLE_NAME + " "
 					+ "WHERE " + MusicTable.YEAR + " = ? "
-							+ "and " + MusicTable.ALBUM_NAME + " LIKE ? "
+							+ "and " + MusicTable.ALBUM_NAME + " LIKE %?% "
 					+ "ORDER BY " + MusicTable.ALBUM_NAME;
 			
 			PreparedStatement ps = connection.prepareStatement(query);

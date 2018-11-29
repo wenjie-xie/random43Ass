@@ -5,16 +5,23 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import app.HL_xiewen4;
+import database.DatabaseConnectionBookApi;
+import gui.functions.GeneralFunctions;
 
-public class ViewFilterPanel extends JPanel {
+public class ViewFilterPanel extends GeneralFunctions {
 
 	private static final long serialVersionUID = -5304227219476304214L;
 
@@ -92,16 +99,64 @@ public class ViewFilterPanel extends JPanel {
 	 * @return a search button
 	 */
 	private JButton createSubmitBtn() {
-		JButton searchBtn = new JButton("Submit");
-		searchBtn.addActionListener(new ActionListener() {
+		JButton submitBtn = new JButton("Submit");
+		submitBtn.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (!bookCheckBox.isSelected() && !movieCheckBox.isSelected() && !musicAlbumCheckBox.isSelected()) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Please select at least one of the checkboxes.");
 				
+				} else if (textAreaToString(nameSearchBar) == null) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Name Search bar is empty.");
+					
+				} else if (textAreaToString(yearSearchBar) == null) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Release year Search bar is empty.");
+				
+				} else if (textAreaToInt(yearSearchBar) == null) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Release year must be a integer.");
+					
+				} else {
+					
+				}
 			}
 		});
 		
-		return searchBtn;
+		return submitBtn;
+	}
+	
+	/**
+	 * Perform the action depending on the filters selected
+	 * REQ: fields can not be empty
+	 */
+	private void performFilter() {
+		String target = nameSearchBar.getText();
+		int year = textAreaToInt(yearSearchBar);
+		ArrayList<String> productNameList = new ArrayList<>();
+		ArrayList<String> productTypeList = new ArrayList<>();
+		ArrayList<String> personList = new ArrayList<>();
+		
+		
+		if (bookCheckBox.isSelected()) {
+			HashMap<String, ArrayList<String>> bookTitleToAuthorMap = DatabaseConnectionBookApi.getBookTitleToAuthorMap(target, year);
+			
+			
+		}
+	}
+	
+	/**
+	 * Return a set of the name and the person responsible
+	 * @return (Name, PersonName)
+	 */
+	private Set<String> toNameAndPerson(HashMap<String, ArrayList<String>> nameToPersonMap) {
+		Set<String> result = new HashSet<>();
+		
+		// product name
+		ArrayList<String> nameList = new ArrayList<>(nameToPersonMap.keySet());
+		for (int i = 0; i < nameList.size(); i++) {
+			String name = nameList.get(i);
+			ArrayList<String> personName = nameToPersonMap.get(name);
+		}
 	}
 	
 	/**
@@ -120,4 +175,5 @@ public class ViewFilterPanel extends JPanel {
 		
 		return searchBtn;
 	}
+	
 }

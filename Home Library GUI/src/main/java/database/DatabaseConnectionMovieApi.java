@@ -940,7 +940,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @param year year of publication
 	 * @return 
 	 */
-	public HashMap<String, ArrayList<String>> getMovieTitleToDirectorMap(String target, int year) {
+	public static HashMap<String, ArrayList<String>> getMovieTitleToDirectorMap(String target, int year) {
 		HashMap<String, ArrayList<String>> titleToDirectors = null;
 		try {
 			// Disable auto commit
@@ -969,14 +969,14 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 		return titleToDirectors;
 	}
 	
-	private HashMap<String, ArrayList<String>> getMovieTitleToDirectorMapHelper(String target, int year) throws SQLException {
+	private static HashMap<String, ArrayList<String>> getMovieTitleToDirectorMapHelper(String target, int year) throws SQLException {
 		HashMap<String, ArrayList<String>> titleToDirector = new HashMap<>();
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "SELECT FROM " + MovieTable.TABLE_NAME + " "
 					+ "WHERE " + MovieTable.YEAR + " = ? "
-							+ "and " + MovieTable.MOVIE_NAME + " LIKE ?";
+							+ "and " + MovieTable.MOVIE_NAME + " LIKE %?%";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
 			ps.setInt(1, year);
@@ -1006,7 +1006,7 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 	 * @param movieYear the year the movie was released
 	 * @throws SQLException 
 	 */
-	private ArrayList<String> getDirectorNameList(String movieTitle, int releasedYear) throws SQLException{
+	private static ArrayList<String> getDirectorNameList(String movieTitle, int releasedYear) throws SQLException{
 		ArrayList<String> directorNameList = new ArrayList<>();
 		
 		Movie movie = new Movie(movieTitle, releasedYear);

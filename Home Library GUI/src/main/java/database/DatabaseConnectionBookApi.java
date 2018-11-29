@@ -903,7 +903,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @param year year of publication
 	 * @return 
 	 */
-	public HashMap<String, ArrayList<String>> getBookTitleToAuthorMap(String target, int year) {
+	public static HashMap<String, ArrayList<String>> getBookTitleToAuthorMap(String target, int year) {
 		HashMap<String, ArrayList<String>> titleToAuthors = null;
 		try {
 			// Disable auto commit
@@ -932,14 +932,14 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 		return titleToAuthors;
 	}
 	
-	private HashMap<String, ArrayList<String>> getBookTitleToAuthorMapHelper(String target, int year) throws SQLException {
+	private static HashMap<String, ArrayList<String>> getBookTitleToAuthorMapHelper(String target, int year) throws SQLException {
 		HashMap<String, ArrayList<String>> titleToAuthor = new HashMap<>();
 		
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			
 			String query = "SELECT FROM " + BookTable.TABLE_NAME + " "
 					+ "WHERE " + BookTable.YEAR_OF_PUBLICATION + " = ? "
-							+ "and " + BookTable.TITLE + " LIKE ?";
+							+ "and " + BookTable.TITLE + " LIKE %?%";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
 			ps.setInt(1, year);
@@ -969,7 +969,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @param bookISBN the isbn of the book must exist
 	 * @throws SQLException 
 	 */
-	private ArrayList<String> getAuthorNameList(String bookISBN) throws SQLException{
+	private static ArrayList<String> getAuthorNameList(String bookISBN) throws SQLException{
 		ArrayList<String> authorNameList = new ArrayList<>();
 		ArrayList<Integer> authorIDList = getAuthorIDList(bookISBN);
 		
