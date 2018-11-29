@@ -19,6 +19,7 @@ import javax.swing.JTextArea;
 
 import app.HL_xiewen4;
 import database.DatabaseConnectionBookApi;
+import database.DatabaseConnectionMusicAlbumApi;
 import gui.functions.GeneralFunctions;
 
 public class ViewFilterPanel extends GeneralFunctions {
@@ -134,29 +135,34 @@ public class ViewFilterPanel extends GeneralFunctions {
 		int year = textAreaToInt(yearSearchBar);
 		ArrayList<String> productNameList = new ArrayList<>();
 		ArrayList<String> productTypeList = new ArrayList<>();
-		ArrayList<String> personList = new ArrayList<>();
+		ArrayList<String> personNameList = new ArrayList<>();
+		ArrayList<String> productReleaseYear = new ArrayList<>();
 		
 		
 		if (bookCheckBox.isSelected()) {
-			HashMap<String, ArrayList<String>> bookTitleToAuthorMap = DatabaseConnectionBookApi.getBookTitleToAuthorMap(target, year);
+			HashMap<String, String> bookTitleToAuthorMap = DatabaseConnectionBookApi.getBookTitleToAuthorMap(target, year);
 			
-			
+			for (String bookTitle : bookTitleToAuthorMap.keySet()) {
+				String authorName = bookTitleToAuthorMap.get(bookTitle);
+				
+				productNameList.add(bookTitle);
+				productTypeList.add("<B>");
+				personNameList.add(authorName);
+				productReleaseYear.add(String.valueOf(year));
+			}
 		}
-	}
-	
-	/**
-	 * Return a set of the name and the person responsible
-	 * @return (Name, PersonName)
-	 */
-	private Set<String> toNameAndPerson(HashMap<String, ArrayList<String>> nameToPersonMap) {
-		Set<String> result = new HashSet<>();
 		
-		// product name
-		ArrayList<String> nameList = new ArrayList<>(nameToPersonMap.keySet());
-		for (int i = 0; i < nameList.size(); i++) {
-			String name = nameList.get(i);
-			ArrayList<String> personName = nameToPersonMap.get(name);
+		if (musicAlbumCheckBox.isSelected()) {
+			HashMap<String, String> musicAlbumNameToSingerMap = DatabaseConnectionMusicAlbumApi.getMovieTitleToDirectorMap(target, year);
 			
+			for (String albumTitle : musicAlbumNameToSingerMap.keySet()) {
+				String singerName = musicAlbumNameToSingerMap.get(albumTitle);
+				
+				productNameList.add(albumTitle);
+				productTypeList.add("<A>");
+				personNameList.add(singerName);
+				productReleaseYear.add(String.valueOf(year));
+			}
 		}
 	}
 	

@@ -902,7 +902,7 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 	 * @param year year of publication
 	 * @return 
 	 */
-	public static HashMap<String, String> getBookTitleToAuthorSet(String target, int year) {
+	public static HashMap<String, String> getBookTitleToAuthorMap(String target, int year) {
 		HashMap<String, String> titleToAuthor = null;
 		try {
 			// Disable auto commit
