@@ -160,7 +160,7 @@ public class ViewFilterPanel extends GeneralFunctions {
 				String singerName = musicAlbumNameToSingerMap.get(albumTitle);
 				
 				productNameList.add(albumTitle);
-				productTypeList.add("<A>");
+				productTypeList.add("<M>");
 				personNameList.add(singerName);
 				productReleaseYear.add(String.valueOf(year));
 			}
@@ -173,7 +173,7 @@ public class ViewFilterPanel extends GeneralFunctions {
 				String directorName = movieNameToSingerMap.get(movieTitle);
 				
 				productNameList.add(movieTitle);
-				productTypeList.add("<M>");
+				productTypeList.add("<F>");
 				personNameList.add(directorName);
 				productReleaseYear.add(String.valueOf(year));
 			}
