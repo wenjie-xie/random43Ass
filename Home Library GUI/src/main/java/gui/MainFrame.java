@@ -21,6 +21,7 @@ import gui.pages.DataUpdateSearchPanel;
 import gui.pages.HomePagePanel;
 import gui.pages.ViewFilterPanel;
 import gui.pages.reports.ReportAuthorsPublication;
+import gui.pages.reports.ReportPublicationInOneYear;
 
 /**
  * @author xiewen4
@@ -211,7 +212,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				flipPageTo(new ReportPublicationInOneYear());
 				
 			}
 		});

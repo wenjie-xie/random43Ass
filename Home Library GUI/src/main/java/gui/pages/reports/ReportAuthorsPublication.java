@@ -14,6 +14,8 @@ import gui.pages.ViewFilterResultPanel;
 
 public class ReportAuthorsPublication extends ReportWithOneInput {
 
+	private static final long serialVersionUID = 3439662102512823539L;
+
 	public ReportAuthorsPublication() {
 		super("Author's Publication Generator:", "Author's Name:");
 	}

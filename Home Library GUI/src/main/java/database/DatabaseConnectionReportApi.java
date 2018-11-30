@@ -14,6 +14,7 @@ import app.HL_xiewen4;
 import database.tables.BookAuthorTable;
 import database.tables.BookKeywordTable;
 import database.tables.BookTable;
+import database.tables.PeopleInvolvedTable;
 import items.Person;
 
 /**
@@ -83,7 +84,8 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 								+ BookTable.YEAR_OF_PUBLICATION + " "
 						+ "FROM "
 							+ BookTable.TABLE_NAME + " "
-							+ "NATURAL JOIN " + bookAuthorQuery;
+							+ "NATURAL JOIN " + bookAuthorQuery + " "
+						+ "ORDER BY " + BookTable.ISBN;
 				
 				PreparedStatement ps = connection.prepareStatement(query);
 				ps.setInt(1, authorID);
@@ -132,5 +134,93 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 		}
 		
 		return person;
+	}
+	
+	/*********************************
+	 * Publications in one Year *
+	 *********************************/
+	
+	/**
+	 * Find all the books, which published in the same year
+	 * @param year
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generatePublicationInOneYear(int year) {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generatePublicationInOneYearHelper(year);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generatePublicationInOneYearHelper(int year) throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("ISBN", new ArrayList<>());
+		result.put("Book’s Name", new ArrayList<>());
+		result.put("Published year", new ArrayList<>());
+		result.put("Authors’ Family Name", new ArrayList<>());
+		result.put("Initial of First Name", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			String bookQuery = 
+					"(SELECT * FROM " + BookTable.TABLE_NAME + " "
+					+ "WHERE " + BookTable.YEAR_OF_PUBLICATION + " = ?) AS b";
+			String query = 
+					"SELECT "
+							+ BookTable.ISBN + ", "
+							+ BookTable.TITLE + ", "
+							+ BookTable.YEAR_OF_PUBLICATION + ", "
+							+ PeopleInvolvedTable.FAMILY_NAME + ", "
+							+ PeopleInvolvedTable.FIRST_NAME + " "
+					+ "FROM " 
+							+ bookQuery + " "
+							+ "NATURAL JOIN " + BookAuthorTable.TABLE_NAME + " "
+							+ "INNER JOIN " + PeopleInvolvedTable.TABLE_NAME + " ON " + BookAuthorTable.AUTHOR_ID + " = " + PeopleInvolvedTable.ID + " "
+					+ "ORDER BY "
+						+ BookTable.TITLE;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, year);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.get("ISBN").add(rs.getString(BookTable.ISBN));
+				result.get("Book’s Name").add(rs.getString(BookTable.TITLE));
+				result.get("Published year").add(rs.getString(BookTable.YEAR_OF_PUBLICATION));
+				result.get("Authors’ Family Name").add(PeopleInvolvedTable.FAMILY_NAME);
+				
+				String firstNameInitial = rs.getString(PeopleInvolvedTable.FIRST_NAME).substring(0, 1) + ".";
+				result.get("Initial of First Name").add(firstNameInitial);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
 	}
 }
