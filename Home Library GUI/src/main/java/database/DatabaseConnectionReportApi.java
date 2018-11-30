@@ -19,6 +19,7 @@ import database.tables.BookTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
+import items.Book;
 import items.Person;
 
 /**
@@ -307,7 +308,7 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 						+ BookTable.TITLE + " LIKE ? OR " 
 						+ BookTable.ABSTRACT + " LIKE ?)"; 
 			String query = 
-					"SELECT "
+					"SELECT DISTINCT "
 						+ BookTable.ISBN + ", "
 						+ BookTable.TITLE + ", "
 						+ BookTable.YEAR_OF_PUBLICATION + " "
@@ -332,6 +333,125 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				result.get("ISBN").add(bookISBN);
 				result.get("Book’s Name").add(bookTitle);
 				result.get("Published year").add(bookPublishedYear);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/***************************
+	 * Frequent Publishers *
+	 ***************************/
+	
+	/**
+	 * Find all the books, which is about a specific subject. The subject of a book can be
+	 * representing title, description or keywords that define the book.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateFrequentPublishers() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateFrequentPublishersHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateFrequentPublishersHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("ISBN", new ArrayList<>());
+		result.put("Book’s Name", new ArrayList<>());
+		result.put("Author’s name", new ArrayList<>());
+		result.put("Published year", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			String authorNameQuery =
+					"(SELECT * "
+					+ "FROM "
+						+ BookAuthorTable.TABLE_NAME + " AS ba "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " AS pi "
+								+ "ON ba." + BookAuthorTable.AUTHOR_ID + " = pi." + PeopleInvolvedTable.ID + ") AS bapi";
+			
+			String authorAndBook =
+					"SELECT * "
+					+ "FROM "
+						+ authorNameQuery + " "
+						+ "NATURAL JOIN "
+						+ BookTable.TABLE_NAME + " ";
+			
+			String twoConsecutiveYearQuery =
+					"(SELECT t1." + PeopleInvolvedTable.ID + " "
+							+ "FROM "
+								+ "(" + authorAndBook + ") AS t1 "
+								+ "INNER JOIN "
+								+ "(" + authorAndBook + ") AS t2 "
+									+ "ON t1." + BookTable.YEAR_OF_PUBLICATION + " = t2." + BookTable.YEAR_OF_PUBLICATION + "+1 "
+										+ "and t1." + BookAuthorTable.AUTHOR_ID + " = t2." + BookAuthorTable.AUTHOR_ID + ")";
+			String query = 
+					"SELECT "
+						+ BookTable.YEAR_OF_PUBLICATION + ", "
+						+ BookTable.ISBN + ", "
+						+ BookTable.TITLE + ", "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ PeopleInvolvedTable.FIRST_NAME + ", "
+						+ PeopleInvolvedTable.MIDDLE_NAME + " "
+					+ "FROM "
+						+ "(" + authorAndBook + ") AS author "
+					+ "WHERE " 
+						+ PeopleInvolvedTable.ID + " IN " + twoConsecutiveYearQuery + " "
+					+ "ORDER BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ PeopleInvolvedTable.FIRST_NAME + ", "
+						+ BookTable.YEAR_OF_PUBLICATION;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String bookTitle = rs.getString(BookTable.TITLE);
+				String bookISBN = rs.getString(BookTable.ISBN);
+				String bookPublishedYear = rs.getString(BookTable.YEAR_OF_PUBLICATION);
+				String authorFN = rs.getString(PeopleInvolvedTable.FIRST_NAME);
+				String authorMN = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
+				String authorLN = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+				
+				result.get("ISBN").add(bookISBN);
+				result.get("Book’s Name").add(bookTitle);
+				result.get("Published year").add(bookPublishedYear);
+				
+				String authorName = authorFN;
+				if (authorMN != null)
+					authorName = authorName + " " + authorMN;
+				authorName = authorName + " " + authorLN;
+				result.get("Author’s name").add(authorName);
 			}
 			
 			connection.close();

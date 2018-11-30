@@ -5,6 +5,8 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -13,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import database.DatabaseConnectionReportApi;
 import gui.pages.DataInsertBookPanel;
 import gui.pages.DataInsertMoviePanel;
 import gui.pages.DataInsertMusicPanel;
@@ -20,6 +23,7 @@ import gui.pages.DataRemoveSearchPanel;
 import gui.pages.DataUpdateSearchPanel;
 import gui.pages.HomePagePanel;
 import gui.pages.ViewFilterPanel;
+import gui.pages.ViewFilterResultPanel;
 import gui.pages.reports.ReportAuthorsPublication;
 import gui.pages.reports.ReportBooksWithSimilarTopic;
 import gui.pages.reports.ReportPublicationInOneYear;
@@ -235,7 +239,8 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				HashMap<String, ArrayList<String>> table = DatabaseConnectionReportApi.generateFrequentPublishers();
+				flipPageTo(new ViewFilterResultPanel(table));
 				
 			}
 		});
