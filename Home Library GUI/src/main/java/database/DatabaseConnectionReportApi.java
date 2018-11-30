@@ -125,10 +125,10 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 		
 		Person person = null;
 		if (newList.size() >= 3) {
-			person = new Person(newList.get(0), newList.get(2));
-			person.setMiddleName(newList.get(2));
-		} else if (newList.size() >= 2) {
-			person = new Person(newList.get(0), newList.get(1));
+			person = new Person(newList.get(2), newList.get(0));
+			person.setMiddleName(newList.get(1));
+		} else if (newList.size() == 2) {
+			person = new Person(newList.get(1), newList.get(0));
 		}
 		
 		return person;

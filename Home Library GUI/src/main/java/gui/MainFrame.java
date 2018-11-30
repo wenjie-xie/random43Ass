@@ -20,6 +20,7 @@ import gui.pages.DataRemoveSearchPanel;
 import gui.pages.DataUpdateSearchPanel;
 import gui.pages.HomePagePanel;
 import gui.pages.ViewFilterPanel;
+import gui.pages.reports.ReportAuthorsPublication;
 
 /**
  * @author xiewen4
@@ -199,7 +200,7 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
+				flipPageTo(new ReportAuthorsPublication());
 				
 			}
 		});

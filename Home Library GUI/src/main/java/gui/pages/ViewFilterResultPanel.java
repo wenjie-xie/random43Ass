@@ -19,7 +19,10 @@ public class ViewFilterResultPanel extends JPanel {
 
 	public ViewFilterResultPanel(HashMap<String, ArrayList<String>> table) {
 		ArrayList<String> col = new ArrayList<>(table.keySet());
-		String[] colNames = {col.get(0), col.get(1), col.get(2), col.get(3)};
+		
+		String[] colNames = new String[col.size()];
+		for (int i = 0; i < col.size(); i++)
+			colNames[i] = col.get(i);
 		String[][] data = to2DArray(table, colNames);
 		
 		@SuppressWarnings("serial")

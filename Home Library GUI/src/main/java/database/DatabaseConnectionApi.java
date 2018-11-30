@@ -161,7 +161,7 @@ public class DatabaseConnectionApi {
 				Integer expectedGender = person.getGender();
 				
 				// check gender iff it's not null
-				if (actualGender != null) {
+				if (expectedGender != null) {
 					if (actualGender == expectedGender) {
 						if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
 							result = formatStringToInt(rs.getString(PeopleInvolvedTable.ID));
