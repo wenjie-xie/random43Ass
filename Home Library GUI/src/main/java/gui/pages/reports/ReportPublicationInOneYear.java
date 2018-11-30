@@ -27,22 +27,20 @@ public class ReportPublicationInOneYear extends ReportWithOneInput {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String input = textField.getText();
-				if (input == null) {
-					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Field can not be blank.");
-				} else {
-				
-					try {
-						int year = Integer.valueOf(input);
-						
-						HashMap<String, ArrayList<String>> table = DatabaseConnectionReportApi.generatePublicationInOneYear(year);
-						HL_xiewen4.mainFrame.flipPageTo(new ViewFilterResultPanel(table));
-						
-					} catch (NumberFormatException e1) {
-						JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Year of publication must be a number.");
-					}
+				try {
+					String input = textField.getText();
+
+					int year = Integer.valueOf(input);
 					
+					HashMap<String, ArrayList<String>> table = DatabaseConnectionReportApi.generatePublicationInOneYear(year);
+					HL_xiewen4.mainFrame.flipPageTo(new ViewFilterResultPanel(table));
+					
+				} catch (NullPointerException e1) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Field can not be blank.");
+				} catch (NumberFormatException e2) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Year of publication must be a number.");
 				}
+				
 			}
 		});
 		

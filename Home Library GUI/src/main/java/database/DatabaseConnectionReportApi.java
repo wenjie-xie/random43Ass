@@ -10,10 +10,14 @@ import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
+import com.sun.org.apache.xpath.internal.compiler.Keywords;
+
 import app.HL_xiewen4;
 import database.tables.BookAuthorTable;
 import database.tables.BookKeywordTable;
 import database.tables.BookTable;
+import database.tables.KeywordTable;
+import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
 import items.Person;
 
@@ -199,7 +203,9 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 							+ "NATURAL JOIN " + BookAuthorTable.TABLE_NAME + " "
 							+ "INNER JOIN " + PeopleInvolvedTable.TABLE_NAME + " ON " + BookAuthorTable.AUTHOR_ID + " = " + PeopleInvolvedTable.ID + " "
 					+ "ORDER BY "
-						+ BookTable.TITLE;
+						+ BookTable.TITLE + ", "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ PeopleInvolvedTable.FIRST_NAME;
 					
 			
 			PreparedStatement ps = connection.prepareStatement(query);
@@ -207,13 +213,125 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 			ResultSet rs = ps.executeQuery();
 			
 			while (rs.next()) {
-				result.get("ISBN").add(rs.getString(BookTable.ISBN));
-				result.get("Book’s Name").add(rs.getString(BookTable.TITLE));
-				result.get("Published year").add(rs.getString(BookTable.YEAR_OF_PUBLICATION));
-				result.get("Authors’ Family Name").add(PeopleInvolvedTable.FAMILY_NAME);
+				String bookTitle = rs.getString(BookTable.TITLE);
 				
-				String firstNameInitial = rs.getString(PeopleInvolvedTable.FIRST_NAME).substring(0, 1) + ".";
-				result.get("Initial of First Name").add(firstNameInitial);
+				if (!result.get("Book’s Name").contains(bookTitle)) {
+					result.get("ISBN").add(rs.getString(BookTable.ISBN));
+					result.get("Book’s Name").add(rs.getString(BookTable.TITLE));
+					result.get("Published year").add(rs.getString(BookTable.YEAR_OF_PUBLICATION));
+					result.get("Authors’ Family Name").add(PeopleInvolvedTable.FAMILY_NAME);
+					
+					String firstNameInitial = rs.getString(PeopleInvolvedTable.FIRST_NAME).substring(0, 1) + ".";
+					result.get("Initial of First Name").add(firstNameInitial);
+				}
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/*****************************
+	 * Books With Similar Topic *
+	 *****************************/
+	
+	/**
+	 * Find all the books, which is about a specific subject. The subject of a book can be
+	 * representing title, description or keywords that define the book.
+	 * @param topic
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateBooksWithSimilarTopic(String topic) {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateBooksWithSimilarTopicHelper(topic);
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateBooksWithSimilarTopicHelper(String topic) throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("ISBN", new ArrayList<>());
+		result.put("Book’s Name", new ArrayList<>());
+		result.put("Published year", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			String keywordQuery =
+					"(SELECT * FROM " + KeywordTable.TABLE_NAME + " "
+					+ "WHERE " + KeywordTable.TAG + " LIKE ?) AS k";
+			String checkBookTagQuery =
+					"(SELECT "
+						+ BookTable.ISBN + ", "
+						+ BookTable.TITLE + ", "
+						+ BookTable.YEAR_OF_PUBLICATION + " "
+					+ "FROM "
+						+ keywordQuery + " "
+						+ "INNER JOIN " 
+						+ BookKeywordTable.TABLE_NAME + " ON " + BookKeywordTable.TABLE_NAME + "." + BookKeywordTable.KEYWORD_ID + " = k" + "." + KeywordTable.ID + " "
+						+ "NATURAL JOIN " 
+						+ BookTable.TABLE_NAME + ") AS cb";
+			String bookQuery = 
+					"(SELECT "
+						+ BookTable.ISBN + ", "
+						+ BookTable.TITLE + ", "
+						+ BookTable.YEAR_OF_PUBLICATION + " "
+					+ "FROM " 
+						+ BookTable.TABLE_NAME + " "
+					+ "WHERE "
+						+ BookTable.TITLE + " LIKE ? OR " 
+						+ BookTable.ABSTRACT + " LIKE ?)"; 
+			String query = 
+					"SELECT "
+						+ BookTable.ISBN + ", "
+						+ BookTable.TITLE + ", "
+						+ BookTable.YEAR_OF_PUBLICATION + " "
+					+ "FROM "
+						+ checkBookTagQuery + " "
+						+ "UNION " 
+						+ bookQuery + " "
+					+ "ORDER BY " + BookTable.ISBN;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, "%" + topic + "%");
+			ps.setString(2, "%" + topic + "%");
+			ps.setString(3, "%" + topic + "%");
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String bookTitle = rs.getString(BookTable.TITLE);
+				String bookISBN = rs.getString(BookTable.ISBN);
+				String bookPublishedYear = rs.getString(BookTable.YEAR_OF_PUBLICATION);
+				
+				result.get("ISBN").add(bookISBN);
+				result.get("Book’s Name").add(bookTitle);
+				result.get("Published year").add(bookPublishedYear);
 			}
 			
 			connection.close();

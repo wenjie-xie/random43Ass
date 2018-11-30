@@ -12,12 +12,10 @@ import app.HL_xiewen4;
 import database.DatabaseConnectionReportApi;
 import gui.pages.ViewFilterResultPanel;
 
-public class ReportAuthorsPublication extends ReportWithOneInput {
+public class ReportBooksWithSimilarTopic extends ReportWithOneInput {
 
-	private static final long serialVersionUID = 3439662102512823539L;
-
-	public ReportAuthorsPublication() {
-		super("Author's Publication Generator:", "Author's Name:");
+	public ReportBooksWithSimilarTopic() {
+		super("Books With Similar Topic Table Generator:", "Topic:");
 	}
 
 	@Override
@@ -28,16 +26,17 @@ public class ReportAuthorsPublication extends ReportWithOneInput {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					String authorName = textField.getText();
-					HashMap<String, ArrayList<String>> table = DatabaseConnectionReportApi.generateAuthorsPublication(authorName);
+					String topic = textField.getText();
+					HashMap<String, ArrayList<String>> table = DatabaseConnectionReportApi.generateBooksWithSimilarTopic(topic);
 					HL_xiewen4.mainFrame.flipPageTo(new ViewFilterResultPanel(table));
-				
+					
 				} catch (NullPointerException e1) {
-					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Please input a name.");
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Topic can not be blank.");
 				}
 				
 			}
 		});
 		return submitBtn;
 	}
+
 }
