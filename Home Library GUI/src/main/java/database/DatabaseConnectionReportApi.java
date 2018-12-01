@@ -771,8 +771,7 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 	 ****************************/
 	
 	/**
-	 * Find all the movies directed by the same person and
-	 * received at least one award.
+	 * Find the singers of all the music, which share the same name.
 	 * @return
 	 */
 	public static HashMap<String, ArrayList<String>> generateMusicWithSimilarName() {
@@ -875,6 +874,110 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				result.get("Album Name").add(albumName);
 				result.get("Music Name").add(musicName);
 				result.get("Singers").add(singerName);
+				result.get("Year").add(year);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/***************************
+	 * Multi Skill Music Crew *
+	 ***************************/
+	
+	/**
+	 * Find all the people who are both the composer and song
+	 * writer for a music but not are not an arranger.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateMultiSkillMusicCrew() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateMultiSkillMusicCrewHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateMultiSkillMusicCrewHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("Family Name", new ArrayList<>());
+		result.put("First Name Initial", new ArrayList<>());
+		result.put("Music Name", new ArrayList<>());
+		result.put("Album Name", new ArrayList<>());
+		result.put("Year", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String isSWAndCQuery =
+					"(SELECT *"
+					+ "FROM "
+						+ PeopleInvolvedMusicTable.TABLE_NAME + " "
+					+ "WHERE "
+						+ PeopleInvolvedMusicTable.IS_SONG_WRITER + " IS NOT NULL "
+						+ "and " + PeopleInvolvedMusicTable.IS_SONG_WRITER + " > 0 "
+						+ "and " + PeopleInvolvedMusicTable.IS_COMPOSER + " IS NOT NULL "
+						+ "and " + PeopleInvolvedMusicTable.IS_COMPOSER + " > 0) AS isswc";
+			
+			String isSWCNotAQuery = 
+					"(SELECT * "
+					+ "FROM "
+						+ isSWAndCQuery + " "
+					+ "WHERE "
+						+ PeopleInvolvedMusicTable.IS_ARRANGER + " IS NULL "
+						+ "OR " + PeopleInvolvedMusicTable.IS_ARRANGER + " = 0) AS isSWCNotA";
+			
+			String query = 
+					"SELECT * "
+					+ "FROM "
+						+ isSWCNotAQuery + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " AS pi "
+								+ "ON isSWCNotA." + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " = pi." + PeopleInvolvedTable.ID + " "
+					+ "ORDER BY "
+						+ PeopleInvolvedMusicTable.YEAR + ", "
+						+ PeopleInvolvedMusicTable.MUSIC_NAME + " DESC";
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+				String firstNameInitial = rs.getString(PeopleInvolvedTable.FIRST_NAME).substring(0, 1) + ".";
+				String musicName = rs.getString(PeopleInvolvedMusicTable.MUSIC_NAME);
+				String albumName = rs.getString(PeopleInvolvedMusicTable.ALBUM_NAME);
+				String year = rs.getString(PeopleInvolvedMusicTable.YEAR);
+				
+				result.get("Family Name").add(familyName);
+				result.get("First Name Initial").add(firstNameInitial);
+				result.get("Music Name").add(musicName);
+				result.get("Album Name").add(albumName);
 				result.get("Year").add(year);
 			}
 			
