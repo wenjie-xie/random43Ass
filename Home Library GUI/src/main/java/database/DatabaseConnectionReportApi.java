@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -33,6 +34,42 @@ import items.Person;
  * This api is use to generate reports
  */
 public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
+	
+	// Helper
+	
+	/**
+	 * Create a view
+	 * @throws SQLException 
+	 */
+	private static String createView(String query) throws SQLException {
+		String viewName = null;
+		try {
+			Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword);
+			viewName = "View" + (int)(Math.floor(Math.random() * 5000));
+			
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("CREATE VIEW " + viewName + " AS "
+					+ query);
+			
+		} catch (SQLException e) {
+			throw new SQLException(e);
+		}
+		
+		return viewName;
+	}
+	
+	
+	private static void dropView(String viewName) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			Statement stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate("DROP VIEW " + viewName);
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
 	
 	/************************
 	 * Author's Publication *
@@ -412,12 +449,14 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 						+ "NATURAL JOIN "
 						+ BookTable.TABLE_NAME + " ";
 			
+			String authorAndBookView = createView(authorAndBook);
+			
 			String twoConsecutiveYearQuery =
 					"(SELECT t1." + PeopleInvolvedTable.ID + " "
 							+ "FROM "
-								+ "(" + authorAndBook + ") AS t1 "
+								+ authorAndBookView + " AS t1 "
 								+ "INNER JOIN "
-								+ "(" + authorAndBook + ") AS t2 "
+								+ authorAndBookView + " AS t2 "
 									+ "ON t1." + BookTable.YEAR_OF_PUBLICATION + " = t2." + BookTable.YEAR_OF_PUBLICATION + "+1 "
 										+ "and t1." + BookAuthorTable.AUTHOR_ID + " = t2." + BookAuthorTable.AUTHOR_ID + ")";
 			
@@ -460,6 +499,8 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				authorName = authorName + " " + authorLN;
 				result.get("Author’s name").add(authorName);
 			}
+			
+			dropView(authorAndBookView);
 			
 			connection.close();
 		} catch (SQLException e) {
