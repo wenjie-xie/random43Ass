@@ -349,8 +349,8 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 	 ***************************/
 	
 	/**
-	 * Find all the books, which is about a specific subject. The subject of a book can be
-	 * representing title, description or keywords that define the book.
+	 * Find all the authors who published books in at least
+	 * two consecutive years.
 	 * @return
 	 */
 	public static HashMap<String, ArrayList<String>> generateFrequentPublishers() {
@@ -414,6 +414,7 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 								+ "(" + authorAndBook + ") AS t2 "
 									+ "ON t1." + BookTable.YEAR_OF_PUBLICATION + " = t2." + BookTable.YEAR_OF_PUBLICATION + "+1 "
 										+ "and t1." + BookAuthorTable.AUTHOR_ID + " = t2." + BookAuthorTable.AUTHOR_ID + ")";
+			
 			String query = 
 					"SELECT "
 						+ BookTable.YEAR_OF_PUBLICATION + ", "
@@ -452,6 +453,86 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 					authorName = authorName + " " + authorMN;
 				authorName = authorName + " " + authorLN;
 				result.get("Author’s name").add(authorName);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/**************************
+	 * Most Popular Subject *
+	 **************************/
+	
+	/**
+	 * Find the most popular subject in your library, which is the
+	 * subject for which a similar tag was used more than once.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateMostPopularSubject() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateMostPopularSubjectHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateMostPopularSubjectHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("Tag", new ArrayList<>());
+		result.put("Frequency", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+
+			String bookTagQuery = 
+					"(SELECT * "
+					+ "FROM "
+						+ BookKeywordTable.TABLE_NAME + " AS bk "
+						+ "INNER JOIN "
+						+ KeywordTable.TABLE_NAME + " AS k "
+							+ "ON bk." + BookKeywordTable.KEYWORD_ID + " = k." + KeywordTable.ID + ") AS bt";
+			
+			String query = 
+					"SELECT "
+						+ KeywordTable.TAG + ", "
+						+ "COUNT(" + BookKeywordTable.ISBN + ") AS Frequency "
+					+ "FROM "
+						+ bookTagQuery + " "
+					+ "GROUP BY "
+						+ "bt." + BookKeywordTable.KEYWORD_ID;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				result.get("Tag").add(rs.getString(KeywordTable.TAG));
+				result.get("Frequency").add(rs.getString("Frequency"));
 			}
 			
 			connection.close();
