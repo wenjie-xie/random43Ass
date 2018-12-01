@@ -311,7 +311,8 @@ public class MainFrame extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				HashMap<String, ArrayList<String>> table = DatabaseConnectionReportApi.generateSimilarNames();
+				flipPageTo(new ViewFilterResultPanel(table));
 				
 			}
 		});

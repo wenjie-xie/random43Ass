@@ -20,6 +20,7 @@ import database.tables.BookTable;
 import database.tables.CrewMemberTable;
 import database.tables.KeywordTable;
 import database.tables.MusicSingerTable;
+import database.tables.MusicTable;
 import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
 import database.tables.Role;
@@ -979,6 +980,206 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				result.get("Music Name").add(musicName);
 				result.get("Album Name").add(albumName);
 				result.get("Year").add(year);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/*********************
+	 * Similar Names *
+	 *********************/
+	
+	/**
+	 * Find the similar family names that have been an author or
+	 * part of music or movie production. It is possible that --
+	 * they are not the same person
+	 * and only share the same family name.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateSimilarNames() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateSimilarNamesHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateSimilarNamesHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("Family Name", new ArrayList<>());
+		result.put("Roles", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			// author
+			String authorQuery =
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ "? AS Roles "
+					+ "FROM "
+						+ BookAuthorTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+								+ "ON " + PeopleInvolvedTable.ID + " = " + BookAuthorTable.AUTHOR_ID + " "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ") AS authorQ";
+			
+			// "Singer";
+			String singerQuery =
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ "? AS Roles "
+					+ "FROM "
+						+ MusicSingerTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+								+ "ON " + MusicSingerTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.ID + " "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ")";
+			
+			// "Producer";
+			String producerQuery =
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ "? AS Roles "
+					+ "FROM "
+						+ MusicTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+								+ "ON " + MusicTable.PRODUCER_ID + " = " + PeopleInvolvedTable.ID + " "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ")";
+			
+			// "Song Writer";
+			String songWriterQuery =
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ "? AS Roles "
+					+ "FROM "
+						+ PeopleInvolvedMusicTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+								+ "ON " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.ID + " "
+					+ "WHERE "
+						+ PeopleInvolvedMusicTable.IS_SONG_WRITER + " IS NOT NULL "
+						+ "and " + PeopleInvolvedMusicTable.IS_SONG_WRITER + " > 0 "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ")";
+			
+			// "Composer";
+			String composerQuery =
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ "? AS Roles "
+					+ "FROM "
+						+ PeopleInvolvedMusicTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+								+ "ON " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.ID + " "
+					+ "WHERE "
+						+ PeopleInvolvedMusicTable.IS_COMPOSER + " IS NOT NULL "
+						+ "and " + PeopleInvolvedMusicTable.IS_COMPOSER + " > 0 "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ")";
+			
+			// "Arranger";
+			String arrangerQuery =
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ "? AS Roles "
+					+ "FROM "
+						+ PeopleInvolvedMusicTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+								+ "ON " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.ID + " "
+					+ "WHERE "
+						+ PeopleInvolvedMusicTable.IS_ARRANGER + " IS NOT NULL "
+						+ "and " + PeopleInvolvedMusicTable.IS_ARRANGER + " > 0 "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ")";
+			
+			// "Director";
+			// "Script Writer";
+			// "Cast";
+			// "Editor";
+			// "Costume Designer";
+			String movieQuery = 
+					"(SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ RoleTable.DESCRIPTION + " AS Roles "
+					+ "FROM "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+						+ "INNER JOIN "
+						+ CrewMemberTable.TABLE_NAME + " "
+								+ "ON " + CrewMemberTable.PEOPLE_INVOLVED_ID + " = " + PeopleInvolvedTable.ID + " "
+						+ "NATURAL JOIN "
+						+ "(SELECT " + RoleTable.ID + " AS " + CrewMemberTable.ROLE_ID + ", " + RoleTable.DESCRIPTION + " FROM " + RoleTable.TABLE_NAME + ") AS role "
+					+ "GROUP BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ RoleTable.DESCRIPTION + ")";
+			
+			String query = 
+					"SELECT * "
+					+ "FROM "
+						+ authorQuery + " "
+						+ "UNION "
+						+ singerQuery + " "
+						+ "UNION "
+						+ producerQuery + " "
+						+ "UNION "
+						+ songWriterQuery + " "
+						+ "UNION "
+						+ composerQuery + " "
+						+ "UNION "
+						+ arrangerQuery + " "
+						+ "UNION "
+						+ movieQuery + " "
+					+ "ORDER BY "
+						+ PeopleInvolvedTable.FAMILY_NAME;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, Role.AUTHOR);
+			ps.setString(2, Role.SINGER);
+			ps.setString(3, Role.PRODUCER);
+			ps.setString(4, Role.SONG_WRITER);
+			ps.setString(5, Role.COMPOSER);
+			ps.setString(6, Role.ARRANGER);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+				String role = rs.getString("Roles");
+				
+				result.get("Family Name").add(familyName);
+				result.get("Roles").add(role);
 			}
 			
 			connection.close();
