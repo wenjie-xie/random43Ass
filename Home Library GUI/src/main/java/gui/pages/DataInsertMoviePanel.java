@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
@@ -50,8 +51,12 @@ public class DataInsertMoviePanel extends MoviePageInsertFunctions {
 				// Add all the info into the Music Album object
 				Movie movie = getMovieInfo();
 				
-				DatabaseConnectionMovieApi.insertMovie(movie);
-				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
+				try {
+					DatabaseConnectionMovieApi.insertMovie(movie);
+					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Warning!");
+				}
 				
 			}
 		});

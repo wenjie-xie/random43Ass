@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import com.sun.org.apache.xpath.internal.compiler.Keywords;
 
 import app.HL_xiewen4;
+import database.tables.AwardTable;
 import database.tables.BookAuthorTable;
 import database.tables.BookKeywordTable;
 import database.tables.BookTable;
@@ -20,6 +21,7 @@ import database.tables.CrewMemberTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
+import database.tables.Role;
 import database.tables.RoleTable;
 import items.Book;
 import items.Person;
@@ -641,6 +643,116 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				result.get("Family Name").add(familyName);
 				result.get("Role").add(role);
 				result.get("Movie Name").add(movieName);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/*************************
+	 * Award Winning Movies *
+	 *************************/
+	
+	/**
+	 * Find all the movies directed by the same person and
+	 * received at least one award.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateAwardWinningMovies() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateAwardWinningMoviesHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateAwardWinningMoviesHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("Movie Name", new ArrayList<>());
+		result.put("Director Name", new ArrayList<>());
+		result.put("# of Awards", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String directorQuery =
+					"(SELECT * "
+					+ "FROM "
+						+ CrewMemberTable.TABLE_NAME + " AS cm "
+						+ "NATURAL JOIN "
+						+ "(SELECT " + RoleTable.DESCRIPTION + ", " + RoleTable.ID + " AS " + CrewMemberTable.ROLE_ID + " FROM " + RoleTable.TABLE_NAME + " WHERE " + RoleTable.DESCRIPTION + " = ?) AS dr "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " AS pi "
+								+ "ON cm." + CrewMemberTable.PEOPLE_INVOLVED_ID + " = pi." + PeopleInvolvedTable.ID + ") AS d";
+			
+			String awardQuery = 
+					"(SELECT "
+						+ AwardTable.MOVIE_NAME + ", "
+						+ "COUNT(" + AwardTable.AWARD + ") AS awardCount "
+					+ "FROM " 
+						+ AwardTable.TABLE_NAME + " "
+					+ "WHERE " 
+						+ AwardTable.AWARD + " IS NOT NULL "
+					+ "GROUP BY "
+						+ AwardTable.MOVIE_NAME + ") AS a";
+			
+			String query = 
+					"SELECT "
+						+ CrewMemberTable.MOVIE_NAME + ", "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ PeopleInvolvedTable.FIRST_NAME + ", "
+						+ PeopleInvolvedTable.MIDDLE_NAME + ", "
+						+ "awardCount "
+					+ "FROM "
+						+ awardQuery + " "
+						+ "NATURAL JOIN "
+						+ directorQuery + " "
+					+ "ORDER BY "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ PeopleInvolvedTable.FIRST_NAME + ", "
+						+ CrewMemberTable.MOVIE_NAME;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setString(1, Role.DIRECTOR);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String movieName = rs.getString(CrewMemberTable.MOVIE_NAME);
+				String directorName = rs.getString(PeopleInvolvedTable.FIRST_NAME);
+				if (rs.getString(PeopleInvolvedTable.MIDDLE_NAME) != null)
+					directorName = directorName + " " + PeopleInvolvedTable.FAMILY_NAME;
+				directorName = directorName + " " + rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+				String numOfAward = rs.getString("awardCount");
+				
+				result.get("Movie Name").add(movieName);
+				result.get("Director Name").add(directorName);
+				result.get("# of Awards").add(numOfAward);
 			}
 			
 			connection.close();

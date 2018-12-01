@@ -266,7 +266,11 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 				ps.setInt(1, castID);
 				ps.setString(2, movie.getMovieName());
 				ps.setInt(3, movie.getReleaseYear());
-				ps.setInt(4, cast.getAward());
+				
+				if (cast.getAward() == null)
+					ps.setNull(4, java.sql.Types.INTEGER);
+				else
+					ps.setInt(4, cast.getAward());
 				ps.executeUpdate();
 			}
 			
