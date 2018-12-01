@@ -16,9 +16,11 @@ import app.HL_xiewen4;
 import database.tables.BookAuthorTable;
 import database.tables.BookKeywordTable;
 import database.tables.BookTable;
+import database.tables.CrewMemberTable;
 import database.tables.KeywordTable;
 import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
+import database.tables.RoleTable;
 import items.Book;
 import items.Person;
 
@@ -524,7 +526,11 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 					+ "FROM "
 						+ bookTagQuery + " "
 					+ "GROUP BY "
-						+ "bt." + BookKeywordTable.KEYWORD_ID;
+						+ "bt." + BookKeywordTable.KEYWORD_ID + " "
+					+ "ORDER BY "
+						+ "Frequency, "
+						+ KeywordTable.TAG + " "
+					+ "LIMIT 1";
 					
 			
 			PreparedStatement ps = connection.prepareStatement(query);
@@ -533,6 +539,108 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 			while (rs.next()) {
 				result.get("Tag").add(rs.getString(KeywordTable.TAG));
 				result.get("Frequency").add(rs.getString("Frequency"));
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/***************************
+	 * Multi Skills Movie Crew *
+	 ***************************/
+	
+	/**
+	 * Find all people who played more than one role in producing a movie.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateMultiSkillsMovieCrew() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateMultiSkillsMovieCrewHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateMultiSkillsMovieCrewHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("Family Name", new ArrayList<>());
+		result.put("Role", new ArrayList<>());
+		result.put("Movie Name", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String memberWithMoreThan2Role =
+					"(SELECT "
+						+ CrewMemberTable.PEOPLE_INVOLVED_ID + ", "
+						+ CrewMemberTable.MOVIE_NAME + ", "
+						+ "COUNT(" + CrewMemberTable.ROLE_ID + ") AS RoleNum "
+					+ "FROM "
+						+ CrewMemberTable.TABLE_NAME + " "
+					+ "GROUP BY "
+						+ CrewMemberTable.PEOPLE_INVOLVED_ID + ", "
+						+ CrewMemberTable.MOVIE_NAME + ", "
+						+ CrewMemberTable.RELEASE_YEAR + " "
+					+ "HAVING RoleNum > 1) AS mt2r"; // more than two roles
+			
+			String descriptionQuery = 
+					"(SELECT * "
+					+ "FROM "
+						+ CrewMemberTable.TABLE_NAME + " AS cm "
+						+ "INNER JOIN "
+						+ RoleTable.TABLE_NAME + " AS r ON r." + RoleTable.ID + " = cm." + CrewMemberTable.ROLE_ID + ") AS cmr";
+			String query = 
+					"SELECT "
+						+ PeopleInvolvedTable.FAMILY_NAME + ", "
+						+ RoleTable.DESCRIPTION + ", "
+						+ CrewMemberTable.MOVIE_NAME + " "
+					+ "FROM "
+						+ memberWithMoreThan2Role + " "
+						+ "NATURAL JOIN "
+						+ descriptionQuery + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " AS pi "
+								+ "ON mt2r." + CrewMemberTable.PEOPLE_INVOLVED_ID + " = pi." + PeopleInvolvedTable.ID + " "
+					+ "ORDER BY "
+						+ PeopleInvolvedTable.FAMILY_NAME;
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String movieName = rs.getString(CrewMemberTable.MOVIE_NAME);
+				String role = rs.getString(RoleTable.DESCRIPTION);
+				String familyName = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+				
+				result.get("Family Name").add(familyName);
+				result.get("Role").add(role);
+				result.get("Movie Name").add(movieName);
 			}
 			
 			connection.close();
