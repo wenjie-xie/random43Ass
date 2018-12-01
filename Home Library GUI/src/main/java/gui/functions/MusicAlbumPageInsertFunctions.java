@@ -349,15 +349,17 @@ public class MusicAlbumPageInsertFunctions extends GeneralFunctions {
 	}
 	
 	private String formatString(String str) {
-		
-		String result = str.replaceAll("'", "");
-		
-		if (str.length() == 4) {
-			result = result.replaceAll("NULL", "").replaceAll("null", "");
-		}
-		
-		if (result.equals("")) {
-			result = null;
+		String result = null;
+		if (str != null) {
+			result = str.replaceAll("'", "");
+			
+			if (str.length() == 4) {
+				result = result.replaceAll("NULL", "").replaceAll("null", "");
+			}
+			
+			if (result.equals("")) {
+				result = null;
+			}
 		}
 		return result;
 	}

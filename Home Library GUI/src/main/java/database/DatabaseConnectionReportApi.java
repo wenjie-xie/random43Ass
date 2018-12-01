@@ -19,6 +19,7 @@ import database.tables.BookKeywordTable;
 import database.tables.BookTable;
 import database.tables.CrewMemberTable;
 import database.tables.KeywordTable;
+import database.tables.MusicSingerTable;
 import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
 import database.tables.Role;
@@ -718,6 +719,7 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 						+ AwardTable.TABLE_NAME + " "
 					+ "WHERE " 
 						+ AwardTable.AWARD + " IS NOT NULL "
+						+ "and " + AwardTable.AWARD + " > 0 "
 					+ "GROUP BY "
 						+ AwardTable.MOVIE_NAME + ") AS a";
 			
@@ -753,6 +755,127 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				result.get("Movie Name").add(movieName);
 				result.get("Director Name").add(directorName);
 				result.get("# of Awards").add(numOfAward);
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	/****************************
+	 * Music With Similar Name *
+	 ****************************/
+	
+	/**
+	 * Find all the movies directed by the same person and
+	 * received at least one award.
+	 * @return
+	 */
+	public static HashMap<String, ArrayList<String>> generateMusicWithSimilarName() {
+		HashMap<String, ArrayList<String>> result = null;
+		try {
+			// Disable auto commit
+			disableAutoCommit();
+			
+			result = generateMusicWithSimilarNameHelper();
+			
+			// commit
+			sqlCommit();
+			
+			// enable auto commit
+			enableAutoCommit();
+		
+		} catch (Exception e) {
+			// roll back
+			try {
+				sqlRollBack();
+				enableAutoCommit();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, ArrayList<String>> generateMusicWithSimilarNameHelper() throws SQLException {
+		HashMap<String, ArrayList<String>> result = new HashMap<>();
+		result.put("Album Name", new ArrayList<>());
+		result.put("Music Name", new ArrayList<>());
+		result.put("Singers", new ArrayList<>());
+		result.put("Year", new ArrayList<>());
+		
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String musicCountQuery =
+					"(SELECT "
+						+ MusicSingerTable.MUSIC_NAME + ", "
+						+ "COUNT(" + MusicSingerTable.MUSIC_NAME + ") AS musicCount "
+					+ "FROM "
+						+ MusicSingerTable.TABLE_NAME + " "
+					+ "GROUP BY "
+						+ MusicSingerTable.MUSIC_NAME + ") AS tm";
+			
+			String uniqueSingersQuery = 
+					"(SELECT "
+						+ MusicSingerTable.MUSIC_NAME + ", "
+						+ MusicSingerTable.PEOPLE_INVOLVED_ID + " "
+					+ "FROM "
+						+ MusicSingerTable.TABLE_NAME + " "
+					+ "GROUP BY "
+						+ MusicSingerTable.MUSIC_NAME + ", "
+						+ MusicSingerTable.PEOPLE_INVOLVED_ID + ") AS us";
+			
+			String moreThan2CountUniqueSingerQuery = 
+					"(SELECT * "
+					+ "FROM "
+						+ musicCountQuery + " "
+						+ "NATURAL JOIN "
+						+ MusicSingerTable.TABLE_NAME + " "
+						+ "NATURAL JOIN "
+						+ uniqueSingersQuery + " "
+					+ "WHERE "
+						+ "musicCount > 1) AS mt2cus";
+			
+			String query =
+					"SELECT * "
+					+ "FROM "
+						+ moreThan2CountUniqueSingerQuery + " "
+						+ "INNER JOIN "
+						+ PeopleInvolvedTable.TABLE_NAME + " AS pi "
+								+ "ON pi." + PeopleInvolvedTable.ID + " = mt2cus." + MusicSingerTable.PEOPLE_INVOLVED_ID + " "
+					+ "ORDER BY "
+						+ MusicSingerTable.MUSIC_NAME + ", "
+						+ MusicSingerTable.YEAR;
+
+					
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				String albumName = rs.getString(MusicSingerTable.ALBUM_NAME);
+				String musicName = rs.getString(MusicSingerTable.MUSIC_NAME);
+				String singerFN = rs.getString(PeopleInvolvedTable.FIRST_NAME);
+				String singerSN = rs.getString(PeopleInvolvedTable.FAMILY_NAME);
+				String singerMN = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
+				String year = rs.getString(MusicSingerTable.YEAR);
+				
+				String singerName = singerFN;
+				if (singerMN != null)
+					singerName = singerName + " " + singerMN;
+				singerName = singerName + " " + singerSN;
+				
+				result.get("Album Name").add(albumName);
+				result.get("Music Name").add(musicName);
+				result.get("Singers").add(singerName);
+				result.get("Year").add(year);
 			}
 			
 			connection.close();
