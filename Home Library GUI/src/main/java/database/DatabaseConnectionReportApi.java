@@ -564,18 +564,28 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 						+ KeywordTable.TABLE_NAME + " AS k "
 							+ "ON bk." + BookKeywordTable.KEYWORD_ID + " = k." + KeywordTable.ID + ") AS bt";
 			
-			String query = 
+			String tagCountQuery = 
 					"SELECT "
 						+ KeywordTable.TAG + ", "
 						+ "COUNT(" + BookKeywordTable.ISBN + ") AS Frequency "
 					+ "FROM "
 						+ bookTagQuery + " "
 					+ "GROUP BY "
-						+ "bt." + BookKeywordTable.KEYWORD_ID + " "
+						+ "bt." + BookKeywordTable.KEYWORD_ID;
+			
+			String viewName = createView(tagCountQuery);
+			
+			String maxCount =
+					"(SELECT MAX(Frequency) FROM " + viewName + ")";
+			
+			String query = 
+					"SELECT * "
+					+ "FROM "
+						+ viewName + " "
+					+ "WHERE "
+						+ "Frequency = " + maxCount + " "
 					+ "ORDER BY "
-						+ "Frequency DESC, "
-						+ KeywordTable.TAG + " "
-					+ "LIMIT 1";
+						+ KeywordTable.TAG;
 					
 			
 			PreparedStatement ps = connection.prepareStatement(query);
@@ -585,6 +595,8 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 				result.get("Tag").add(rs.getString(KeywordTable.TAG));
 				result.get("Frequency").add(rs.getString("Frequency"));
 			}
+			
+			dropView(viewName);
 			
 			connection.close();
 		} catch (SQLException e) {
