@@ -573,7 +573,7 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 					+ "GROUP BY "
 						+ "bt." + BookKeywordTable.KEYWORD_ID + " "
 					+ "ORDER BY "
-						+ "Frequency, "
+						+ "Frequency DESC, "
 						+ KeywordTable.TAG + " "
 					+ "LIMIT 1";
 					

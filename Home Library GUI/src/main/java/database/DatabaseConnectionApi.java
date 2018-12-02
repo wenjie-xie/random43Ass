@@ -157,21 +157,12 @@ public class DatabaseConnectionApi {
 				// check both middle name and gender
 				String actualMiddleName = rs.getString(PeopleInvolvedTable.MIDDLE_NAME);
 				String expectedMiddleName = person.getMiddleName();
-				Integer actualGender = formatStringToInt(rs.getString(PeopleInvolvedTable.GENDER));
-				Integer expectedGender = person.getGender();
+				/*Integer actualGender = formatStringToInt(rs.getString(PeopleInvolvedTable.GENDER));
+				Integer expectedGender = person.getGender();*/
 				
-				// check gender iff it's not null
-				if (expectedGender != null) {
-					if (actualGender == expectedGender) {
-						if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
-							result = formatStringToInt(rs.getString(PeopleInvolvedTable.ID));
-						}
-					}
-					
-				} else {
-					if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
-						result = formatStringToInt(rs.getString(PeopleInvolvedTable.ID));
-					}
+				// check middle name apparently there won't be a person with the same name but different gender
+				if ((actualMiddleName == null && expectedMiddleName == null) || (actualMiddleName.equals(expectedMiddleName))) {
+					result = formatStringToInt(rs.getString(PeopleInvolvedTable.ID));
 				}
 			}
 			
