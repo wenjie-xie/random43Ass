@@ -42,7 +42,7 @@ public class DataInsertMusicPanel extends MusicAlbumPageInsertFunctions {
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Music Album object
 				MusicAlbum musicAlbum = getMusicAlbumInfo();
-				
+
 				DatabaseConnectionMusicAlbumApi.insertMusicAlbum(musicAlbum);
 				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				

@@ -50,13 +50,9 @@ public class DataInsertMoviePanel extends MoviePageInsertFunctions {
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Music Album object
 				Movie movie = getMovieInfo();
-				
-				try {
-					DatabaseConnectionMovieApi.insertMovie(movie);
-					HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
-				} catch (Exception e1) {
-					JOptionPane.showMessageDialog(HL_xiewen4.mainFrame, "Warning!");
-				}
+
+				DatabaseConnectionMovieApi.insertMovie(movie);
+				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
 				
 			}
 		});

@@ -118,7 +118,10 @@ public class DatabaseConnectionReportApi extends DatabaseConnectionApi {
 		result.put("Published year", new ArrayList<>());
 		
 		Person author = formatNameToPerson(authorName);
-		Integer authorID = tryToFindPerson(author);
+		
+		Integer authorID = null;
+		if (author != null)
+			authorID = tryToFindPerson(author);
 		
 		if (authorID != null) {
 			try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {

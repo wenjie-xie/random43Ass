@@ -32,7 +32,7 @@ import items.Person;
 public class DatabaseConnectionApi {
 	protected static final String URL = "jdbc:mysql://localhost:3306/HL?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	protected static final String sqlUsername = "root";
-	protected static final String sqlPassword = "a";
+	protected static final String sqlPassword = "";
 	
 	
 	/**
@@ -43,7 +43,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			System.out.println("SET AUTOCOMMIT = 0");
+			//System.out.println("SET AUTOCOMMIT = 0");
 			stmt.executeUpdate("SET AUTOCOMMIT = 0");
 			
 		} catch (SQLException e) {
@@ -60,7 +60,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			System.out.println("SET AUTOCOMMIT = 1");
+			//System.out.println("SET AUTOCOMMIT = 1");
 			stmt.executeUpdate("SET AUTOCOMMIT = 1");
 			
 		} catch (SQLException e) {
@@ -76,7 +76,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			System.out.println("COMMIT");
+			//System.out.println("COMMIT");
 			stmt.executeUpdate("COMMIT");
 			
 		} catch (SQLException e) {
@@ -92,7 +92,7 @@ public class DatabaseConnectionApi {
 		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
 			Statement stmt = null;
 			stmt = connection.createStatement();
-			System.out.println("ROLLBACK");
+			//System.out.println("ROLLBACK");
 			stmt.executeUpdate("ROLLBACK");
 			
 		} catch (SQLException e) {

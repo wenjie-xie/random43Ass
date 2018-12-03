@@ -48,9 +48,6 @@ public class DataInsertBookPanel extends BookPageInsertFunctions {
 			public void actionPerformed(ActionEvent e) {
 				// Add all the info into the Book object
 				Book book = getBookInfo();
-				System.out.println("*******************************");
-				System.out.println(book.toString());
-				System.out.println("*******************************");
 				
 				DatabaseConnectionBookApi.insertBook(book);
 				HL_xiewen4.mainFrame.flipPageTo(new HomePagePanel());
