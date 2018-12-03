@@ -823,6 +823,9 @@ public class DatabaseConnectionBookApi extends DatabaseConnectionApi {
 			// remove book from book table
 			removeBookFromBookTable(bookISBN);
 			
+			// clean people involved table
+			cleanPeopleInvolvedTable();
+			
 			// commit
 			sqlCommit();
 			

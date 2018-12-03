@@ -849,6 +849,9 @@ public class DatabaseConnectionMovieApi extends DatabaseConnectionApi {
 			// remove movie from Movie table
 			removeMovieFromMovieTable(movieName);
 			
+			// clean people involved table
+			cleanPeopleInvolvedTable();
+						
 			// commit
 			sqlCommit();
 			

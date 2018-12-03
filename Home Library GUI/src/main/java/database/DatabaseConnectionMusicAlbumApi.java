@@ -1081,6 +1081,9 @@ public class DatabaseConnectionMusicAlbumApi extends DatabaseConnectionApi {
 			// remove music album from music table
 			removeMusicAlbumFromMusicTable(musicAlbumName);
 			
+			// clean people involved table
+			cleanPeopleInvolvedTable();
+			
 			// commit
 			sqlCommit();
 			

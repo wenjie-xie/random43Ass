@@ -14,9 +14,14 @@ import java.util.HashMap;
 
 import com.sun.jndi.cosnaming.CNNameParser;
 
+import database.tables.AwardTable;
 import database.tables.BookAuthorTable;
 import database.tables.BookTable;
+import database.tables.CrewMemberTable;
 import database.tables.KeywordTable;
+import database.tables.MusicSingerTable;
+import database.tables.MusicTable;
+import database.tables.PeopleInvolvedMusicTable;
 import database.tables.PeopleInvolvedTable;
 import items.Book;
 import items.Movie;
@@ -479,6 +484,99 @@ public class DatabaseConnectionApi {
 			ps.executeUpdate();
 			
 			connection.close();
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	/**************************************
+	 * Remove person from people Involved *
+	 **************************************/
+	
+	/**
+	 * Check is the personID is used at all
+	 * @param personID
+	 * @return true iff it is used
+	 * @throws SQLException
+	 */
+	private static boolean isPersonIDUsed(int personID) throws SQLException {
+		boolean result = false;
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String uid = 
+					"(SELECT DISTINCT personID "
+					+ "FROM "
+						+ "(SELECT " + BookAuthorTable.AUTHOR_ID + " AS personID FROM " + BookAuthorTable.TABLE_NAME + ") AS t "
+						+ "UNION "
+						+ "(SELECT " + PeopleInvolvedMusicTable.PEOPLE_INVOLVED_ID + " AS personID FROM " + PeopleInvolvedMusicTable.TABLE_NAME + ") "
+						+ "UNION "
+						+ "(SELECT " + CrewMemberTable.PEOPLE_INVOLVED_ID + " AS personID FROM " + CrewMemberTable.TABLE_NAME + ") "
+						+ "UNION "
+						+ "(SELECT " + MusicSingerTable.PEOPLE_INVOLVED_ID + " AS personID FROM " + MusicSingerTable.TABLE_NAME + ") "
+						+ "UNION "
+						+ "(SELECT " + MusicTable.PRODUCER_ID + " AS personID FROM " + MusicTable.TABLE_NAME + ") "
+						+ "UNION "
+						+ "(SELECT " + AwardTable.PEOPLE_INVOLVED_ID + " AS personID FROM " + AwardTable.TABLE_NAME + ")) AS uid";
+			
+			String query =
+					"SELECT personID FROM " + uid + " "
+					+ "WHERE personID = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, personID);
+			ResultSet rs = ps.executeQuery();
+			result = rs.next();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+		
+		return result;
+	}
+	
+	
+	private static void removeIDFromPeopleInvolvedTable(int personId) throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String query = 
+					"DELETE FROM "
+						+ PeopleInvolvedTable.TABLE_NAME + " "
+					+ "WHERE "
+						+ PeopleInvolvedTable.ID + " = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ps.setInt(1, personId);
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+		    throw new SQLException(e);
+		}
+	}
+	
+	
+	/**
+	 * Clean the unused if from the people involved table
+	 * @throws SQLException 
+	 */
+	public static void cleanPeopleInvolvedTable() throws SQLException {
+		try (Connection connection = DriverManager.getConnection(URL, sqlUsername, sqlPassword)) {
+			
+			String query = 
+					"SELECT "
+						+ PeopleInvolvedTable.ID + " "
+					+ "FROM "
+						+ PeopleInvolvedTable.TABLE_NAME;
+			
+			PreparedStatement ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			int personID = rs.getInt(PeopleInvolvedTable.ID);
+			
+			if (!isPersonIDUsed(personID)) {
+				removeIDFromPeopleInvolvedTable(personID);
+			}
+		}
+			
 		} catch (SQLException e) {
 		    throw new SQLException(e);
 		}
